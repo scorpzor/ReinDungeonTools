@@ -15,6 +15,9 @@ local MOB_ICON_SPACING = 6
 local MOB_HIGHLIGHT_SIZE = 36
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
+-- Pull border frames (one per pull, encompasses all packs)
+local pullBorders = {}
+
 --------------------------------------------------------------------------------
 -- Pack Button Creation
 --------------------------------------------------------------------------------
@@ -126,25 +129,6 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     idLabel:SetText(tostring(data.id))
     idLabel:SetTextColor(0.7, 0.7, 0.7)
     packGroup.idLabel = idLabel
-    
-    -- Perimeter border frame (hidden by default, shown when assigned to pull)
-    local perimeterSize = containerSize + 12
-    local perimeter = CreateFrame("Frame", nil, packGroup)
-    perimeter:SetSize(perimeterSize, perimeterSize)
-    perimeter:SetPoint("CENTER")
-    perimeter:SetFrameLevel(packGroup:GetFrameLevel() - 1) -- Behind the icons
-    
-    -- Use backdrop to create a border
-    perimeter:SetBackdrop({
-        bgFile = nil,
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 12,
-        insets = { left = 2, right = 2, top = 2, bottom = 2 }
-    })
-    perimeter:SetBackdropBorderColor(1, 1, 1, 0.8)
-    perimeter:Hide()
-    packGroup.perimeter = perimeter
     
     return packGroup
 end
@@ -373,6 +357,104 @@ function UI:OnMobIconEnter(button)
 end
 
 --------------------------------------------------------------------------------
+-- Pull Border Management
+--------------------------------------------------------------------------------
+
+--- Create or update a border that encompasses all packs in a pull
+-- @param pullNum number Pull number
+-- @param packIds table Array of pack IDs in this pull
+-- @param r number Red color component
+-- @param g number Green color component
+-- @param b number Blue color component
+-- @param alpha number Alpha transparency
+local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
+    if #packIds == 0 then
+        -- No packs, hide border
+        if pullBorders[pullNum] then
+            pullBorders[pullNum]:Hide()
+        end
+        return
+    end
+    
+    -- Calculate bounding box of all packs in this pull (using map-relative coordinates)
+    local minX, minY, maxX, maxY = nil, nil, nil, nil
+    local validPacks = 0
+    
+    local mapWidth, mapHeight = UI:GetMapDimensions()
+    
+    for _, packId in ipairs(packIds) do
+        local packGroup = RDT.State.packButtons["pack" .. packId]
+        if packGroup then
+            -- Get pack size
+            local packWidth = packGroup:GetWidth() or 0
+            local packHeight = packGroup:GetHeight() or 0
+            
+            -- Get pack center position relative to map
+            local points = {packGroup:GetPoint()}
+            if points[1] and points[3] then
+                local x = points[4] or 0
+                local y = points[5] or 0
+                
+                -- Calculate bounds (center +/- half size)
+                local left = x - packWidth / 2
+                local right = x + packWidth / 2
+                local bottom = y - packHeight / 2
+                local top = y + packHeight / 2
+                
+                minX = minX and math.min(minX, left) or left
+                maxX = maxX and math.max(maxX, right) or right
+                minY = minY and math.min(minY, bottom) or bottom
+                maxY = maxY and math.max(maxY, top) or top
+                validPacks = validPacks + 1
+            end
+        end
+    end
+    
+    if validPacks == 0 or not minX then return end
+    
+    -- Add padding around the bounding box
+    local padding = 20
+    minX = minX - padding
+    maxX = maxX + padding
+    minY = minY - padding
+    maxY = maxY + padding
+    
+    local width = maxX - minX
+    local height = maxY - minY
+    local centerX = (minX + maxX) / 2
+    local centerY = (minY + maxY) / 2
+    
+    -- Create or reuse border frame
+    local border = pullBorders[pullNum]
+    if not border then
+        border = CreateFrame("Frame", "RDT_PullBorder" .. pullNum, UI.mapContainer)
+        border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
+        border:SetBackdrop({
+            bgFile = nil,
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = false,
+            edgeSize = 16,
+            insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        })
+        pullBorders[pullNum] = border
+    end
+    
+    -- Position and size the border (relative to map)
+    border:SetSize(width, height)
+    border:ClearAllPoints()
+    border:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", centerX, centerY)
+    border:SetBackdropBorderColor(r, g, b, alpha)
+    border:Show()
+end
+
+--- Clear all pull borders
+local function ClearAllPullBorders()
+    for _, border in pairs(pullBorders) do
+        border:Hide()
+    end
+end
+
+--------------------------------------------------------------------------------
 -- Pack Visual Updates
 --------------------------------------------------------------------------------
 
@@ -382,6 +464,10 @@ function UI:UpdateLabels()
     
     RDT:DebugPrint("Updating pack labels")
     
+    -- Clear all pull borders first
+    ClearAllPullBorders()
+    
+    -- Update pack labels
     for _, packGroup in pairs(RDT.State.packButtons) do
         local pullNum = RDT.State.currentRoute.pulls[packGroup.packId] or 0
         packGroup.pullNum = pullNum
@@ -393,15 +479,16 @@ function UI:UpdateLabels()
                 mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
             end
         end
-        
-        -- Update perimeter border
-        if packGroup.perimeter then
-            if pullNum > 0 then
-                packGroup.perimeter:Show()
+    end
+    
+    -- Create borders for each pull
+    if RDT.RouteManager then
+        local pulls = RDT.RouteManager:GetUsedPulls(RDT.State.currentRoute.pulls)
+        for _, pullNum in ipairs(pulls) do
+            local packIds = RDT.RouteManager:GetPacksInPull(pullNum)
+            if #packIds > 0 then
                 local r, g, b = unpack(RDT:GetPullColor(pullNum))
-                packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
-            else
-                packGroup.perimeter:Hide()
+                UpdatePullBorder(pullNum, packIds, r, g, b, 0.8)
             end
         end
     end
@@ -410,32 +497,8 @@ end
 --- Update a single pack's labels
 -- @param packId number Pack ID to update
 function UI:UpdatePackLabel(packId)
-    if not RDT.State.currentRoute then return end
-    
-    local packGroup = RDT.State.packButtons["pack" .. packId]
-    if not packGroup then return end
-    
-    local pullNum = RDT.State.currentRoute.pulls[packId] or 0
-    packGroup.pullNum = pullNum
-    
-    -- Update label on each mob icon in the pack
-    if packGroup.mobButtons then
-        for _, mobBtn in ipairs(packGroup.mobButtons) do
-            mobBtn.label:SetText(pullNum > 0 and tostring(pullNum) or "")
-            mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
-        end
-    end
-    
-    -- Update perimeter border
-    if packGroup.perimeter then
-        if pullNum > 0 then
-            packGroup.perimeter:Show()
-            local r, g, b = unpack(RDT:GetPullColor(pullNum))
-            packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
-        else
-            packGroup.perimeter:Hide()
-        end
-    end
+    -- Just call UpdateLabels to refresh everything including borders
+    self:UpdateLabels()
 end
 
 --- Highlight packs in a specific pull
@@ -460,18 +523,19 @@ function UI:HighlightPull(pullNum, enable)
                         end
                     end
                 end
-                
-                -- Enhance perimeter when highlighting
-                if packGroup.perimeter and packGroup.perimeter:IsShown() then
-                    if enable then
-                        packGroup.perimeter:SetBackdropBorderColor(1, 1, 0, 1) -- Bright yellow
-                    else
-                        -- Restore original pull color
-                        local r, g, b = unpack(RDT:GetPullColor(pullNum))
-                        packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
-                    end
-                end
             end
+        end
+    end
+    
+    -- Highlight pull border
+    local border = pullBorders[pullNum]
+    if border and border:IsShown() then
+        if enable then
+            border:SetBackdropBorderColor(1, 1, 0, 1) -- Bright yellow
+        else
+            -- Restore original pull color
+            local r, g, b = unpack(RDT:GetPullColor(pullNum))
+            border:SetBackdropBorderColor(r, g, b, 0.8)
         end
     end
 end
@@ -567,6 +631,13 @@ end
 function UI:ClearPacks()
     RDT:DebugPrint("Clearing pack groups")
     
+    -- Clear all pull borders
+    for _, border in pairs(pullBorders) do
+        border:Hide()
+        border:SetParent(nil)
+    end
+    wipe(pullBorders)
+    
     for name, packGroup in pairs(RDT.State.packButtons) do
         if packGroup then
             -- Clean up mob buttons
@@ -575,10 +646,6 @@ function UI:ClearPacks()
                     mobBtn:Hide()
                     mobBtn:SetParent(nil)
                 end
-            end
-            -- Clean up perimeter
-            if packGroup.perimeter then
-                packGroup.perimeter:Hide()
             end
             packGroup:Hide()
             packGroup:SetParent(nil)
@@ -658,4 +725,4 @@ function UI:ResetPackFilter()
     self:ShowAllPacks()
 end
 
-RDT:DebugPrint("PackButtons.lua loaded with mob portrait support")
+RDT:DebugPrint("PackButtons.lua loaded with mob portraits and dynamic pull borders")
