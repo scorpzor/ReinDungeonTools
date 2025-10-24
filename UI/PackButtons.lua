@@ -238,7 +238,7 @@ function UI:SetupMobIconHandlers(button)
     end)
 end
 
---- Handle mob icon click (selects entire pack)
+--- Handle mob icon click (adds pack to current pull)
 -- @param button Frame The clicked mob icon button
 -- @param mouseButton string "LeftButton" or "RightButton"
 function UI:OnMobIconClick(button, mouseButton)
@@ -251,46 +251,19 @@ function UI:OnMobIconClick(button, mouseButton)
             RDT.RouteManager:UnassignPack(packId)
         end
     else
-        -- Left-click: Toggle pack selection
-        self:TogglePackSelection(packId, packGroup)
-    end
-end
-
---- Toggle pack selection state (updates all mob icons in pack)
--- @param packId number Pack ID
--- @param packGroup Frame Pack group frame
-function UI:TogglePackSelection(packId, packGroup)
-    local idx = nil
-    
-    -- Find if already selected
-    for i, id in ipairs(RDT.State.selectedPacks) do
-        if id == packId then
-            idx = i
-            break
-        end
-    end
-    
-    if idx then
-        -- Deselect
-        tremove(RDT.State.selectedPacks, idx)
-        -- Hide highlights on all mob icons in pack
-        if packGroup and packGroup.mobButtons then
-            for _, mobBtn in ipairs(packGroup.mobButtons) do
-                mobBtn.highlight:Hide()
+        -- Left-click: Add pack to current pull (or toggle if already in same pull)
+        if RDT.State.currentRoute and RDT.State.currentRoute.pulls[packId] == RDT.State.currentPull then
+            -- Already in current pull, remove it
+            if RDT.RouteManager then
+                RDT.RouteManager:UnassignPack(packId)
             end
-        end
-    else
-        -- Select
-        tinsert(RDT.State.selectedPacks, packId)
-        -- Show highlights on all mob icons in pack
-        if packGroup and packGroup.mobButtons then
-            for _, mobBtn in ipairs(packGroup.mobButtons) do
-                mobBtn.highlight:Show()
+        else
+            -- Add to current pull
+            if RDT.RouteManager then
+                RDT.RouteManager:AddPackToPull(packId)
             end
         end
     end
-    
-    self:UpdateGroupButton()
 end
 
 --- Show tooltip when hovering over mob icon
@@ -560,9 +533,6 @@ function UI:ClearSelection()
     
     -- Clear selection array
     wipe(RDT.State.selectedPacks)
-    
-    -- Update group button
-    self:UpdateGroupButton()
 end
 
 --- Select all packs in a pull
@@ -586,8 +556,6 @@ function UI:SelectPull(pullNum)
             end
         end
     end
-    
-    self:UpdateGroupButton()
 end
 
 --- Select multiple packs by ID
@@ -607,8 +575,6 @@ function UI:SelectPacks(packIds)
             end
         end
     end
-    
-    self:UpdateGroupButton()
 end
 
 --- Check if a pack is selected

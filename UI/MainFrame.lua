@@ -98,7 +98,7 @@ function UI:CreateMainFrame()
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     helpText:SetPoint("BOTTOM", 0, 18)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    helpText:SetText("Left-Click: Select | Right-Click: Remove | Type /rdt help for commands")
+    helpText:SetText("Left-Click Pack: Add to Pull | Click Pull Sidebar: Switch Pull | Right-Click: Remove")
     helpText:SetTextColor(0.6, 0.6, 0.6)
 
     RDT:DebugPrint("Main frame created successfully")
@@ -254,23 +254,30 @@ function UI:CreateButtonContainer(parent)
     buttonContainer:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
     buttonContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
 
-    -- Group button (top)
-    local groupButton = CreateFrame("Button", "RDT_GroupButton", buttonContainer, "UIPanelButtonTemplate")
-    groupButton:SetPoint("TOP", buttonContainer, "TOP", 0, -14)
-    groupButton:SetSize(240, 28)
-    groupButton:SetText(L["GROUP_PULL"])
-    groupButton:SetScript("OnClick", function()
+    -- New Pull button (top)
+    local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer, "UIPanelButtonTemplate")
+    newPullButton:SetPoint("TOP", buttonContainer, "TOP", 0, -14)
+    newPullButton:SetSize(240, 28)
+    newPullButton:SetText("New Pull")
+    newPullButton:SetScript("OnClick", function()
         if RDT.RouteManager then
-            RDT.RouteManager:GroupPull()
+            RDT.RouteManager:NewPull()
         end
     end)
-    UI.groupButton = groupButton
+    
+    -- Add current pull indicator text
+    local pullIndicator = buttonContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    pullIndicator:SetPoint("TOP", newPullButton, "BOTTOM", 0, -2)
+    pullIndicator:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    pullIndicator:SetText("|cFFFFAA00Current Pull: " .. RDT.State.currentPull .. "|r")
+    UI.pullIndicator = pullIndicator
+    UI.newPullButton = newPullButton
 
     -- Clear selection button
     local clearSelButton = CreateFrame("Button", "RDT_ClearSelButton", buttonContainer, "UIPanelButtonTemplate")
-    clearSelButton:SetPoint("TOP", groupButton, "BOTTOM", 0, -5)
+    clearSelButton:SetPoint("TOP", pullIndicator, "BOTTOM", 0, -8)
     clearSelButton:SetSize(240, 26)
-    clearSelButton:SetText(L["CLEAR_SEL"])
+    clearSelButton:SetText("Undo Last")
     clearSelButton:SetScript("OnClick", function()
         if UI.ClearSelection then
             UI:ClearSelection()
@@ -322,18 +329,11 @@ function UI:CreateButtonContainer(parent)
     end)
 end
 
---- Update the group button text with selection count
--- @param count number Number of selected packs (optional, auto-detects if nil)
-function UI:UpdateGroupButton(count)
-    if not UI.groupButton then return end
+--- Update the pull indicator text with current pull number
+function UI:UpdatePullIndicator()
+    if not UI.pullIndicator then return end
     
-    count = count or #RDT.State.selectedPacks
-    
-    if count > 0 then
-        UI.groupButton:SetText(L["GROUP_PULL"] .. " (" .. count .. ")")
-    else
-        UI.groupButton:SetText(L["GROUP_PULL"])
-    end
+    UI.pullIndicator:SetText("|cFFFFAA00Current Pull: " .. RDT.State.currentPull .. "|r")
 end
 
 --------------------------------------------------------------------------------

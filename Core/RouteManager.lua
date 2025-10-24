@@ -12,7 +12,7 @@ local RM = RDT.RouteManager
 -- Pull Number Management
 --------------------------------------------------------------------------------
 
---- Get next available pull number
+--- Get next available pull number (max + 1)
 -- @param pullsTable table The pulls table from a route
 -- @return number Next available pull number (minimum 1)
 function RM:GetNextPull(pullsTable)
@@ -27,6 +27,23 @@ function RM:GetNextPull(pullsTable)
         end
     end
     return maxP + 1
+end
+
+--- Get the highest pull number in use
+-- @param pullsTable table The pulls table from a route
+-- @return number Highest pull number (0 if none)
+function RM:GetMaxPull(pullsTable)
+    if not pullsTable or type(pullsTable) ~= "table" then
+        return 0
+    end
+    
+    local maxP = 0
+    for _, p in pairs(pullsTable) do
+        if type(p) == "number" and p > maxP then
+            maxP = p
+        end
+    end
+    return maxP
 end
 
 --- Get all unique pull numbers in use
@@ -113,39 +130,45 @@ end
 -- Route Modification
 --------------------------------------------------------------------------------
 
---- Group selected packs into current pull
-function RM:GroupPull()
-    if #RDT.State.selectedPacks == 0 then 
-        RDT:Print("No packs selected")
-        return 
-    end
+--- Add a pack to the current pull
+-- @param packId number Pack ID to add
+function RM:AddPackToPull(packId)
+    if not RDT.State.currentRoute or not packId then return end
     
-    RDT:DebugPrint("Grouping " .. #RDT.State.selectedPacks .. " packs into pull " .. RDT.State.currentPull)
+    RDT:DebugPrint("Adding pack " .. packId .. " to pull " .. RDT.State.currentPull)
     
-    -- Assign all selected packs to current pull
-    for _, id in ipairs(RDT.State.selectedPacks) do
-        RDT.State.currentRoute.pulls[id] = RDT.State.currentPull
-    end
+    -- Assign pack to current pull
+    RDT.State.currentRoute.pulls[packId] = RDT.State.currentPull
     
     -- Update UI
     if RDT.UI then
-        if RDT.UI.ClearSelection then
-            RDT.UI:ClearSelection()
-        end
         if RDT.UI.UpdateLabels then
             RDT.UI:UpdateLabels()
         end
+        if RDT.UI.UpdatePullList then
+            RDT.UI:UpdatePullList()
+        end
     end
+end
+
+--- Create a new pull (always creates max pull + 1)
+function RM:NewPull()
+    -- Always calculate next pull as max + 1
+    local maxPull = self:GetMaxPull(RDT.State.currentRoute.pulls)
+    local nextPull = maxPull + 1
+    RDT.State.currentPull = nextPull
     
-    -- Advance to next pull
-    RDT.State.currentPull = self:GetNextPull(RDT.State.currentRoute.pulls)
+    RDT:Print(string.format("Started new pull #%d", nextPull))
     
-    -- Update pull list
-    if RDT.UI and RDT.UI.UpdatePullList then
-        RDT.UI:UpdatePullList()
+    -- Update UI
+    if RDT.UI then
+        if RDT.UI.UpdatePullIndicator then
+            RDT.UI:UpdatePullIndicator()
+        end
+        if RDT.UI.UpdatePullList then
+            RDT.UI:UpdatePullList()
+        end
     end
-    
-    RDT:Print(string.format("Grouped %d packs into pull", #RDT.State.selectedPacks))
 end
 
 --- Unassign a pack from its pull

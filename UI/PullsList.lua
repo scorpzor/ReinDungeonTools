@@ -191,16 +191,24 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     local startYOffset = yOffset
     
-    -- Create pull header (clickable)
+    -- Create pull header (clickable, highlight if current)
     local header = fontStringPool:Acquire()
     header:SetPoint("TOPLEFT", 5, yOffset)
     header:SetWidth(PULLS_PANEL_WIDTH - 40)
     header:SetJustifyH("LEFT")
     header:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     
-    local headerText = string.format("|cFFFFFFFF%s %d|r (%d%%)", L["PULL"], pullNum, totalCount)
+    local isCurrentPull = (pullNum == RDT.State.currentPull)
+    local prefix = isCurrentPull and "> " or ""
+    local headerText = string.format("|cFFFFFFFF%s%s %d|r (%d%%)", prefix, L["PULL"], pullNum, totalCount)
     header:SetText(headerText)
-    header:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+    
+    -- Brighten color if this is the current pull
+    local r, g, b = unpack(RDT:GetPullColor(pullNum))
+    if isCurrentPull then
+        r, g, b = math.min(1, r * 1.5), math.min(1, g * 1.5), math.min(1, b * 1.5)
+    end
+    header:SetTextColor(r, g, b)
     
     yOffset = yOffset - 18
     
@@ -241,23 +249,40 @@ function UI:RenderPullEntry(pullNum, yOffset)
         pullButton = CreateFrame("Button", "RDT_PullEntry" .. pullNum, pullsScrollChild)
         pullButtons[pullNum] = pullButton
         
-        -- Set up hover handlers
+        -- Set up hover handlers with tooltip
         pullButton:SetScript("OnEnter", function(self)
             if UI.HighlightPull then
                 UI:HighlightPull(self.pullNum, true)
             end
+            
+            -- Show tooltip
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Pull #" .. self.pullNum, 1, 1, 1)
+            GameTooltip:AddLine("Click to switch to this pull", 0.7, 0.7, 0.7)
+            if self.pullNum == RDT.State.currentPull then
+                GameTooltip:AddLine("|cFF00FF00Currently active|r", 0, 1, 0)
+            end
+            GameTooltip:Show()
         end)
         
         pullButton:SetScript("OnLeave", function(self)
             if UI.HighlightPull then
                 UI:HighlightPull(self.pullNum, false)
             end
+            GameTooltip:Hide()
         end)
         
-        -- Optional: Click to select all packs in pull
+        -- Click to switch to this pull
         pullButton:SetScript("OnClick", function(self, button)
-            if button == "LeftButton" and UI.SelectPull then
-                UI:SelectPull(self.pullNum)
+            if button == "LeftButton" then
+                RDT.State.currentPull = self.pullNum
+                if RDT.UI and RDT.UI.UpdatePullIndicator then
+                    RDT.UI:UpdatePullIndicator()
+                end
+                if RDT.UI and RDT.UI.UpdatePullList then
+                    RDT.UI:UpdatePullList()
+                end
+                RDT:Print(string.format("Switched to pull #%d", self.pullNum))
             end
         end)
         pullButton:RegisterForClicks("LeftButtonUp")

@@ -8,9 +8,11 @@ L["TITLE"] = "Rein Dungeon Tools"
 L["CURRENT_PULLS"] = "Current Pulls"
 
 -- Buttons
-L["GROUP_PULL"] = "Group Pull"
-L["CLEAR_SEL"] = "Clear Sel"
+L["NEW_PULL"] = "New Pull"
+L["UNDO_LAST"] = "Undo Last"
 L["RESET_ALL"] = "Reset All"
+L["EXPORT"] = "Export"
+L["IMPORT"] = "Import"
 
 -- Messages
 L["NO_PULLS"] = "No pulls defined"
@@ -26,9 +28,9 @@ L["ERROR_NO_PACKS"] = "Error: No pack data for dungeon"
 L["ERROR_INIT"] = "Error during initialization"
 
 -- Tooltips
-L["TOOLTIP_CLICK_SELECT"] = "Click to select/deselect"
-L["TOOLTIP_SHIFT_CLICK"] = "Shift+Click to assign to pull"
+L["TOOLTIP_CLICK_ADD"] = "Click to add to current pull"
 L["TOOLTIP_RIGHT_CLICK"] = "Right-Click to remove from pull"
+L["CURRENT_PULL"] = "Current Pull: %d"
 
 -- Slash commands
 L["SLASH_HELP"] = "Available commands:"
