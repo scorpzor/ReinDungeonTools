@@ -1,0 +1,22 @@
+## Interface: 30300
+## Title: Rein Dungeon Tools
+## Notes: Route planning tool for WotLK Heroic dungeons - Plan enemy forces pulls
+## Author: scorpzor
+## Version: 1.0.0
+## SavedVariables: ReinDungeonToolsDB
+## OptionalDeps: Ace3, LibCompress, AceSerializer-3.0
+## X-Category: Map
+## X-Website: https://github.com/scorpzor/ReinDungeonTools
+## X-Curse-Project-ID: 0
+## X-WoWI-ID: 0
+
+# Libraries (will use Ascension's built-in if available, otherwise load bundled)
+embeds.xml
+
+# Localization
+Locales\enUS.lua
+
+# Core addon files
+Core.lua
+Data.lua
+UI.lua
