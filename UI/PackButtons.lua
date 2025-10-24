@@ -127,6 +127,25 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     idLabel:SetTextColor(0.7, 0.7, 0.7)
     packGroup.idLabel = idLabel
     
+    -- Perimeter border frame (hidden by default, shown when assigned to pull)
+    local perimeterSize = containerSize + 12
+    local perimeter = CreateFrame("Frame", nil, packGroup)
+    perimeter:SetSize(perimeterSize, perimeterSize)
+    perimeter:SetPoint("CENTER")
+    perimeter:SetFrameLevel(packGroup:GetFrameLevel() - 1) -- Behind the icons
+    
+    -- Use backdrop to create a border
+    perimeter:SetBackdrop({
+        bgFile = nil,
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = { left = 2, right = 2, top = 2, bottom = 2 }
+    })
+    perimeter:SetBackdropBorderColor(1, 1, 1, 0.8)
+    perimeter:Hide()
+    packGroup.perimeter = perimeter
+    
     return packGroup
 end
 
@@ -374,6 +393,17 @@ function UI:UpdateLabels()
                 mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
             end
         end
+        
+        -- Update perimeter border
+        if packGroup.perimeter then
+            if pullNum > 0 then
+                packGroup.perimeter:Show()
+                local r, g, b = unpack(RDT:GetPullColor(pullNum))
+                packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
+            else
+                packGroup.perimeter:Hide()
+            end
+        end
     end
 end
 
@@ -395,6 +425,17 @@ function UI:UpdatePackLabel(packId)
             mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
         end
     end
+    
+    -- Update perimeter border
+    if packGroup.perimeter then
+        if pullNum > 0 then
+            packGroup.perimeter:Show()
+            local r, g, b = unpack(RDT:GetPullColor(pullNum))
+            packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
+        else
+            packGroup.perimeter:Hide()
+        end
+    end
 end
 
 --- Highlight packs in a specific pull
@@ -407,6 +448,7 @@ function UI:HighlightPull(pullNum, enable)
         if pNum == pullNum then
             local packGroup = RDT.State.packButtons["pack" .. packId]
             if packGroup and packGroup.mobButtons then
+                -- Highlight mob icons
                 for _, mobBtn in ipairs(packGroup.mobButtons) do
                     if mobBtn.highlight then
                         if enable then
@@ -416,6 +458,17 @@ function UI:HighlightPull(pullNum, enable)
                             mobBtn.highlight:Hide()
                             mobBtn.highlight:SetVertexColor(1, 1, 1, 1) -- Reset
                         end
+                    end
+                end
+                
+                -- Enhance perimeter when highlighting
+                if packGroup.perimeter and packGroup.perimeter:IsShown() then
+                    if enable then
+                        packGroup.perimeter:SetBackdropBorderColor(1, 1, 0, 1) -- Bright yellow
+                    else
+                        -- Restore original pull color
+                        local r, g, b = unpack(RDT:GetPullColor(pullNum))
+                        packGroup.perimeter:SetBackdropBorderColor(r, g, b, 0.9)
                     end
                 end
             end
@@ -522,6 +575,10 @@ function UI:ClearPacks()
                     mobBtn:Hide()
                     mobBtn:SetParent(nil)
                 end
+            end
+            -- Clean up perimeter
+            if packGroup.perimeter then
+                packGroup.perimeter:Hide()
             end
             packGroup:Hide()
             packGroup:SetParent(nil)

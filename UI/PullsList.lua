@@ -15,6 +15,7 @@ local pullsScrollChild
 local pullsTitleText
 local totalForcesLabel
 local fontStringPool
+local pullButtons = {} -- Store pull entry buttons
 
 -- Constants
 local PULLS_PANEL_WIDTH = 250
@@ -123,6 +124,11 @@ function UI:UpdatePullList()
     -- Release all FontStrings back to pool
     fontStringPool:ReleaseAll()
     
+    -- Hide all pull buttons
+    for _, btn in pairs(pullButtons) do
+        btn:Hide()
+    end
+    
     pullsScrollChild:SetHeight(1)
     local yOffset = -5
     
@@ -183,6 +189,8 @@ function UI:RenderPullEntry(pullNum, yOffset)
     -- Sort by pack ID
     table.sort(packDetails, function(a, b) return a.id < b.id end)
     
+    local startYOffset = yOffset
+    
     -- Create pull header (clickable)
     local header = fontStringPool:Acquire()
     header:SetPoint("TOPLEFT", 5, yOffset)
@@ -193,9 +201,6 @@ function UI:RenderPullEntry(pullNum, yOffset)
     local headerText = string.format("|cFFFFFFFF%s %d|r (%d%%)", L["PULL"], pullNum, totalCount)
     header:SetText(headerText)
     header:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
-    
-    -- Make header interactive (future: click to select pull)
-    -- This would require converting FontString to Button, TBD
     
     yOffset = yOffset - 18
     
@@ -227,6 +232,42 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     -- Add spacing between pulls
     yOffset = yOffset - 8
+    
+    -- Create invisible button overlay for hover/click interactions
+    local entryHeight = math.abs(startYOffset - yOffset)
+    local pullButton = pullButtons[pullNum]
+    
+    if not pullButton then
+        pullButton = CreateFrame("Button", "RDT_PullEntry" .. pullNum, pullsScrollChild)
+        pullButtons[pullNum] = pullButton
+        
+        -- Set up hover handlers
+        pullButton:SetScript("OnEnter", function(self)
+            if UI.HighlightPull then
+                UI:HighlightPull(self.pullNum, true)
+            end
+        end)
+        
+        pullButton:SetScript("OnLeave", function(self)
+            if UI.HighlightPull then
+                UI:HighlightPull(self.pullNum, false)
+            end
+        end)
+        
+        -- Optional: Click to select all packs in pull
+        pullButton:SetScript("OnClick", function(self, button)
+            if button == "LeftButton" and UI.SelectPull then
+                UI:SelectPull(self.pullNum)
+            end
+        end)
+        pullButton:RegisterForClicks("LeftButtonUp")
+    end
+    
+    -- Position and size the button
+    pullButton.pullNum = pullNum
+    pullButton:SetSize(PULLS_PANEL_WIDTH - 40, entryHeight)
+    pullButton:SetPoint("TOPLEFT", 5, startYOffset)
+    pullButton:Show()
     
     return yOffset
 end
@@ -373,6 +414,13 @@ function UI:CleanupPullsList()
     if fontStringPool then
         fontStringPool:ReleaseAll()
     end
+    
+    -- Clean up pull buttons
+    for _, btn in pairs(pullButtons) do
+        btn:Hide()
+        btn:SetParent(nil)
+    end
+    wipe(pullButtons)
     
     RDT:DebugPrint("Pulls list cleaned up")
 end
