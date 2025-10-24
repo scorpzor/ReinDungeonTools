@@ -324,7 +324,7 @@ function UI:OnMobIconEnter(button)
     end
     
     GameTooltip:AddLine(" ")
-    GameTooltip:AddLine(L["TOOLTIP_CLICK_SELECT"], 0.5, 0.5, 0.5)
+    GameTooltip:AddLine(L["TOOLTIP_CLICK_ADD"], 0.5, 0.5, 0.5)
     GameTooltip:AddLine(L["TOOLTIP_RIGHT_CLICK"], 0.5, 0.5, 0.5)
     GameTooltip:Show()
 end

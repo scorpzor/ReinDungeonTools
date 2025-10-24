@@ -89,8 +89,8 @@ function UI:InitializePullsList(panel)
 
     -- ScrollFrame for pulls list
     pullsScrollFrame = CreateFrame("ScrollFrame", "RDT_PullsScroll", pullsPanel, "UIPanelScrollFrameTemplate")
-    pullsScrollFrame:SetPoint("TOPLEFT", 8, -35)
-    pullsScrollFrame:SetPoint("BOTTOMRIGHT", -28, 8)
+    pullsScrollFrame:SetPoint("TOPLEFT", 4, -35)
+    pullsScrollFrame:SetPoint("BOTTOMRIGHT", -28, 4)
 
     pullsScrollChild = CreateFrame("Frame", "RDT_PullsScrollChild", pullsScrollFrame)
     pullsScrollChild:SetSize(PULLS_PANEL_WIDTH - 40, 1)

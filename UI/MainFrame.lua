@@ -48,34 +48,29 @@ function UI:CreateMainFrame()
     mainFrame:SetClampedToScreen(true)
     mainFrame:SetFrameStrata("HIGH")
     mainFrame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 11, right = 12, top = 12, bottom = 12 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     mainFrame:SetBackdropColor(0.05, 0.05, 0.05, 0.95)
+    mainFrame:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     mainFrame:Hide()
 
     -- Title bar background
     local titleBg = mainFrame:CreateTexture(nil, "BACKGROUND")
-    titleBg:SetPoint("TOPLEFT", 12, -12)
-    titleBg:SetPoint("TOPRIGHT", -12, -12)
+    titleBg:SetPoint("TOPLEFT", 1, -1)
+    titleBg:SetPoint("TOPRIGHT", -1, -1)
     titleBg:SetHeight(36)
     titleBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
 
-    -- Title text (combined with dungeon name)
+    -- Title text (centered)
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("TOPLEFT", 25, -22)
+    titleText:SetPoint("TOP", 0, -18)
     titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
     titleText:SetText(L["TITLE"])
-    titleText:SetJustifyH("LEFT")
-
-    -- Version text (next to title)
-    versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    versionText:SetPoint("LEFT", titleText, "RIGHT", 8, 0)
-    versionText:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    versionText:SetText("|cFF888888v" .. RDT.Version .. "|r")
-    versionText:SetTextColor(0.5, 0.5, 0.5)
+    titleText:SetJustifyH("CENTER")
 
     -- Close button
     local closeButton = CreateFrame("Button", nil, mainFrame, "UIPanelCloseButton")
@@ -88,18 +83,32 @@ function UI:CreateMainFrame()
     -- Create map container
     self:CreateMapContainer(mainFrame)
     
-    -- Create pulls panel (right side)
-    self:CreatePullsPanel(mainFrame)
-    
-    -- Create button container at bottom
+    -- Create button container (top right)
     self:CreateButtonContainer(mainFrame)
     
-    -- Help text at bottom
+    -- Create pulls panel (below button container, right side)
+    self:CreatePullsPanel(mainFrame)
+    
+    -- Bottom bar background
+    local bottomBg = mainFrame:CreateTexture(nil, "BACKGROUND")
+    bottomBg:SetPoint("BOTTOMLEFT", 1, 1)
+    bottomBg:SetPoint("BOTTOMRIGHT", -1, 1)
+    bottomBg:SetHeight(20)
+    bottomBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
+
+    -- Help text at bottom (left side)
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    helpText:SetPoint("BOTTOM", 0, 18)
+    helpText:SetPoint("BOTTOMLEFT", 8, 6)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
     helpText:SetText("Left-Click Pack: Add to Pull | Click Pull Sidebar: Switch Pull | Right-Click: Remove")
     helpText:SetTextColor(0.6, 0.6, 0.6)
+    
+    -- Version text (bottom right)
+    versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    versionText:SetPoint("BOTTOMRIGHT", -8, 6)
+    versionText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+    versionText:SetText("|cFF888888v" .. RDT.Version .. "|r")
+    versionText:SetTextColor(0.5, 0.5, 0.5)
 
     RDT:DebugPrint("Main frame created successfully")
     return mainFrame
@@ -113,8 +122,8 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
     dropdownFrame = CreateFrame("Frame", "RDT_DungeonDropdown", parent, "UIDropDownMenuTemplate")
-    dropdownFrame:SetPoint("TOPLEFT", 200, -28)
-    UIDropDownMenu_SetWidth(dropdownFrame, 260)
+    dropdownFrame:SetPoint("TOPLEFT", -10, -24)
+    UIDropDownMenu_SetWidth(dropdownFrame, 240)
     
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
     UIDropDownMenu_SetText(dropdownFrame, currentDungeon)
@@ -161,21 +170,22 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
-    mapContainer:SetPoint("TOPLEFT", 20, -58)
+    mapContainer:SetPoint("TOPLEFT", 8, -46)
     mapContainer:SetSize(MAP_WIDTH, MAP_HEIGHT)
     mapContainer:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     mapContainer:SetBackdropColor(0, 0, 0, 1)
     mapContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
     -- Map texture
     mapTexture = mapContainer:CreateTexture(nil, "BACKGROUND")
-    mapTexture:SetPoint("TOPLEFT", 4, -4)
-    mapTexture:SetPoint("BOTTOMRIGHT", -4, 4)
+    mapTexture:SetPoint("TOPLEFT", 1, -1)
+    mapTexture:SetPoint("BOTTOMRIGHT", -1, 1)
     mapTexture:SetTexture("Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
     
@@ -215,16 +225,18 @@ end
 -- @param parent Frame Parent frame
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
-    pullsPanel:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 10, -(BUTTON_PANEL_HEIGHT + 10))
-    pullsPanel:SetSize(PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT)
+    pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -8)
+    pullsPanel:SetPoint("BOTTOMLEFT", mapContainer, "BOTTOMRIGHT", 8, 0)
+    pullsPanel:SetWidth(PULLS_PANEL_WIDTH)
     pullsPanel:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 8, right = 8, top = 8, bottom = 8 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     pullsPanel:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
-    pullsPanel:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    pullsPanel:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
     -- Store reference for PullsList module
     UI.pullsPanel = pullsPanel
@@ -243,16 +255,17 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
-    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 10, 0)
+    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 8, 0)
     buttonContainer:SetSize(PULLS_PANEL_WIDTH, BUTTON_PANEL_HEIGHT)
     buttonContainer:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 16, edgeSize = 16,
-        insets = { left = 8, right = 8, top = 8, bottom = 8 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     buttonContainer:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
-    buttonContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    buttonContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
     -- New Pull button (top)
     local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer, "UIPanelButtonTemplate")
@@ -323,11 +336,8 @@ end
 function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     
-    if dungeonName then
-        titleText:SetText(L["TITLE"] .. " |cFFFFAA00-|r " .. dungeonName)
-    else
-        titleText:SetText(L["TITLE"])
-    end
+    -- Title is always just the addon name (dungeon shown in dropdown)
+    titleText:SetText(L["TITLE"])
 end
 
 --------------------------------------------------------------------------------
