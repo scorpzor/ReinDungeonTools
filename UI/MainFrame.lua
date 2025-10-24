@@ -9,9 +9,10 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 -- UI Constants
-local FRAME_WIDTH, FRAME_HEIGHT = 1000, 700
-local MAP_WIDTH, MAP_HEIGHT = 700, 600
-local PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT = 250, 600
+local FRAME_WIDTH, FRAME_HEIGHT = 1350, 850
+local MAP_WIDTH, MAP_HEIGHT = 1050, 740
+local PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT = 260, 580
+local BUTTON_PANEL_HEIGHT = 140
 
 -- Local frame references
 local mainFrame
@@ -59,20 +60,21 @@ function UI:CreateMainFrame()
     local titleBg = mainFrame:CreateTexture(nil, "BACKGROUND")
     titleBg:SetPoint("TOPLEFT", 12, -12)
     titleBg:SetPoint("TOPRIGHT", -12, -12)
-    titleBg:SetHeight(60)
+    titleBg:SetHeight(36)
     titleBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
 
-    -- Title text
+    -- Title text (combined with dungeon name)
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("TOP", 0, -18)
-    titleText:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+    titleText:SetPoint("TOPLEFT", 25, -22)
+    titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
     titleText:SetText(L["TITLE"])
+    titleText:SetJustifyH("LEFT")
 
-    -- Version text
+    -- Version text (next to title)
     versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    versionText:SetPoint("TOP", titleText, "BOTTOM", 0, -3)
-    versionText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    versionText:SetText("v" .. RDT.Version)
+    versionText:SetPoint("LEFT", titleText, "RIGHT", 8, 0)
+    versionText:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    versionText:SetText("|cFF888888v" .. RDT.Version .. "|r")
     versionText:SetTextColor(0.5, 0.5, 0.5)
 
     -- Close button
@@ -94,7 +96,7 @@ function UI:CreateMainFrame()
     
     -- Help text at bottom
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    helpText:SetPoint("BOTTOM", 0, 52)
+    helpText:SetPoint("BOTTOM", 0, 18)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
     helpText:SetText("Left-Click: Select | Right-Click: Remove | Type /rdt help for commands")
     helpText:SetTextColor(0.6, 0.6, 0.6)
@@ -111,8 +113,8 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
     dropdownFrame = CreateFrame("Frame", "RDT_DungeonDropdown", parent, "UIDropDownMenuTemplate")
-    dropdownFrame:SetPoint("TOPLEFT", 8, -50)
-    UIDropDownMenu_SetWidth(dropdownFrame, 220)
+    dropdownFrame:SetPoint("TOPLEFT", 200, -28)
+    UIDropDownMenu_SetWidth(dropdownFrame, 260)
     
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
     UIDropDownMenu_SetText(dropdownFrame, currentDungeon)
@@ -159,7 +161,7 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
-    mapContainer:SetPoint("TOPLEFT", 20, -85)
+    mapContainer:SetPoint("TOPLEFT", 20, -58)
     mapContainer:SetSize(MAP_WIDTH, MAP_HEIGHT)
     mapContainer:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -213,7 +215,7 @@ end
 -- @param parent Frame Parent frame
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
-    pullsPanel:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 10, 0)
+    pullsPanel:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 10, -(BUTTON_PANEL_HEIGHT + 10))
     pullsPanel:SetSize(PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT)
     pullsPanel:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -237,18 +239,25 @@ end
 -- Button Container
 --------------------------------------------------------------------------------
 
---- Create bottom button container
+--- Create button container (top right)
 -- @param parent Frame Parent frame
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
-    buttonContainer:SetPoint("BOTTOMLEFT", 20, 15)
-    buttonContainer:SetPoint("BOTTOMRIGHT", -20, 15)
-    buttonContainer:SetHeight(35)
+    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 10, 0)
+    buttonContainer:SetSize(PULLS_PANEL_WIDTH, BUTTON_PANEL_HEIGHT)
+    buttonContainer:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+        tile = true, tileSize = 16, edgeSize = 16,
+        insets = { left = 8, right = 8, top = 8, bottom = 8 }
+    })
+    buttonContainer:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
+    buttonContainer:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
 
-    -- Group button (center)
+    -- Group button (top)
     local groupButton = CreateFrame("Button", "RDT_GroupButton", buttonContainer, "UIPanelButtonTemplate")
-    groupButton:SetPoint("CENTER", 0, 0)
-    groupButton:SetSize(140, 30)
+    groupButton:SetPoint("TOP", buttonContainer, "TOP", 0, -14)
+    groupButton:SetSize(240, 28)
     groupButton:SetText(L["GROUP_PULL"])
     groupButton:SetScript("OnClick", function()
         if RDT.RouteManager then
@@ -257,10 +266,10 @@ function UI:CreateButtonContainer(parent)
     end)
     UI.groupButton = groupButton
 
-    -- Clear selection button (left of group)
+    -- Clear selection button
     local clearSelButton = CreateFrame("Button", "RDT_ClearSelButton", buttonContainer, "UIPanelButtonTemplate")
-    clearSelButton:SetPoint("RIGHT", groupButton, "LEFT", -5, 0)
-    clearSelButton:SetSize(120, 30)
+    clearSelButton:SetPoint("TOP", groupButton, "BOTTOM", 0, -5)
+    clearSelButton:SetSize(240, 26)
     clearSelButton:SetText(L["CLEAR_SEL"])
     clearSelButton:SetScript("OnClick", function()
         if UI.ClearSelection then
@@ -271,10 +280,10 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Reset button (right of group)
+    -- Reset button
     local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer, "UIPanelButtonTemplate")
-    resetButton:SetPoint("LEFT", groupButton, "RIGHT", 5, 0)
-    resetButton:SetSize(120, 30)
+    resetButton:SetPoint("TOP", clearSelButton, "BOTTOM", 0, -5)
+    resetButton:SetSize(240, 26)
     resetButton:SetText(L["RESET_ALL"])
     resetButton:SetScript("OnClick", function()
         if RDT.RouteManager then
@@ -282,10 +291,10 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Export button (above buttons, left)
+    -- Export button (left side of pair)
     local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer, "UIPanelButtonTemplate")
-    exportButton:SetPoint("BOTTOM", buttonContainer, "TOP", -65, 5)
-    exportButton:SetSize(120, 25)
+    exportButton:SetPoint("TOPLEFT", resetButton, "BOTTOMLEFT", 0, -5)
+    exportButton:SetSize(117, 24)
     exportButton:SetText("Export")
     exportButton:SetScript("OnClick", function()
         if not RDT.ImportExport then
@@ -299,10 +308,10 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Import button (above buttons, right)
+    -- Import button (right side of pair)
     local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer, "UIPanelButtonTemplate")
-    importButton:SetPoint("BOTTOM", buttonContainer, "TOP", 65, 5)
-    importButton:SetSize(120, 25)
+    importButton:SetPoint("TOPRIGHT", resetButton, "BOTTOMRIGHT", 0, -5)
+    importButton:SetSize(117, 24)
     importButton:SetText("Import")
     importButton:SetScript("OnClick", function()
         if RDT.Dialogs and RDT.Dialogs.ShowImport then
@@ -337,7 +346,7 @@ function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     
     if dungeonName then
-        titleText:SetText(L["TITLE"] .. "\n|cFFFFAA00" .. dungeonName .. "|r")
+        titleText:SetText(L["TITLE"] .. " |cFFFFAA00-|r " .. dungeonName)
     else
         titleText:SetText(L["TITLE"])
     end
