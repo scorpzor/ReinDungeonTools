@@ -124,6 +124,11 @@ function RDT:OnEnable()
     self:LoadDungeon(currentDungeon)
     self.State.isInitialized = true
     
+    -- Initialize minimap button
+    if self.MinimapButton then
+        self.MinimapButton:Initialize()
+    end
+    
     self:Print("ReinDungeonTools v" .. self.Version .. " loaded! Type /rdt to open")
 end
 

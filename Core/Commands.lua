@@ -89,6 +89,45 @@ local commands = {
         end
     end,
     
+    -- Minimap button management
+    ["minimap"] = function(args)
+        if not args or args == "" then
+            RDT:Print("Usage: /rdt minimap <show|hide|toggle|reset>")
+            return
+        end
+        
+        local subCmd = string.lower(strtrim(args))
+        
+        if not RDT.MinimapButton then
+            RDT:PrintError("Minimap button module not loaded")
+            return
+        end
+        
+        if subCmd == "show" then
+            RDT.MinimapButton:Show()
+            RDT:Print("Minimap button shown")
+            
+        elseif subCmd == "hide" then
+            RDT.MinimapButton:Hide()
+            RDT:Print("Minimap button hidden")
+            
+        elseif subCmd == "toggle" then
+            RDT.MinimapButton:Toggle()
+            if RDT.MinimapButton:IsShown() then
+                RDT:Print("Minimap button shown")
+            else
+                RDT:Print("Minimap button hidden")
+            end
+            
+        elseif subCmd == "reset" then
+            RDT.MinimapButton:ResetPosition()
+            
+        else
+            RDT:PrintError("Unknown minimap command: " .. subCmd)
+            RDT:Print("Available: show, hide, toggle, reset")
+        end
+    end,
+    
     -- Profile management
     ["profile"] = function(args)
         if not args or args == "" then
@@ -154,6 +193,11 @@ local commands = {
         RDT:Print(L["SLASH_VERSION"])
         RDT:Print("/rdt export - Export current route")
         RDT:Print("/rdt import [string] - Import route")
+        RDT:Print("/rdt minimap <command> - Minimap button control")
+        RDT:Print("  show - Show minimap button")
+        RDT:Print("  hide - Hide minimap button")
+        RDT:Print("  toggle - Toggle minimap button")
+        RDT:Print("  reset - Reset button position")
         RDT:Print("/rdt profile <command> - Profile management")
         RDT:Print("  list - Show all profiles")
         RDT:Print("  use <name> - Switch to profile")

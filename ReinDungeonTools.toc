@@ -26,6 +26,7 @@ Data.lua
 Core\Database.lua
 Core\Commands.lua
 Core\RouteManager.lua
+Core\MinimapButton.lua
 
 # Modules
 Modules\ImportExport.lua
