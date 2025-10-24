@@ -1,193 +1,361 @@
--- Dungeon data and validation
-local RDT = _G.RDT
-local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
+-- Data.lua
+-- Dungeon definitions and data management module
+-- NOTE: This file loads AFTER Core/Init.lua, so RDT object already exists
 
--- Data module
+local RDT = _G.RDT
+if not RDT then
+    error("RDT object not found! Data.lua must load after Core/Init.lua")
+end
+
+-- Data namespace
 RDT.Data = {}
 local Data = RDT.Data
 
 -- Dungeon definitions
--- packData uses normalized x,y (0-1) coords
--- 'count' = enemy forces percentage
-local Dungeons = {
-    ["Test Dungeon"] = {
-        texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\TestDungeon",
-        packData = {
-            {id=1, x=0.08, y=0.85, count=5},
-            {id=2, x=0.18, y=0.82, count=8},
-            {id=3, x=0.12, y=0.78, count=6},
-            {id=4, x=0.22, y=0.75, count=10},
-            {id=5, x=0.28, y=0.72, count=7},
-            {id=6, x=0.32, y=0.68, count=9},
-            {id=7, x=0.38, y=0.82, count=5},
-            {id=8, x=0.42, y=0.78, count=8},
-            {id=9, x=0.48, y=0.75, count=6},
-            {id=10, x=0.52, y=0.72, count=10},
-            {id=11, x=0.58, y=0.68, count=7},
-            {id=12, x=0.62, y=0.65, count=9},
-            {id=13, x=0.68, y=0.62, count=5},
-            {id=14, x=0.72, y=0.58, count=8},
-            {id=15, x=0.78, y=0.55, count=6},
-            {id=16, x=0.82, y=0.52, count=10},
-            {id=17, x=0.88, y=0.48, count=7},
-            {id=18, x=0.92, y=0.45, count=9},
-            {id=19, x=0.15, y=0.45, count=5},
-            {id=20, x=0.25, y=0.38, count=8},
-            -- Total: 148%
-        }
+local dungeons = {}
+
+--------------------------------------------------------------------------------
+-- Example Dungeon: Test Dungeon
+--------------------------------------------------------------------------------
+
+dungeons["Test Dungeon"] = {
+    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\TestDungeon",
+    packData = {
+        -- Format: {id, x, y, count}
+        -- x, y are coordinates from 0.0 to 1.0 (percentage of map width/height)
+        -- count is enemy forces percentage
+        {id = 1, x = 0.2, y = 0.3, count = 5},
+        {id = 2, x = 0.3, y = 0.4, count = 7},
+        {id = 3, x = 0.5, y = 0.5, count = 8},
+        {id = 4, x = 0.6, y = 0.3, count = 6},
+        {id = 5, x = 0.7, y = 0.6, count = 10},
+        {id = 6, x = 0.4, y = 0.7, count = 9},
+        {id = 7, x = 0.8, y = 0.4, count = 11},
+        {id = 8, x = 0.3, y = 0.6, count = 7},
+        {id = 9, x = 0.6, y = 0.7, count = 12},
+        {id = 10, x = 0.5, y = 0.3, count = 8},
     },
-    ["Utgarde Keep"] = {
-        texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\UtgardeKeep",
-        packData = {
-            {id=1, x=0.10, y=0.90, count=15},
-            {id=2, x=0.20, y=0.85, count=20},
-            {id=3, x=0.30, y=0.80, count=18},
-            {id=4, x=0.40, y=0.75, count=25},
-            {id=5, x=0.50, y=0.70, count=22},
-            -- Total: 100%
-        }
-    },
-    -- Add more dungeons here:
-    -- ["Dungeon Name"] = {
-    --     texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName",
-    --     packData = {
-    --         {id=1, x=0.5, y=0.5, count=10},
-    --         ...
-    --     }
-    -- },
 }
 
--- Validate a single pack's data
-local function ValidatePack(dungeonName, pack, packIndex)
-    local errors = {}
-    
-    -- Check ID
-    if not pack.id then
-        tinsert(errors, string.format("Pack #%d missing id", packIndex))
-    end
-    
-    -- Check coordinates
-    if not pack.x or type(pack.x) ~= "number" or pack.x < 0 or pack.x > 1 then
-        tinsert(errors, string.format("Pack %s has invalid x coordinate: %s", 
-            tostring(pack.id or packIndex), tostring(pack.x)))
-    end
-    
-    if not pack.y or type(pack.y) ~= "number" or pack.y < 0 or pack.y > 1 then
-        tinsert(errors, string.format("Pack %s has invalid y coordinate: %s", 
-            tostring(pack.id or packIndex), tostring(pack.y)))
-    end
-    
-    -- Check count
-    if not pack.count or type(pack.count) ~= "number" or pack.count < 0 then
-        tinsert(errors, string.format("Pack %s has invalid count: %s", 
-            tostring(pack.id or packIndex), tostring(pack.count)))
-    end
-    
-    return errors
-end
+--------------------------------------------------------------------------------
+-- Example Dungeon: Utgarde Keep (WotLK Heroic)
+--------------------------------------------------------------------------------
 
--- Validate all dungeon data
-function Data:ValidateAll()
-    local totalErrors = 0
-    local totalWarnings = 0
-    
-    RDT:DebugPrint("Validating dungeon data...")
-    
-    for dungeonName, data in pairs(Dungeons) do
-        -- Check texture
-        if not data.texture or type(data.texture) ~= "string" then
-            RDT:PrintError(string.format("Dungeon '%s' missing or invalid texture path", dungeonName))
-            totalErrors = totalErrors + 1
-        end
+dungeons["Utgarde Keep"] = {
+    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\UtgardeKeep",
+    packData = {
+        -- First room
+        {id = 1, x = 0.5, y = 0.15, count = 8},   -- Entrance pack
+        {id = 2, x = 0.45, y = 0.25, count = 10}, -- Left patrol
+        {id = 3, x = 0.55, y = 0.25, count = 10}, -- Right patrol
         
-        -- Check packData
-        if not data.packData or type(data.packData) ~= "table" then
-            RDT:PrintError(string.format("Dungeon '%s' has invalid packData", dungeonName))
-            totalErrors = totalErrors + 1
-        elseif #data.packData == 0 then
-            RDT:PrintError(string.format("Dungeon '%s' has no packs defined", dungeonName))
-            totalWarnings = totalWarnings + 1
-        else
-            -- Validate each pack
-            local packIds = {}
-            local totalCount = 0
-            
-            for i, pack in ipairs(data.packData) do
-                local packErrors = ValidatePack(dungeonName, pack, i)
-                
-                for _, err in ipairs(packErrors) do
-                    RDT:PrintError(string.format("[%s] %s", dungeonName, err))
-                    totalErrors = totalErrors + 1
-                end
-                
-                -- Check for duplicate IDs
-                if pack.id then
-                    if packIds[pack.id] then
-                        RDT:PrintError(string.format("[%s] Duplicate pack ID: %d", dungeonName, pack.id))
-                        totalErrors = totalErrors + 1
-                    else
-                        packIds[pack.id] = true
-                    end
-                end
-                
-                -- Sum total forces
-                if pack.count and type(pack.count) == "number" then
-                    totalCount = totalCount + pack.count
-                end
-            end
-            
-            -- Report total enemy forces
-            RDT:DebugPrint(string.format("[%s] Total enemy forces: %d%%", dungeonName, totalCount))
-            
-            if totalCount < 100 then
-                RDT:PrintError(string.format("[%s] Total forces (%d%%) is less than 100%%", dungeonName, totalCount))
-                totalWarnings = totalWarnings + 1
-            end
-        end
-    end
-    
-    -- Summary
-    if totalErrors > 0 then
-        RDT:PrintError(string.format("Data validation found %d error(s) and %d warning(s)", totalErrors, totalWarnings))
-    elseif totalWarnings > 0 then
-        RDT:Print(string.format("Data validation found %d warning(s)", totalWarnings))
-    else
-        RDT:DebugPrint("Data validation passed with no errors")
-    end
-    
-    return totalErrors == 0
-end
+        -- Before first boss
+        {id = 4, x = 0.5, y = 0.35, count = 12},  -- Large pack
+        {id = 5, x = 0.4, y = 0.4, count = 7},    -- Side pack left
+        {id = 6, x = 0.6, y = 0.4, count = 7},    -- Side pack right
+        
+        -- After first boss
+        {id = 7, x = 0.5, y = 0.5, count = 9},    -- Corridor pack
+        {id = 8, x = 0.45, y = 0.55, count = 11}, -- Dragon whelps left
+        {id = 9, x = 0.55, y = 0.55, count = 11}, -- Dragon whelps right
+        
+        -- Before second boss
+        {id = 10, x = 0.5, y = 0.65, count = 10}, -- Proto-drakes
+        {id = 11, x = 0.4, y = 0.7, count = 8},   -- Small pack
+        
+        -- Final area
+        {id = 12, x = 0.5, y = 0.8, count = 13},  -- Large pack before final boss
+    },
+}
 
--- Get list of all dungeon names
+--------------------------------------------------------------------------------
+-- Data Access Functions
+--------------------------------------------------------------------------------
+
+--- Get list of all dungeon names
+-- @return table Array of dungeon names
 function Data:GetDungeonNames()
     local names = {}
-    for name in pairs(Dungeons) do
+    for name in pairs(dungeons) do
         tinsert(names, name)
     end
     table.sort(names)
     return names
 end
 
--- Get dungeon data by name
-function Data:GetDungeon(name)
-    return Dungeons[name]
+--- Get dungeon data by name
+-- @param dungeonName string Name of the dungeon
+-- @return table Dungeon data or nil if not found
+function Data:GetDungeon(dungeonName)
+    return dungeons[dungeonName]
 end
 
--- Check if dungeon exists
-function Data:DungeonExists(name)
-    return Dungeons[name] ~= nil
+--- Check if dungeon exists
+-- @param dungeonName string Name of the dungeon
+-- @return boolean True if dungeon exists
+function Data:DungeonExists(dungeonName)
+    return dungeons[dungeonName] ~= nil
 end
 
--- Get total available enemy forces for a dungeon
-function Data:GetDungeonTotalForces(name)
-    local dungeon = Dungeons[name]
-    if not dungeon or not dungeon.packData then return 0 end
+--- Get total available forces for a dungeon
+-- @param dungeonName string Name of the dungeon
+-- @return number Total enemy forces percentage
+function Data:GetDungeonTotalForces(dungeonName)
+    local dungeon = dungeons[dungeonName]
+    if not dungeon or not dungeon.packData then
+        return 0
+    end
     
     local total = 0
     for _, pack in ipairs(dungeon.packData) do
-        if pack.count then
-            total = total + pack.count
-        end
+        total = total + (pack.count or 0)
     end
     return total
+end
+
+--- Get number of packs in a dungeon
+-- @param dungeonName string Name of the dungeon
+-- @return number Number of packs
+function Data:GetDungeonPackCount(dungeonName)
+    local dungeon = dungeons[dungeonName]
+    if not dungeon or not dungeon.packData then
+        return 0
+    end
+    return #dungeon.packData
+end
+
+--- Add a custom dungeon (for future user-created dungeons)
+-- @param dungeonName string Name of the dungeon
+-- @param dungeonData table Dungeon data structure
+-- @return boolean Success status
+function Data:AddDungeon(dungeonName, dungeonData)
+    if type(dungeonName) ~= "string" or dungeonName == "" then
+        if RDT.PrintError then
+            RDT:PrintError("Invalid dungeon name")
+        end
+        return false
+    end
+    
+    if type(dungeonData) ~= "table" then
+        if RDT.PrintError then
+            RDT:PrintError("Invalid dungeon data")
+        end
+        return false
+    end
+    
+    if dungeons[dungeonName] then
+        if RDT.Print then
+            RDT:Print("Warning: Overwriting existing dungeon '" .. dungeonName .. "'")
+        end
+    end
+    
+    dungeons[dungeonName] = dungeonData
+    return true
+end
+
+--------------------------------------------------------------------------------
+-- Data Validation
+--------------------------------------------------------------------------------
+
+--- Validate a pack data entry
+-- @param pack table Pack data {id, x, y, count}
+-- @return boolean isValid, string errorMessage
+local function ValidatePack(pack)
+    if type(pack) ~= "table" then
+        return false, "Pack is not a table"
+    end
+    
+    if type(pack.id) ~= "number" then
+        return false, "Pack ID must be a number"
+    end
+    
+    if type(pack.x) ~= "number" or pack.x < 0 or pack.x > 1 then
+        return false, string.format("Pack %d has invalid x coordinate: %s", pack.id, tostring(pack.x))
+    end
+    
+    if type(pack.y) ~= "number" or pack.y < 0 or pack.y > 1 then
+        return false, string.format("Pack %d has invalid y coordinate: %s", pack.id, tostring(pack.y))
+    end
+    
+    if type(pack.count) ~= "number" or pack.count < 0 then
+        return false, string.format("Pack %d has invalid count: %s", pack.id, tostring(pack.count))
+    end
+    
+    return true, nil
+end
+
+--- Validate dungeon data structure
+-- @param dungeonName string Name of the dungeon
+-- @param dungeonData table Dungeon data
+-- @return boolean isValid, string errorMessage
+function Data:ValidateDungeon(dungeonName, dungeonData)
+    if type(dungeonData) ~= "table" then
+        return false, "Dungeon data is not a table"
+    end
+    
+    if type(dungeonData.texture) ~= "string" then
+        return false, "Dungeon missing texture path"
+    end
+    
+    if type(dungeonData.packData) ~= "table" then
+        return false, "Dungeon missing packData table"
+    end
+    
+    if #dungeonData.packData == 0 then
+        return false, "Dungeon has no packs defined"
+    end
+    
+    -- Validate each pack
+    local packIds = {}
+    for i, pack in ipairs(dungeonData.packData) do
+        local isValid, err = ValidatePack(pack)
+        if not isValid then
+            return false, string.format("%s (pack index %d)", err, i)
+        end
+        
+        -- Check for duplicate IDs
+        if packIds[pack.id] then
+            return false, string.format("Duplicate pack ID: %d", pack.id)
+        end
+        packIds[pack.id] = true
+    end
+    
+    return true, nil
+end
+
+--- Validate all dungeons
+-- @return boolean Success status
+function Data:ValidateAll()
+    local hasErrors = false
+    
+    for name, data in pairs(dungeons) do
+        local isValid, err = self:ValidateDungeon(name, data)
+        if not isValid then
+            if RDT.PrintError then
+                RDT:PrintError(string.format("Dungeon '%s' validation failed: %s", name, err))
+            end
+            hasErrors = true
+        end
+    end
+    
+    if not hasErrors then
+        if RDT.DebugPrint then
+            RDT:DebugPrint(string.format("Validated %d dungeons successfully", self:GetDungeonCount()))
+        end
+    end
+    
+    return not hasErrors
+end
+
+--- Get total number of dungeons
+-- @return number Number of dungeons
+function Data:GetDungeonCount()
+    local count = 0
+    for _ in pairs(dungeons) do
+        count = count + 1
+    end
+    return count
+end
+
+--------------------------------------------------------------------------------
+-- Data Export (for addon developers)
+--------------------------------------------------------------------------------
+
+--- Export dungeon data as Lua table string (for debugging/sharing)
+-- @param dungeonName string Name of the dungeon
+-- @return string Lua code representing the dungeon
+function Data:ExportDungeonAsLua(dungeonName)
+    local dungeon = dungeons[dungeonName]
+    if not dungeon then
+        return nil
+    end
+    
+    local lines = {
+        string.format('dungeons["%s"] = {', dungeonName),
+        string.format('    texture = "%s",', dungeon.texture),
+        '    packData = {',
+    }
+    
+    for _, pack in ipairs(dungeon.packData) do
+        tinsert(lines, string.format(
+            '        {id = %d, x = %.2f, y = %.2f, count = %d},',
+            pack.id, pack.x, pack.y, pack.count
+        ))
+    end
+    
+    tinsert(lines, '    },')
+    tinsert(lines, '}')
+    
+    return table.concat(lines, "\n")
+end
+
+--------------------------------------------------------------------------------
+-- Statistics
+--------------------------------------------------------------------------------
+
+--- Get statistics about all dungeons
+-- @return table Statistics table
+function Data:GetStatistics()
+    local stats = {
+        totalDungeons = 0,
+        totalPacks = 0,
+        totalForces = 0,
+        avgPacksPerDungeon = 0,
+        avgForcesPerDungeon = 0,
+    }
+    
+    for name, data in pairs(dungeons) do
+        stats.totalDungeons = stats.totalDungeons + 1
+        local packCount = #(data.packData or {})
+        stats.totalPacks = stats.totalPacks + packCount
+        stats.totalForces = stats.totalForces + self:GetDungeonTotalForces(name)
+    end
+    
+    if stats.totalDungeons > 0 then
+        stats.avgPacksPerDungeon = stats.totalPacks / stats.totalDungeons
+        stats.avgForcesPerDungeon = stats.totalForces / stats.totalDungeons
+    end
+    
+    return stats
+end
+
+--------------------------------------------------------------------------------
+-- Debug Commands
+--------------------------------------------------------------------------------
+
+--- Print dungeon information
+-- @param dungeonName string Name of the dungeon
+function Data:PrintDungeonInfo(dungeonName)
+    local dungeon = self:GetDungeon(dungeonName)
+    if not dungeon then
+        if RDT.PrintError then
+            RDT:PrintError("Dungeon not found: " .. tostring(dungeonName))
+        end
+        return
+    end
+    
+    if RDT.Print then
+        RDT:Print(string.format("Dungeon: %s", dungeonName))
+        RDT:Print(string.format("  Packs: %d", #dungeon.packData))
+        RDT:Print(string.format("  Total Forces: %d%%", self:GetDungeonTotalForces(dungeonName)))
+        RDT:Print(string.format("  Texture: %s", dungeon.texture))
+    end
+end
+
+--- Print all dungeon names
+function Data:PrintDungeonList()
+    local names = self:GetDungeonNames()
+    if RDT.Print then
+        RDT:Print(string.format("Available Dungeons (%d):", #names))
+        for _, name in ipairs(names) do
+            local packCount = self:GetDungeonPackCount(name)
+            local totalForces = self:GetDungeonTotalForces(name)
+            RDT:Print(string.format("  - %s (%d packs, %d%% forces)", name, packCount, totalForces))
+        end
+    end
+end
+
+-- Module loaded message
+if RDT.DebugPrint then
+    RDT:DebugPrint("Data.lua loaded with " .. Data:GetDungeonCount() .. " dungeons")
 end

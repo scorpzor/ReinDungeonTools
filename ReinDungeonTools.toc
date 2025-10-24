@@ -10,13 +10,28 @@
 ## X-Curse-Project-ID: 0
 ## X-WoWI-ID: 0
 
-# Libraries (will use Ascension's built-in if available, otherwise load bundled)
+# Libraries
 embeds.xml
 
 # Localization
 Locales\enUS.lua
 
-# Core addon files
-Core.lua
+# Core Systems (order matters!)
+Core\Init.lua
+
+# Dungeon Data (after Init creates RDT object)
 Data.lua
-UI.lua
+
+# Core continued
+Core\Database.lua
+Core\Commands.lua
+Core\RouteManager.lua
+
+# Modules
+Modules\ImportExport.lua
+
+# UI Components
+UI\MainFrame.lua
+UI\PackButtons.lua
+UI\PullsList.lua
+UI\Dialogs.lua
