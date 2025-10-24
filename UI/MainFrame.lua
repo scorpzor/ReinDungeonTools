@@ -127,6 +127,7 @@ function UI:CreateDungeonDropdown(parent)
             return
         end
         
+        local activeDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
         local dungeonNames = RDT.Data:GetDungeonNames()
         
         for _, name in ipairs(dungeonNames) do
@@ -136,7 +137,7 @@ function UI:CreateDungeonDropdown(parent)
                     UIDropDownMenu_SetText(dropdownFrame, name)
                 end
             end
-            info.checked = (name == currentDungeon)
+            info.checked = (name == activeDungeon)
             UIDropDownMenu_AddButton(info)
         end
     end)
