@@ -39,60 +39,60 @@ local mobDatabase = {
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
     },
     
-    -- Utgarde Keep mobs (using 3D portraits via creatureId)
+    -- Utgarde Keep mobs (using thematic WotLK icons)
     ["uk_vrykul_warrior"] = {
         name = "Vrykul Warrior",
         count = 4,
         creatureId = 23970,
-        displayIcon = "portrait", -- Special flag to use SetPortraitTexture
+        displayIcon = "Interface\\Icons\\INV_Sword_68", -- Warrior sword
     },
     ["uk_vrykul_necromancer"] = {
         name = "Vrykul Necromancer",
         count = 4,
         creatureId = 23954,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\Spell_Shadow_AnimateDead", -- Necromancer
     },
     ["uk_dragonflayer_forge_master"] = {
         name = "Dragonflayer Forge Master",
         count = 4,
         creatureId = 24079,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\INV_Hammer_20", -- Blacksmith hammer
     },
     ["uk_dragonflayer_runecaster"] = {
         name = "Dragonflayer Runecaster",
         count = 4,
         creatureId = 23960,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- Caster
     },
     ["uk_dragonflayer_ironhelm"] = {
         name = "Dragonflayer Ironhelm",
         count = 4,
         creatureId = 23961,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\INV_Helmet_08", -- Helmet
     },
     ["uk_proto_drake"] = {
         name = "Proto-Drake",
         count = 4,
         creatureId = 24082,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\Ability_Mount_Drake_Proto", -- Drake mount
     },
     ["uk_tunneling_ghoul"] = {
         name = "Tunneling Ghoul",
         count = 1,
         creatureId = 23632,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\Spell_Shadow_RaiseDead", -- Ghoul
     },
     ["uk_dragonflayer_bonecrusher"] = {
         name = "Dragonflayer Bonecrusher",
         count = 4,
         creatureId = 24069,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\INV_Mace_12", -- Mace/crusher
     },
     ["uk_savage_worg"] = {
         name = "Savage Worg",
         count = 1,
         creatureId = 23644,
-        displayIcon = "portrait",
+        displayIcon = "Interface\\Icons\\Ability_Mount_WhiteDireWolf", -- Worg/wolf
     },
 }
 

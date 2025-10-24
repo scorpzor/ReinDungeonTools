@@ -148,14 +148,24 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     icon:SetPoint("CENTER")
     
     -- Set icon based on displayIcon type
+    local iconSet = false
+    
     if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
-        -- Use 3D portrait
-        SetPortraitTexture(icon, "creature" .. mobInfo.creatureId)
-    elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" then
+        -- Try to use 3D portrait (may not work with creature IDs in 3.3.5a)
+        -- SetPortraitTexture only works with unit tokens, not creature IDs
+        -- So we'll skip this and fall through to fallback
+        iconSet = false
+    elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" and mobInfo.displayIcon ~= "" then
         -- Use explicit texture path
         icon:SetTexture(mobInfo.displayIcon)
-    else
-        -- Fallback to question mark
+        -- Check if texture was actually set
+        if icon:GetTexture() then
+            iconSet = true
+        end
+    end
+    
+    -- Fallback to question mark if icon wasn't set
+    if not iconSet then
         icon:SetTexture(FALLBACK_ICON)
     end
     
