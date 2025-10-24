@@ -21,8 +21,7 @@ local commands = {
             frame:Hide()
         else
             frame:Show()
-            if RDT.UI then
-                RDT.UI:ClearSelection()
+            if RDT.UI and RDT.UI.UpdatePullList then
                 RDT.UI:UpdatePullList()
             end
         end

@@ -22,8 +22,7 @@ RDT.Debug = false
 
 -- Runtime state (not saved)
 RDT.State = {
-    selectedPacks = {},      -- Array of currently selected pack IDs
-    currentPull = 1,         -- Next pull number to assign
+    currentPull = 1,         -- Current pull number for adding packs
     currentRoute = nil,      -- Reference to current route table from DB
     packButtons = {},        -- Map of packID -> button frame
     isInitialized = false,   -- Whether addon has finished loading
@@ -203,9 +202,6 @@ function RDT:LoadDungeon(dungeonName)
         end
         if self.UI.UpdateTitle then
             self.UI:UpdateTitle(dungeonName)
-        end
-        if self.UI.ClearSelection then
-            self.UI:ClearSelection()
         end
         if self.UI.UpdateLabels then
             self.UI:UpdateLabels()

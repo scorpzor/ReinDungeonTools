@@ -9,7 +9,6 @@ L["CURRENT_PULLS"] = "Current Pulls"
 
 -- Buttons
 L["NEW_PULL"] = "New Pull"
-L["UNDO_LAST"] = "Undo Last"
 L["RESET_ALL"] = "Reset All"
 L["EXPORT"] = "Export"
 L["IMPORT"] = "Import"

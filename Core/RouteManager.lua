@@ -233,9 +233,6 @@ function RM:ResetPulls()
     
     -- Update UI
     if RDT.UI then
-        if RDT.UI.ClearSelection then
-            RDT.UI:ClearSelection()
-        end
         if RDT.UI.UpdateLabels then
             RDT.UI:UpdateLabels()
         end

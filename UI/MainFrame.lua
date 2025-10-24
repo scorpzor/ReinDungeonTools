@@ -273,23 +273,9 @@ function UI:CreateButtonContainer(parent)
     UI.pullIndicator = pullIndicator
     UI.newPullButton = newPullButton
 
-    -- Clear selection button
-    local clearSelButton = CreateFrame("Button", "RDT_ClearSelButton", buttonContainer, "UIPanelButtonTemplate")
-    clearSelButton:SetPoint("TOP", pullIndicator, "BOTTOM", 0, -8)
-    clearSelButton:SetSize(240, 26)
-    clearSelButton:SetText("Undo Last")
-    clearSelButton:SetScript("OnClick", function()
-        if UI.ClearSelection then
-            UI:ClearSelection()
-        end
-        if UI.UpdatePullList then
-            UI:UpdatePullList()
-        end
-    end)
-
     -- Reset button
     local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer, "UIPanelButtonTemplate")
-    resetButton:SetPoint("TOP", clearSelButton, "BOTTOM", 0, -5)
+    resetButton:SetPoint("TOP", pullIndicator, "BOTTOM", 0, -8)
     resetButton:SetSize(240, 26)
     resetButton:SetText(L["RESET_ALL"])
     resetButton:SetScript("OnClick", function()
