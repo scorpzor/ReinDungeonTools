@@ -15,28 +15,32 @@ local Data = RDT.Data
 local dungeons = {}
 
 -- Mob definitions (shared across all dungeons)
--- Each mob has: name, count (enemy forces %), creatureId (optional), displayIcon (optional)
+-- Each mob has: name, count (enemy forces %), creatureId (optional), displayIcon (optional), scale (optional)
 -- displayIcon can be: SetPortraitTexture for 3D portrait, or explicit texture path
 -- If no displayIcon, defaults to question mark icon
+-- scale: visual size multiplier (0.6-1.0), defaults to 1.0. Smaller scale = less important mob
 local mobDatabase = {
     -- Example mobs for Test Dungeon
     ["test_trash_1"] = {
         name = "Weak Trash Mob",
         count = 2,
         creatureId = 10001,
-        displayIcon = "Interface\\Icons\\INV_Misc_QuestionMark", -- Fallback example
+        displayIcon = "Interface\\Icons\\INV_Misc_QuestionMark",
+        scale = 0.7, -- Small weak mob
     },
     ["test_trash_2"] = {
         name = "Strong Trash Mob", 
         count = 3,
         creatureId = 10002,
         displayIcon = "Interface\\Icons\\Ability_Warrior_Savageblow",
+        scale = 0.9, -- Medium sized
     },
     ["test_elite"] = {
         name = "Elite Guard",
         count = 5,
         creatureId = 10003,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 1.0, -- Full size elite
     },
     
     -- Utgarde Keep mobs (using thematic WotLK icons)
@@ -45,54 +49,63 @@ local mobDatabase = {
         count = 4,
         creatureId = 23970,
         displayIcon = "Interface\\Icons\\INV_Sword_68", -- Warrior sword
+        scale = 0.9, -- Medium elite
     },
     ["uk_vrykul_necromancer"] = {
         name = "Vrykul Necromancer",
         count = 4,
         creatureId = 23954,
         displayIcon = "Interface\\Icons\\Spell_Shadow_AnimateDead", -- Necromancer
+        scale = 1.0, -- Dangerous caster - full size
     },
     ["uk_dragonflayer_forge_master"] = {
         name = "Dragonflayer Forge Master",
         count = 4,
         creatureId = 24079,
         displayIcon = "Interface\\Icons\\INV_Hammer_20", -- Blacksmith hammer
+        scale = 0.85, -- Medium threat
     },
     ["uk_dragonflayer_runecaster"] = {
         name = "Dragonflayer Runecaster",
         count = 4,
         creatureId = 23960,
         displayIcon = "Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- Caster
+        scale = 1.0, -- Dangerous caster - full size
     },
     ["uk_dragonflayer_ironhelm"] = {
         name = "Dragonflayer Ironhelm",
         count = 4,
         creatureId = 23961,
         displayIcon = "Interface\\Icons\\INV_Helmet_08", -- Helmet
+        scale = 0.85, -- Medium threat
     },
     ["uk_proto_drake"] = {
         name = "Proto-Drake",
         count = 4,
         creatureId = 24082,
         displayIcon = "Interface\\Icons\\Ability_Mount_Drake_Proto", -- Drake mount
+        scale = 1.0, -- Big dangerous drake - full size
     },
     ["uk_tunneling_ghoul"] = {
         name = "Tunneling Ghoul",
         count = 1,
         creatureId = 23632,
         displayIcon = "Interface\\Icons\\Spell_Shadow_RaiseDead", -- Ghoul
+        scale = 0.65, -- Small trash mob
     },
     ["uk_dragonflayer_bonecrusher"] = {
         name = "Dragonflayer Bonecrusher",
         count = 4,
         creatureId = 24069,
         displayIcon = "Interface\\Icons\\INV_Mace_12", -- Mace/crusher
+        scale = 0.9, -- Medium elite
     },
     ["uk_savage_worg"] = {
         name = "Savage Worg",
         count = 1,
         creatureId = 23644,
         displayIcon = "Interface\\Icons\\Ability_Mount_WhiteDireWolf", -- Worg/wolf
+        scale = 0.65, -- Small trash mob
     },
 }
 

@@ -66,7 +66,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     packGroup.mobs = data.mobs or {}
     packGroup.mobButtons = {}
     
-    -- Convert mobs table to array for consistent ordering
+    -- Convert mobs table to array for consistent ordering (sort by scale descending)
     local mobList = {}
     for mobKey, quantity in pairs(data.mobs) do
         local mobDef = RDT.Data:GetMob(mobKey)
@@ -78,37 +78,45 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
                     count = mobDef.count,
                     creatureId = mobDef.creatureId,
                     displayIcon = mobDef.displayIcon,
+                    scale = mobDef.scale or 1.0, -- Default to full size
                 })
             end
         end
     end
     
-    -- Calculate layout (arrange in a compact grid)
+    -- Sort by scale descending (largest/most important first)
+    table.sort(mobList, function(a, b) return (a.scale or 1.0) > (b.scale or 1.0) end)
+    
+    -- Calculate layout: biggest mob in center, others in clockwise circle
     local totalMobs = #mobList
-    local iconsPerRow = math.min(totalMobs, 4) -- Max 4 mobs per row
-    local numRows = math.ceil(totalMobs / iconsPerRow)
+    local radius = 28 + (totalMobs * 2.5) -- Dynamic radius based on mob count
     
-    -- Calculate total size
-    local totalWidth = iconsPerRow * (MOB_ICON_SIZE + MOB_ICON_SPACING) - MOB_ICON_SPACING
-    local totalHeight = numRows * (MOB_ICON_SIZE + MOB_ICON_SPACING) - MOB_ICON_SPACING
-    
-    packGroup:SetSize(totalWidth, totalHeight)
+    -- Set container size to encompass the circle
+    local containerSize = radius * 2 + MOB_ICON_SIZE
+    packGroup:SetSize(containerSize, containerSize)
     packGroup:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", data.x * mapWidth, data.y * mapHeight)
     
     -- Create individual mob icons
-    local iconIndex = 0
-    for _, mobInfo in ipairs(mobList) do
-        local row = math.floor(iconIndex / iconsPerRow)
-        local col = iconIndex % iconsPerRow
+    for iconIndex, mobInfo in ipairs(mobList) do
+        local xOffset, yOffset
         
-        -- Offset from center of group
-        local xOffset = (col - (iconsPerRow - 1) / 2) * (MOB_ICON_SIZE + MOB_ICON_SPACING)
-        local yOffset = ((numRows - 1) / 2 - row) * (MOB_ICON_SIZE + MOB_ICON_SPACING)
+        if iconIndex == 1 then
+            -- First mob (biggest): place in center
+            xOffset, yOffset = 0, 0
+        else
+            -- Remaining mobs: arrange in clockwise circle starting from top (12 o'clock)
+            local satelliteMobs = totalMobs - 1 -- Number of mobs in the circle
+            local angleStep = 360 / satelliteMobs
+            local satelliteIndex = iconIndex - 2 -- Index in the satellite circle (0-based)
+            local angle = 270 - (angleStep * satelliteIndex) -- Clockwise from top
+            local radians = math.rad(angle)
+            
+            xOffset = radius * math.cos(radians)
+            yOffset = radius * math.sin(radians)
+        end
         
         local mobButton = self:CreateMobIcon(packGroup, mobInfo, xOffset, yOffset)
         tinsert(packGroup.mobButtons, mobButton)
-        
-        iconIndex = iconIndex + 1
     end
     
     -- Pack ID label (below pack)
@@ -124,16 +132,22 @@ end
 
 --- Create a single mob icon button
 -- @param parent Frame Parent pack group frame
--- @param mobInfo table Mob information {key, name, count, creatureId, displayIcon}
+-- @param mobInfo table Mob information {key, name, count, creatureId, displayIcon, scale}
 -- @param xOffset number X offset from parent center
 -- @param yOffset number Y offset from parent center
 -- @return Frame The created mob button
 function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local button = CreateFrame("Button", nil, parent)
-    button:SetSize(MOB_ICON_SIZE, MOB_ICON_SIZE)
+    
+    -- Apply scale to icon size
+    local scale = mobInfo.scale or 1.0
+    local scaledSize = MOB_ICON_SIZE * scale
+    
+    button:SetSize(scaledSize, scaledSize)
     button:SetPoint("CENTER", parent, "CENTER", xOffset, yOffset)
     button.packId = parent.packId
     button.mobInfo = mobInfo
+    button.iconScale = scale
     
     -- Background/border
     local bg = button:CreateTexture(nil, "BACKGROUND")
@@ -142,9 +156,10 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     bg:SetVertexColor(0.8, 0.8, 0.8)
     button.bg = bg
     
-    -- Portrait/Icon texture
+    -- Portrait/Icon texture (scaled)
     local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(MOB_ICON_SIZE - 4, MOB_ICON_SIZE - 4)
+    local scaledIconSize = (MOB_ICON_SIZE - 4) * scale
+    icon:SetSize(scaledIconSize, scaledIconSize)
     icon:SetPoint("CENTER")
     
     -- Set icon based on displayIcon type
@@ -171,19 +186,21 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     
     button.icon = icon
     
-    -- Selection highlight
+    -- Selection highlight (scaled)
     local highlight = button:CreateTexture(nil, "OVERLAY")
     highlight:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
     highlight:SetBlendMode("ADD")
-    highlight:SetSize(MOB_HIGHLIGHT_SIZE, MOB_HIGHLIGHT_SIZE)
+    local scaledHighlightSize = MOB_HIGHLIGHT_SIZE * scale
+    highlight:SetSize(scaledHighlightSize, scaledHighlightSize)
     highlight:SetPoint("CENTER")
     highlight:Hide()
     button.highlight = highlight
     
-    -- Pull number label (overlay on icon)
+    -- Pull number label (overlay on icon, scaled font)
     local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     label:SetPoint("CENTER", 0, 0)
-    label:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    local scaledFontSize = math.max(9, 12 * scale) -- Min font size of 9
+    label:SetFont("Fonts\\FRIZQT__.TTF", scaledFontSize, "OUTLINE")
     label:SetTextColor(1, 1, 1)
     button.label = label
     
