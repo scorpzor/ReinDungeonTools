@@ -12,7 +12,6 @@ local UI = RDT.UI
 local pullsPanel
 local pullsScrollFrame
 local pullsScrollChild
-local pullsTitleText
 local totalForcesLabel
 local fontStringPool
 local pullButtons = {} -- Store pull entry buttons
@@ -81,22 +80,16 @@ end
 -- @param panel Frame The pulls panel container
 function UI:InitializePullsList(panel)
     pullsPanel = panel
-    
-    -- Pulls panel title
-    pullsTitleText = pullsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    pullsTitleText:SetPoint("TOP", 0, -10)
-    pullsTitleText:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
-    pullsTitleText:SetText(L["CURRENT_PULLS"])
 
-    -- Total forces display
+    -- Total forces display (at top)
     totalForcesLabel = pullsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    totalForcesLabel:SetPoint("TOP", pullsTitleText, "BOTTOM", 0, -5)
-    totalForcesLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    totalForcesLabel:SetPoint("TOP", 0, -12)
+    totalForcesLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
     totalForcesLabel:SetText(L["TOTAL_FORCES"] .. ": 0%")
 
     -- ScrollFrame for pulls list
     pullsScrollFrame = CreateFrame("ScrollFrame", "RDT_PullsScroll", pullsPanel, "UIPanelScrollFrameTemplate")
-    pullsScrollFrame:SetPoint("TOPLEFT", 8, -50)
+    pullsScrollFrame:SetPoint("TOPLEFT", 8, -35)
     pullsScrollFrame:SetPoint("BOTTOMRIGHT", -28, 8)
 
     pullsScrollChild = CreateFrame("Frame", "RDT_PullsScrollChild", pullsScrollFrame)
@@ -141,6 +134,20 @@ function UI:UpdatePullList()
     -- Get all pulls in use
     local pulls = RDT.RouteManager:GetUsedPulls(RDT.State.currentRoute.pulls)
     
+    -- Always include the current pull if it's not already in the list
+    local currentPullExists = false
+    for _, pullNum in ipairs(pulls) do
+        if pullNum == RDT.State.currentPull then
+            currentPullExists = true
+            break
+        end
+    end
+    
+    if not currentPullExists and RDT.State.currentPull then
+        tinsert(pulls, RDT.State.currentPull)
+        table.sort(pulls)
+    end
+    
     if #pulls == 0 then
         self:ShowEmptyMessage()
         self:UpdateTotalForces()
@@ -167,7 +174,9 @@ function UI:RenderPullEntry(pullNum, yOffset)
     -- Get packs in this pull
     local packs = RDT.RouteManager:GetPacksInPull(pullNum)
     
-    if #packs == 0 then
+    -- Show empty pulls if it's the current pull (for better UX)
+    local isCurrentPull = (pullNum == RDT.State.currentPull)
+    if #packs == 0 and not isCurrentPull then
         return yOffset
     end
     
@@ -198,9 +207,14 @@ function UI:RenderPullEntry(pullNum, yOffset)
     header:SetJustifyH("LEFT")
     header:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     
-    local isCurrentPull = (pullNum == RDT.State.currentPull)
     local prefix = isCurrentPull and "> " or ""
-    local headerText = string.format("|cFFFFFFFF%s%s %d|r (%d%%)", prefix, L["PULL"], pullNum, totalCount)
+    local headerText
+    if #packs == 0 then
+        -- Empty pull (current pull only)
+        headerText = string.format("|cFFFFFFFF%s%s %d|r (empty)", prefix, L["PULL"], pullNum)
+    else
+        headerText = string.format("|cFFFFFFFF%s%s %d|r (%d%%)", prefix, L["PULL"], pullNum, totalCount)
+    end
     header:SetText(headerText)
     
     -- Brighten color if this is the current pull
@@ -212,31 +226,43 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     yOffset = yOffset - 18
     
-    -- Create pack list (multiple lines if needed)
-    local packIds = {}
-    for _, pack in ipairs(packDetails) do
-        tinsert(packIds, string.format("#%d (%d%%)", pack.id, pack.count))
+    -- Create pack list (only if there are packs)
+    if #packs > 0 then
+        local packIds = {}
+        for _, pack in ipairs(packDetails) do
+            tinsert(packIds, string.format("#%d (%d%%)", pack.id, pack.count))
+        end
+        
+        local packListText = table.concat(packIds, ", ")
+        
+        -- Word wrap if too long
+        local maxCharsPerLine = 35
+        if #packListText > maxCharsPerLine then
+            packListText = self:WrapText(packListText, maxCharsPerLine)
+        end
+        
+        local packList = fontStringPool:Acquire()
+        packList:SetPoint("TOPLEFT", 15, yOffset)
+        packList:SetWidth(PULLS_PANEL_WIDTH - 50)
+        packList:SetJustifyH("LEFT")
+        packList:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+        packList:SetText(packListText)
+        packList:SetTextColor(0.8, 0.8, 0.8)
+        
+        -- Calculate height of text (approximate)
+        local lines = select(2, packListText:gsub("\n", "\n")) + 1
+        yOffset = yOffset - (lines * 12)
+    else
+        -- Empty pull - show "Click packs to add" message
+        local emptyMsg = fontStringPool:Acquire()
+        emptyMsg:SetPoint("TOPLEFT", 15, yOffset)
+        emptyMsg:SetWidth(PULLS_PANEL_WIDTH - 50)
+        emptyMsg:SetJustifyH("LEFT")
+        emptyMsg:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+        emptyMsg:SetText("|cFF888888Click packs to add...|r")
+        emptyMsg:SetTextColor(0.5, 0.5, 0.5)
+        yOffset = yOffset - 12
     end
-    
-    local packListText = table.concat(packIds, ", ")
-    
-    -- Word wrap if too long
-    local maxCharsPerLine = 35
-    if #packListText > maxCharsPerLine then
-        packListText = self:WrapText(packListText, maxCharsPerLine)
-    end
-    
-    local packList = fontStringPool:Acquire()
-    packList:SetPoint("TOPLEFT", 15, yOffset)
-    packList:SetWidth(PULLS_PANEL_WIDTH - 50)
-    packList:SetJustifyH("LEFT")
-    packList:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    packList:SetText(packListText)
-    packList:SetTextColor(0.8, 0.8, 0.8)
-    
-    -- Calculate height of text (approximate)
-    local lines = select(2, packListText:gsub("\n", "\n")) + 1
-    yOffset = yOffset - (lines * 12)
     
     -- Add spacing between pulls
     yOffset = yOffset - 8
@@ -302,7 +328,7 @@ function UI:ShowEmptyMessage()
     pullsScrollChild:SetHeight(1)
     
     local noPullsText = fontStringPool:Acquire()
-    noPullsText:SetPoint("TOP", 0, -50)
+    noPullsText:SetPoint("TOP", 0, -20)
     noPullsText:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
     noPullsText:SetText(L["NO_PULLS"])
     noPullsText:SetTextColor(0.5, 0.5, 0.5)

@@ -264,18 +264,11 @@ function UI:CreateButtonContainer(parent)
             RDT.RouteManager:NewPull()
         end
     end)
-    
-    -- Add current pull indicator text
-    local pullIndicator = buttonContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    pullIndicator:SetPoint("TOP", newPullButton, "BOTTOM", 0, -2)
-    pullIndicator:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
-    pullIndicator:SetText("|cFFFFAA00Current Pull: " .. RDT.State.currentPull .. "|r")
-    UI.pullIndicator = pullIndicator
     UI.newPullButton = newPullButton
 
     -- Reset button
     local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer, "UIPanelButtonTemplate")
-    resetButton:SetPoint("TOP", pullIndicator, "BOTTOM", 0, -8)
+    resetButton:SetPoint("TOP", newPullButton, "BOTTOM", 0, -5)
     resetButton:SetSize(240, 26)
     resetButton:SetText(L["RESET_ALL"])
     resetButton:SetScript("OnClick", function()
@@ -315,11 +308,10 @@ function UI:CreateButtonContainer(parent)
     end)
 end
 
---- Update the pull indicator text with current pull number
+--- Update pull display (removed - no longer needed)
 function UI:UpdatePullIndicator()
-    if not UI.pullIndicator then return end
-    
-    UI.pullIndicator:SetText("|cFFFFAA00Current Pull: " .. RDT.State.currentPull .. "|r")
+    -- Placeholder for backward compatibility
+    -- Pull number is now shown in the pulls list with ">" prefix
 end
 
 --------------------------------------------------------------------------------

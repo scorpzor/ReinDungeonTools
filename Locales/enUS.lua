@@ -5,7 +5,6 @@ if not L then return end
 
 -- Main UI
 L["TITLE"] = "Rein Dungeon Tools"
-L["CURRENT_PULLS"] = "Current Pulls"
 
 -- Buttons
 L["NEW_PULL"] = "New Pull"
