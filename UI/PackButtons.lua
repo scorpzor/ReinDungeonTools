@@ -1,5 +1,6 @@
 -- UI/PackButtons.lua
 -- Pack button creation, interaction, and visual updates
+-- Now displays individual mob portraits for each pack
 
 local RDT = _G.RDT
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
@@ -9,16 +10,17 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 -- Pack button styling constants
-local PACK_BUTTON_SIZE = 28
-local PACK_ICON_SIZE = 20
-local PACK_HIGHLIGHT_SIZE = 32
+local MOB_ICON_SIZE = 32
+local MOB_ICON_SPACING = 6
+local MOB_HIGHLIGHT_SIZE = 36
+local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 --------------------------------------------------------------------------------
 -- Pack Button Creation
 --------------------------------------------------------------------------------
 
---- Create pack buttons on the map
--- @param packData table Array of pack definitions with {id, x, y, count}
+--- Create pack buttons on the map (now creates multiple mob icons per pack)
+-- @param packData table Array of pack definitions with {id, x, y, mobs, count}
 function UI:CreatePacks(packData)
     if not packData then
         RDT:PrintError("No pack data provided to CreatePacks")
@@ -32,7 +34,7 @@ function UI:CreatePacks(packData)
     
     local mapWidth, mapHeight = UI:GetMapDimensions()
     
-    RDT:DebugPrint("Creating " .. #packData .. " pack buttons")
+    RDT:DebugPrint("Creating " .. #packData .. " packs with mob icons")
     
     for _, data in ipairs(packData) do
         -- Validate coordinates
@@ -41,83 +43,156 @@ function UI:CreatePacks(packData)
             return
         end
         
-        local button = self:CreatePackButton(data, mapWidth, mapHeight)
-        RDT.State.packButtons["pack" .. data.id] = button
+        local packGroup = self:CreatePackGroup(data, mapWidth, mapHeight)
+        RDT.State.packButtons["pack" .. data.id] = packGroup
     end
     
     -- Update labels after all buttons created
     self:UpdateLabels()
     
-    RDT:DebugPrint("Pack buttons created successfully")
+    RDT:DebugPrint("Pack mob icons created successfully")
 end
 
---- Create a single pack button
--- @param data table Pack data {id, x, y, count}
+--- Create a pack group with individual mob icons
+-- @param data table Pack data {id, x, y, mobs, count}
 -- @param mapWidth number Map width for positioning
 -- @param mapHeight number Map height for positioning
--- @return Frame The created button
-function UI:CreatePackButton(data, mapWidth, mapHeight)
-    local button = CreateFrame("Button", "RDT_Pack" .. data.id, UI.mapContainer)
-    button:SetSize(PACK_BUTTON_SIZE, PACK_BUTTON_SIZE)
-    button:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", data.x * mapWidth, data.y * mapHeight)
-    button.packId = data.id
-    button.count = data.count or 0
+-- @return Frame The created pack group frame
+function UI:CreatePackGroup(data, mapWidth, mapHeight)
+    -- Create container frame for the pack
+    local packGroup = CreateFrame("Frame", "RDT_Pack" .. data.id, UI.mapContainer)
+    packGroup.packId = data.id
+    packGroup.count = data.count or 0
+    packGroup.mobs = data.mobs or {}
+    packGroup.mobButtons = {}
+    
+    -- Convert mobs table to array for consistent ordering
+    local mobList = {}
+    for mobKey, quantity in pairs(data.mobs) do
+        local mobDef = RDT.Data:GetMob(mobKey)
+        if mobDef then
+            for i = 1, quantity do
+                tinsert(mobList, {
+                    key = mobKey,
+                    name = mobDef.name,
+                    count = mobDef.count,
+                    creatureId = mobDef.creatureId,
+                    displayIcon = mobDef.displayIcon,
+                })
+            end
+        end
+    end
+    
+    -- Calculate layout (arrange in a compact grid)
+    local totalMobs = #mobList
+    local iconsPerRow = math.min(totalMobs, 4) -- Max 4 mobs per row
+    local numRows = math.ceil(totalMobs / iconsPerRow)
+    
+    -- Calculate total size
+    local totalWidth = iconsPerRow * (MOB_ICON_SIZE + MOB_ICON_SPACING) - MOB_ICON_SPACING
+    local totalHeight = numRows * (MOB_ICON_SIZE + MOB_ICON_SPACING) - MOB_ICON_SPACING
+    
+    packGroup:SetSize(totalWidth, totalHeight)
+    packGroup:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", data.x * mapWidth, data.y * mapHeight)
+    
+    -- Create individual mob icons
+    local iconIndex = 0
+    for _, mobInfo in ipairs(mobList) do
+        local row = math.floor(iconIndex / iconsPerRow)
+        local col = iconIndex % iconsPerRow
+        
+        -- Offset from center of group
+        local xOffset = (col - (iconsPerRow - 1) / 2) * (MOB_ICON_SIZE + MOB_ICON_SPACING)
+        local yOffset = ((numRows - 1) / 2 - row) * (MOB_ICON_SIZE + MOB_ICON_SPACING)
+        
+        local mobButton = self:CreateMobIcon(packGroup, mobInfo, xOffset, yOffset)
+        tinsert(packGroup.mobButtons, mobButton)
+        
+        iconIndex = iconIndex + 1
+    end
+    
+    -- Pack ID label (below pack)
+    local idLabel = packGroup:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    idLabel:SetPoint("TOP", packGroup, "BOTTOM", 0, -2)
+    idLabel:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+    idLabel:SetText(tostring(data.id))
+    idLabel:SetTextColor(0.7, 0.7, 0.7)
+    packGroup.idLabel = idLabel
+    
+    return packGroup
+end
 
-    -- Background circle
+--- Create a single mob icon button
+-- @param parent Frame Parent pack group frame
+-- @param mobInfo table Mob information {key, name, count, creatureId, displayIcon}
+-- @param xOffset number X offset from parent center
+-- @param yOffset number Y offset from parent center
+-- @return Frame The created mob button
+function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
+    local button = CreateFrame("Button", nil, parent)
+    button:SetSize(MOB_ICON_SIZE, MOB_ICON_SIZE)
+    button:SetPoint("CENTER", parent, "CENTER", xOffset, yOffset)
+    button.packId = parent.packId
+    button.mobInfo = mobInfo
+    
+    -- Background/border
     local bg = button:CreateTexture(nil, "BACKGROUND")
-    bg:SetSize(PACK_BUTTON_SIZE, PACK_BUTTON_SIZE)
-    bg:SetPoint("CENTER")
-    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\PackCircle")
-    bg:SetVertexColor(0.2, 0.2, 0.2, 0.8)
+    bg:SetAllPoints()
+    bg:SetTexture("Interface\\Buttons\\UI-Quickslot2")
+    bg:SetVertexColor(0.8, 0.8, 0.8)
     button.bg = bg
-
-    -- Icon (skull)
+    
+    -- Portrait/Icon texture
     local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(PACK_ICON_SIZE, PACK_ICON_SIZE)
+    icon:SetSize(MOB_ICON_SIZE - 4, MOB_ICON_SIZE - 4)
     icon:SetPoint("CENTER")
-    icon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_7") -- Skull
+    
+    -- Set icon based on displayIcon type
+    if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
+        -- Use 3D portrait
+        SetPortraitTexture(icon, "creature" .. mobInfo.creatureId)
+    elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" then
+        -- Use explicit texture path
+        icon:SetTexture(mobInfo.displayIcon)
+    else
+        -- Fallback to question mark
+        icon:SetTexture(FALLBACK_ICON)
+    end
+    
     button.icon = icon
-
+    
     -- Selection highlight
     local highlight = button:CreateTexture(nil, "OVERLAY")
     highlight:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
     highlight:SetBlendMode("ADD")
-    highlight:SetSize(PACK_HIGHLIGHT_SIZE, PACK_HIGHLIGHT_SIZE)
+    highlight:SetSize(MOB_HIGHLIGHT_SIZE, MOB_HIGHLIGHT_SIZE)
     highlight:SetPoint("CENTER")
     highlight:Hide()
     button.highlight = highlight
-
-    -- Pull number label (center)
+    
+    -- Pull number label (overlay on icon)
     local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     label:SetPoint("CENTER", 0, 0)
-    label:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+    label:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
     label:SetTextColor(1, 1, 1)
     button.label = label
-
-    -- Pack ID label (below button)
-    local idLabel = button:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    idLabel:SetPoint("TOP", button, "BOTTOM", 0, 2)
-    idLabel:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
-    idLabel:SetText(tostring(data.id))
-    idLabel:SetTextColor(0.7, 0.7, 0.7)
-    button.idLabel = idLabel
-
+    
     -- Set up interaction
-    self:SetupPackButtonHandlers(button)
-
+    self:SetupMobIconHandlers(button)
+    
     return button
 end
 
 --------------------------------------------------------------------------------
--- Pack Button Interaction
+-- Mob Icon Interaction
 --------------------------------------------------------------------------------
 
---- Set up click and tooltip handlers for a pack button
--- @param button Frame The pack button
-function UI:SetupPackButtonHandlers(button)
+--- Set up click and tooltip handlers for a mob icon
+-- @param button Frame The mob icon button
+function UI:SetupMobIconHandlers(button)
     -- Click handler
     button:SetScript("OnClick", function(self, mouseButton)
-        UI:OnPackButtonClick(self, mouseButton)
+        UI:OnMobIconClick(self, mouseButton)
     end)
 
     -- Register for clicks
@@ -125,7 +200,7 @@ function UI:SetupPackButtonHandlers(button)
 
     -- Tooltip handlers
     button:SetScript("OnEnter", function(self)
-        UI:OnPackButtonEnter(self)
+        UI:OnMobIconEnter(self)
     end)
     
     button:SetScript("OnLeave", function()
@@ -133,27 +208,28 @@ function UI:SetupPackButtonHandlers(button)
     end)
 end
 
---- Handle pack button click
--- @param button Frame The clicked button
+--- Handle mob icon click (selects entire pack)
+-- @param button Frame The clicked mob icon button
 -- @param mouseButton string "LeftButton" or "RightButton"
-function UI:OnPackButtonClick(button, mouseButton)
+function UI:OnMobIconClick(button, mouseButton)
     local packId = button.packId
+    local packGroup = RDT.State.packButtons["pack" .. packId]
     
     if mouseButton == "RightButton" then
-        -- Right-click: Remove from pull
+        -- Right-click: Remove pack from pull
         if RDT.RouteManager then
             RDT.RouteManager:UnassignPack(packId)
         end
     else
-        -- Left-click: Toggle selection
-        self:TogglePackSelection(packId, button)
+        -- Left-click: Toggle pack selection
+        self:TogglePackSelection(packId, packGroup)
     end
 end
 
---- Toggle pack selection state
+--- Toggle pack selection state (updates all mob icons in pack)
 -- @param packId number Pack ID
--- @param button Frame Pack button frame
-function UI:TogglePackSelection(packId, button)
+-- @param packGroup Frame Pack group frame
+function UI:TogglePackSelection(packId, packGroup)
     local idx = nil
     
     -- Find if already selected
@@ -167,22 +243,73 @@ function UI:TogglePackSelection(packId, button)
     if idx then
         -- Deselect
         tremove(RDT.State.selectedPacks, idx)
-        button.highlight:Hide()
+        -- Hide highlights on all mob icons in pack
+        if packGroup and packGroup.mobButtons then
+            for _, mobBtn in ipairs(packGroup.mobButtons) do
+                mobBtn.highlight:Hide()
+            end
+        end
     else
         -- Select
         tinsert(RDT.State.selectedPacks, packId)
-        button.highlight:Show()
+        -- Show highlights on all mob icons in pack
+        if packGroup and packGroup.mobButtons then
+            for _, mobBtn in ipairs(packGroup.mobButtons) do
+                mobBtn.highlight:Show()
+            end
+        end
     end
     
     self:UpdateGroupButton()
 end
 
---- Show tooltip when hovering over pack button
--- @param button Frame The pack button
-function UI:OnPackButtonEnter(button)
+--- Show tooltip when hovering over mob icon
+-- @param button Frame The mob icon button
+function UI:OnMobIconEnter(button)
+    local packGroup = RDT.State.packButtons["pack" .. button.packId]
+    
     GameTooltip:SetOwner(button, "ANCHOR_CURSOR")
-    GameTooltip:SetText(L["PACK"] .. " " .. button.packId, 1, 1, 1, 1, true)
-    GameTooltip:AddLine(L["ENEMY_FORCES"] .. ": " .. button.count .. "%", 1, 1, 1)
+    
+    -- Mob name as title
+    if button.mobInfo then
+        GameTooltip:SetText(button.mobInfo.name, 1, 1, 0.5, 1, true)
+        GameTooltip:AddLine("Enemy Forces: " .. button.mobInfo.count .. "%", 1, 1, 1)
+    end
+    
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddLine(L["PACK"] .. " " .. button.packId, 0.7, 0.7, 0.7)
+    
+    -- Show pack total
+    if packGroup then
+        GameTooltip:AddLine("Pack Total: " .. packGroup.count .. "%", 1, 1, 1)
+        
+        -- Show pack composition
+        if packGroup.mobs and next(packGroup.mobs) then
+            GameTooltip:AddLine(" ")
+            GameTooltip:AddLine("Pack Composition:", 1, 0.82, 0)
+            
+            -- Sort mobs by quantity
+            local mobList = {}
+            for mobKey, quantity in pairs(packGroup.mobs) do
+                tinsert(mobList, {key = mobKey, quantity = quantity})
+            end
+            table.sort(mobList, function(a, b) return a.quantity > b.quantity end)
+            
+            -- Display each mob type
+            for _, mobData in ipairs(mobList) do
+                local mobDef = RDT.Data:GetMob(mobData.key)
+                if mobDef then
+                    local mobTotalCount = mobData.quantity * mobDef.count
+                    GameTooltip:AddDoubleLine(
+                        string.format("%dx %s", mobData.quantity, mobDef.name),
+                        string.format("%d%%", mobTotalCount),
+                        0.8, 0.8, 0.8,
+                        0.8, 0.8, 0.8
+                    )
+                end
+            end
+        end
+    end
     
     -- Show current pull assignment if any
     if RDT.State.currentRoute then
@@ -200,35 +327,47 @@ function UI:OnPackButtonEnter(button)
 end
 
 --------------------------------------------------------------------------------
--- Pack Button Visual Updates
+-- Pack Visual Updates
 --------------------------------------------------------------------------------
 
---- Update all pack labels with pull numbers and colors
+--- Update all pack labels with pull numbers and colors (for all mob icons)
 function UI:UpdateLabels()
     if not RDT.State.currentRoute then return end
     
     RDT:DebugPrint("Updating pack labels")
     
-    for _, button in pairs(RDT.State.packButtons) do
-        local pullNum = RDT.State.currentRoute.pulls[button.packId] or 0
-        button.pullNum = pullNum
-        button.label:SetText(pullNum > 0 and tostring(pullNum) or "")
-        button.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+    for _, packGroup in pairs(RDT.State.packButtons) do
+        local pullNum = RDT.State.currentRoute.pulls[packGroup.packId] or 0
+        packGroup.pullNum = pullNum
+        
+        -- Update label on each mob icon in the pack
+        if packGroup.mobButtons then
+            for _, mobBtn in ipairs(packGroup.mobButtons) do
+                mobBtn.label:SetText(pullNum > 0 and tostring(pullNum) or "")
+                mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+            end
+        end
     end
 end
 
---- Update a single pack button's label
+--- Update a single pack's labels
 -- @param packId number Pack ID to update
 function UI:UpdatePackLabel(packId)
     if not RDT.State.currentRoute then return end
     
-    local button = RDT.State.packButtons["pack" .. packId]
-    if not button then return end
+    local packGroup = RDT.State.packButtons["pack" .. packId]
+    if not packGroup then return end
     
     local pullNum = RDT.State.currentRoute.pulls[packId] or 0
-    button.pullNum = pullNum
-    button.label:SetText(pullNum > 0 and tostring(pullNum) or "")
-    button.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+    packGroup.pullNum = pullNum
+    
+    -- Update label on each mob icon in the pack
+    if packGroup.mobButtons then
+        for _, mobBtn in ipairs(packGroup.mobButtons) do
+            mobBtn.label:SetText(pullNum > 0 and tostring(pullNum) or "")
+            mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+        end
+    end
 end
 
 --- Highlight packs in a specific pull
@@ -239,14 +378,18 @@ function UI:HighlightPull(pullNum, enable)
     
     for packId, pNum in pairs(RDT.State.currentRoute.pulls) do
         if pNum == pullNum then
-            local button = RDT.State.packButtons["pack" .. packId]
-            if button and button.highlight then
-                if enable then
-                    button.highlight:Show()
-                    button.highlight:SetVertexColor(1, 1, 0, 0.5) -- Yellow tint
-                else
-                    button.highlight:Hide()
-                    button.highlight:SetVertexColor(1, 1, 1, 1) -- Reset
+            local packGroup = RDT.State.packButtons["pack" .. packId]
+            if packGroup and packGroup.mobButtons then
+                for _, mobBtn in ipairs(packGroup.mobButtons) do
+                    if mobBtn.highlight then
+                        if enable then
+                            mobBtn.highlight:Show()
+                            mobBtn.highlight:SetVertexColor(1, 1, 0, 0.5) -- Yellow tint
+                        else
+                            mobBtn.highlight:Hide()
+                            mobBtn.highlight:SetVertexColor(1, 1, 1, 1) -- Reset
+                        end
+                    end
                 end
             end
         end
@@ -261,11 +404,13 @@ end
 function UI:ClearSelection()
     RDT:DebugPrint("Clearing pack selection")
     
-    -- Hide highlights
+    -- Hide highlights on all mob icons
     for _, id in ipairs(RDT.State.selectedPacks) do
-        local button = RDT.State.packButtons["pack" .. id]
-        if button then 
-            button.highlight:Hide()
+        local packGroup = RDT.State.packButtons["pack" .. id]
+        if packGroup and packGroup.mobButtons then
+            for _, mobBtn in ipairs(packGroup.mobButtons) do
+                mobBtn.highlight:Hide()
+            end
         end
     end
     
@@ -285,10 +430,15 @@ function UI:SelectPull(pullNum)
     
     for packId, pNum in pairs(RDT.State.currentRoute.pulls) do
         if pNum == pullNum then
-            local button = RDT.State.packButtons["pack" .. packId]
-            if button then
+            local packGroup = RDT.State.packButtons["pack" .. packId]
+            if packGroup then
                 tinsert(RDT.State.selectedPacks, packId)
-                button.highlight:Show()
+                -- Show highlights on all mob icons in pack
+                if packGroup.mobButtons then
+                    for _, mobBtn in ipairs(packGroup.mobButtons) do
+                        mobBtn.highlight:Show()
+                    end
+                end
             end
         end
     end
@@ -302,10 +452,15 @@ function UI:SelectPacks(packIds)
     self:ClearSelection()
     
     for _, packId in ipairs(packIds) do
-        local button = RDT.State.packButtons["pack" .. packId]
-        if button then
+        local packGroup = RDT.State.packButtons["pack" .. packId]
+        if packGroup then
             tinsert(RDT.State.selectedPacks, packId)
-            button.highlight:Show()
+            -- Show highlights on all mob icons in pack
+            if packGroup.mobButtons then
+                for _, mobBtn in ipairs(packGroup.mobButtons) do
+                    mobBtn.highlight:Show()
+                end
+            end
         end
     end
     
@@ -325,84 +480,91 @@ function UI:IsPackSelected(packId)
 end
 
 --------------------------------------------------------------------------------
--- Pack Button Cleanup
+-- Pack Cleanup
 --------------------------------------------------------------------------------
 
---- Clear all pack buttons from the map
+--- Clear all pack groups from the map
 function UI:ClearPacks()
-    RDT:DebugPrint("Clearing pack buttons")
+    RDT:DebugPrint("Clearing pack groups")
     
-    for name, button in pairs(RDT.State.packButtons) do
-        if button then
-            button:Hide()
-            button:SetParent(nil)
+    for name, packGroup in pairs(RDT.State.packButtons) do
+        if packGroup then
+            -- Clean up mob buttons
+            if packGroup.mobButtons then
+                for _, mobBtn in ipairs(packGroup.mobButtons) do
+                    mobBtn:Hide()
+                    mobBtn:SetParent(nil)
+                end
+            end
+            packGroup:Hide()
+            packGroup:SetParent(nil)
         end
     end
     
     wipe(RDT.State.packButtons)
 end
 
---- Hide all pack buttons (without destroying)
+--- Hide all pack groups (without destroying)
 function UI:HideAllPacks()
-    for _, button in pairs(RDT.State.packButtons) do
-        if button then
-            button:Hide()
+    for _, packGroup in pairs(RDT.State.packButtons) do
+        if packGroup then
+            packGroup:Hide()
         end
     end
 end
 
---- Show all pack buttons
+--- Show all pack groups
 function UI:ShowAllPacks()
-    for _, button in pairs(RDT.State.packButtons) do
-        if button then
-            button:Show()
+    for _, packGroup in pairs(RDT.State.packButtons) do
+        if packGroup then
+            packGroup:Show()
         end
     end
 end
 
---- Get pack button by ID
+--- Get pack group by ID
 -- @param packId number Pack ID
--- @return Frame Pack button or nil
+-- @return Frame Pack group or nil
 function UI:GetPackButton(packId)
     return RDT.State.packButtons["pack" .. packId]
 end
 
---- Get all pack buttons
--- @return table Map of packId -> button
+--- Get all pack groups
+-- @return table Map of packId -> packGroup
 function UI:GetAllPackButtons()
     return RDT.State.packButtons
 end
 
 --------------------------------------------------------------------------------
--- Pack Button Filters (Future Feature)
+-- Pack Filters (Future Feature)
 --------------------------------------------------------------------------------
 
---- Filter pack buttons by criteria (placeholder for future)
--- @param filterFunc function Filter function(button) returns boolean
+--- Filter pack groups by criteria (placeholder for future)
+-- @param filterFunc function Filter function(packGroup) returns boolean
 function UI:FilterPacks(filterFunc)
-    for _, button in pairs(RDT.State.packButtons) do
-        if filterFunc(button) then
-            button:Show()
+    for _, packGroup in pairs(RDT.State.packButtons) do
+        if filterFunc(packGroup) then
+            packGroup:Show()
         else
-            button:Hide()
+            packGroup:Hide()
         end
     end
 end
 
 --- Show only unassigned packs
 function UI:ShowUnassignedPacks()
-    self:FilterPacks(function(button)
+    self:FilterPacks(function(packGroup)
         if not RDT.State.currentRoute then return true end
-        local pullNum = RDT.State.currentRoute.pulls[button.packId]
+        local pullNum = RDT.State.currentRoute.pulls[packGroup.packId]
         return not pullNum or pullNum == 0
     end)
 end
 
 --- Show only assigned packs
 function UI:ShowAssignedPacks()
-    self:FilterPacks(function(button)
+    self:FilterPacks(function(packGroup)
         if not RDT.State.currentRoute then return false end
-        local pullNum = RDT.State.currentRoute.pulls[button.packId]
+        local pullNum = RDT.State.currentRoute.pulls[packGroup.packId]
         return pullNum and pullNum > 0
     end)
 end
@@ -412,4 +574,4 @@ function UI:ResetPackFilter()
     self:ShowAllPacks()
 end
 
-RDT:DebugPrint("PackButtons.lua loaded")
+RDT:DebugPrint("PackButtons.lua loaded with mob portrait support")

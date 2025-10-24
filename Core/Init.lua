@@ -1,5 +1,6 @@
 -- Core/Init.lua
 -- Addon initialization with Ace3 framework
+-- Updated to support new mob dictionary system
 
 local ADDON_NAME = "ReinDungeonTools"
 local RDT = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
@@ -174,8 +175,13 @@ function RDT:LoadDungeon(dungeonName)
     -- Calculate next pull number
     self.State.currentPull = self.RouteManager:GetNextPull(self.State.currentRoute.pulls)
     
-    -- Get dungeon data
-    local dungeonData = self.Data:GetDungeon(dungeonName)
+    -- CHANGED: Use GetProcessedDungeon to get pack data with calculated counts
+    local dungeonData = self.Data:GetProcessedDungeon(dungeonName)
+    
+    if not dungeonData then
+        self:PrintError("Failed to process dungeon data")
+        return false
+    end
     
     if not dungeonData.packData or #dungeonData.packData == 0 then
         self:PrintError(L["ERROR_NO_PACKS"])
