@@ -340,12 +340,6 @@ end
 --------------------------------------------------------------------------------
 
 --- Create or update a border that encompasses all packs in a pull
--- @param pullNum number Pull number
--- @param packIds table Array of pack IDs in this pull
--- @param r number Red color component
--- @param g number Green color component
--- @param b number Blue color component
--- @param alpha number Alpha transparency
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if #packIds == 0 then
         -- No packs, hide border
@@ -412,8 +406,8 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
             bgFile = nil,
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
             tile = false,
-            edgeSize = 12,  -- Reduced from 16 for thinner border
-            insets = { left = 3, right = 3, top = 3, bottom = 3 }  -- Adjusted insets
+            edgeSize = 12,
+            insets = { left = 3, right = 3, top = 3, bottom = 3 }
         })
         pullBorders[pullNum] = border
     end
