@@ -89,11 +89,13 @@ function UI:InitializePullsList(panel)
 
     -- ScrollFrame for pulls list
     pullsScrollFrame = CreateFrame("ScrollFrame", "RDT_PullsScroll", pullsPanel, "UIPanelScrollFrameTemplate")
-    pullsScrollFrame:SetPoint("TOPLEFT", 4, -35)
-    pullsScrollFrame:SetPoint("BOTTOMRIGHT", -28, 4)
+    pullsScrollFrame:SetPoint("TOPLEFT", 2, -35)
+    pullsScrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
 
     pullsScrollChild = CreateFrame("Frame", "RDT_PullsScrollChild", pullsScrollFrame)
-    pullsScrollChild:SetSize(PULLS_PANEL_WIDTH - 40, 1)
+    -- Use width of scroll frame viewport
+    local scrollWidth = pullsScrollFrame:GetWidth() or (PULLS_PANEL_WIDTH - 28)
+    pullsScrollChild:SetSize(scrollWidth, 1)
     pullsScrollFrame:SetScrollChild(pullsScrollChild)
 
     -- Initialize FontString pool
@@ -259,10 +261,12 @@ function UI:RenderPullEntry(pullNum, yOffset)
         pullButton:RegisterForClicks("LeftButtonUp")
     end
     
-    -- Position and size the button (full width)
+    -- Position and size the button (full width - anchor to both sides)
     pullButton.pullNum = pullNum
-    pullButton:SetSize(PULLS_PANEL_WIDTH - 36, entryHeight)
-    pullButton:SetPoint("TOPLEFT", 0, startYOffset)
+    pullButton:SetHeight(entryHeight)
+    pullButton:ClearAllPoints()
+    pullButton:SetPoint("TOPLEFT", pullsScrollChild, "TOPLEFT", 0, startYOffset)
+    pullButton:SetPoint("TOPRIGHT", pullsScrollChild, "TOPRIGHT", 0, startYOffset)
     
     -- Update background color (faded pull color)
     if pullButton.bgTexture then
@@ -300,7 +304,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
     local packList = fontStringPool:Acquire()
     packList:SetParent(pullButton)
     packList:SetPoint("CENTER", pullButton, "CENTER", 0, 0)
-    packList:SetWidth(PULLS_PANEL_WIDTH - 120)
+    packList:SetWidth(120)  -- Fixed width for center section
     packList:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     packList:SetJustifyH("CENTER")
     packList:SetText(centerText)
