@@ -200,9 +200,12 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     local startYOffset = yOffset
     
+    -- Get pull color
+    local r, g, b = unpack(RDT:GetPullColor(pullNum))
+    
     -- Create pull header (clickable, highlight if current)
     local header = fontStringPool:Acquire()
-    header:SetPoint("TOPLEFT", 5, yOffset)
+    header:SetPoint("TOPLEFT", 8, yOffset)
     header:SetWidth(PULLS_PANEL_WIDTH - 40)
     header:SetJustifyH("LEFT")
     header:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
@@ -218,7 +221,6 @@ function UI:RenderPullEntry(pullNum, yOffset)
     header:SetText(headerText)
     
     -- Brighten color if this is the current pull
-    local r, g, b = unpack(RDT:GetPullColor(pullNum))
     if isCurrentPull then
         r, g, b = math.min(1, r * 1.5), math.min(1, g * 1.5), math.min(1, b * 1.5)
     end
@@ -242,7 +244,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
         end
         
         local packList = fontStringPool:Acquire()
-        packList:SetPoint("TOPLEFT", 15, yOffset)
+        packList:SetPoint("TOPLEFT", 18, yOffset)
         packList:SetWidth(PULLS_PANEL_WIDTH - 50)
         packList:SetJustifyH("LEFT")
         packList:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
@@ -255,7 +257,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
     else
         -- Empty pull - show "Click packs to add" message
         local emptyMsg = fontStringPool:Acquire()
-        emptyMsg:SetPoint("TOPLEFT", 15, yOffset)
+        emptyMsg:SetPoint("TOPLEFT", 18, yOffset)
         emptyMsg:SetWidth(PULLS_PANEL_WIDTH - 50)
         emptyMsg:SetJustifyH("LEFT")
         emptyMsg:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
@@ -274,6 +276,12 @@ function UI:RenderPullEntry(pullNum, yOffset)
     if not pullButton then
         pullButton = CreateFrame("Button", "RDT_PullEntry" .. pullNum, pullsScrollChild)
         pullButtons[pullNum] = pullButton
+        
+        -- Create background texture for this pull
+        local bgTexture = pullButton:CreateTexture(nil, "BACKGROUND")
+        bgTexture:SetAllPoints(pullButton)
+        bgTexture:SetColorTexture(0, 0, 0, 0)
+        pullButton.bgTexture = bgTexture
         
         -- Set up hover handlers with tooltip
         pullButton:SetScript("OnEnter", function(self)
@@ -314,11 +322,23 @@ function UI:RenderPullEntry(pullNum, yOffset)
         pullButton:RegisterForClicks("LeftButtonUp")
     end
     
-    -- Position and size the button
+    -- Position and size the button (full width)
     pullButton.pullNum = pullNum
-    pullButton:SetSize(PULLS_PANEL_WIDTH - 40, entryHeight)
-    pullButton:SetPoint("TOPLEFT", 5, startYOffset)
+    pullButton:SetSize(PULLS_PANEL_WIDTH - 36, entryHeight)
+    pullButton:SetPoint("TOPLEFT", 0, startYOffset)
+    
+    -- Update background color (faded pull color)
+    if pullButton.bgTexture then
+        local bgR, bgG, bgB = unpack(RDT:GetPullColor(pullNum))
+        -- Fade the color significantly for background
+        local fadeAlpha = isCurrentPull and 0.25 or 0.15
+        pullButton.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
+    end
+    
     pullButton:Show()
+    
+    -- Add 1px spacing after this pull
+    yOffset = yOffset - 1
     
     return yOffset
 end
