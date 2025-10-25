@@ -6,7 +6,6 @@ A route planning addon for classic dungeons.
 
 - **Interactive Map**: Visual dungeon maps with enemy pack positioning
 - **Pull Planning**: Organize packs into numbered pulls for optimal routing
-- **Enemy Forces Tracking**: Real-time progress toward 100% completion
 - **Route Import/Export**: Share routes via encoded strings
 - **Party Sharing**: Send routes to party members in-game (WIP)
 - **Minimap Button**: Quick access to the planner
