@@ -1,30 +1,26 @@
 -- Data.lua
--- Dungeon definitions and data management module with mob dictionary
+-- Dungeon registry and data management module
 -- NOTE: This file loads AFTER Core/Init.lua, so RDT object already exists
+--
+-- This module provides the registry for dungeons and mobs. Individual dungeons
+-- are defined in separate files under Dungeons/ folder.
 --
 -- MAP TEXTURE FORMATS:
 -- ====================
 -- 1. SINGLE TEXTURE (Simple, for small dungeons):
---    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\dungeon"
+--    texture = "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\DungeonName\\map"
 --
--- 2. TILED MAP (High-res, multi-floor support):
+-- 2. TILED MAP (High-res, for large dungeons):
 --    tiles = {
 --        tileWidth = 1024,     -- Each tile texture size (must be power-of-2)
 --        tileHeight = 1024,
 --        cols = 2,             -- Number of tile columns
 --        rows = 2,             -- Number of tile rows
---        floors = {
---            [1] = {           -- Floor 1 data
---                tiles = {
---                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile1",
---                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile2",
---                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile3",
---                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile4",
---                }
---            },
---            [2] = {           -- Floor 2 data (if dungeon has multiple floors)
---                tiles = { ... }
---            }
+--        tiles = {             -- Array of tile paths (left-to-right, top-to-bottom)
+--            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\DungeonName\\Tile1",
+--            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\DungeonName\\Tile2",
+--            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\DungeonName\\Tile3",
+--            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\DungeonName\\Tile4",
 --        }
 --    }
 --    
@@ -41,96 +37,108 @@ end
 RDT.Data = {}
 local Data = RDT.Data
 
--- Dungeon definitions
+-- Dungeon registry
 local dungeons = {}
 
--- Mob definitions (shared across all dungeons)
--- Each mob has: name, count (enemy forces value, decimal), creatureId (optional), displayIcon (optional), scale (optional)
--- count: decimal value representing enemy forces (e.g., 0.5 for weak trash, 2.0 for elite)
--- displayIcon can be: SetPortraitTexture for 3D portrait, or explicit texture path
--- If no displayIcon, defaults to question mark icon
--- scale: visual size multiplier (0.6-1.0), defaults to 1.0. Smaller scale = less important mob
-local mobDatabase = {
-    -- Example mobs for Test Dungeon
-    ["generic_trash_mob"] = {
-        name = "Generic Trash Mob",
-        count = 0.5,
-        creatureId = 10001,
-        displayIcon = "Interface\\Icons\\INV_Misc_QuestionMark",
-        scale = 0.5, -- Small weak mob
-    },
-    ["generic_normal_mob"] = {
-        name = "Generic Normal Mob", 
-        count = 1,
-        creatureId = 10002,
-        displayIcon = "Interface\\Icons\\Ability_Warrior_Savageblow",
-        scale = 0.7, -- Medium sized
-    },
-    ["generic_big_mob"] = {
-        name = "Generic Big Mob",
-        count = 2,
-        creatureId = 10003,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 0.9, -- Full size elite
-    },
-    ["generic_elite_mob"] = {
-        name = "Generic Elite Mob",
-        count = 2,
-        creatureId = 10003,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 1.0, -- Full size elite
-    },
-    ["generic_boss"] = {
-        name = "Generic Boss",
-        count = 2,
-        creatureId = 10003,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 1.0, -- Full size elite
-    },
-}
+-- Mob database (shared across all dungeons)
+local mobDatabase = {}
 
 --------------------------------------------------------------------------------
--- Stratholme
+-- Core Registry Functions
 --------------------------------------------------------------------------------
--- Dungeon structure:
---   texture: Map texture path (single texture or tiles structure)
---   totalCount: Required enemy forces count for 100% completion (e.g., 100)
---   packData: Array of pack definitions with id, x, y, and mobs
 
-dungeons["Stratholme"] = {
-    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Classic\\stratholme",
-    totalCount = 120,  -- Required enemy forces to complete (100%)
-    packData = {
-        -- First room
-        {
-            id = 1, 
-            x = 0.5, 
-            y = 0.15, 
-            mobs = {
-                ["generic_trash_mob"] = 2,
-                ["generic_big_mob"] = 1,
-            }
-        },
-        {
-            id = 2, 
-            x = 0.45, 
-            y = 0.25, 
-            mobs = {
-                ["generic_trash_mob"] = 3,
-                ["generic_big_mob"] = 1,
-                ["generic_elite_mob"] = 1,
-            }
-        },
-    },
-}
+--- Register a new dungeon (called by dungeon modules)
+-- @param name string Display name of the dungeon
+-- @param data table Dungeon data {texture/tiles, totalCount, packData}
+function Data:RegisterDungeon(name, data)
+    if not name or not data then
+        RDT:PrintError("RegisterDungeon: Invalid parameters")
+        return
+    end
+    
+    if dungeons[name] then
+        RDT:PrintError("RegisterDungeon: Dungeon already registered: " .. name)
+        return
+    end
+    
+    dungeons[name] = data
+    RDT:DebugPrint("Registered dungeon: " .. name)
+end
+
+--- Register multiple mobs at once (called by dungeon modules)
+-- @param mobs table Dictionary of mob definitions {[key] = {name, count, ...}}
+function Data:RegisterMobs(mobs)
+    if not mobs then
+        RDT:PrintError("RegisterMobs: Invalid parameters")
+        return
+    end
+    
+    for key, mobData in pairs(mobs) do
+        if mobDatabase[key] then
+            RDT:PrintError("RegisterMobs: Mob already registered: " .. key)
+        else
+            mobDatabase[key] = mobData
+            RDT:DebugPrint("Registered mob: " .. key)
+        end
+    end
+end
+
+--- Register a single mob (called by dungeon modules)
+-- @param key string Mob identifier
+-- @param mobData table Mob definition {name, count, creatureId, displayIcon, scale}
+function Data:RegisterMob(key, mobData)
+    if not key or not mobData then
+        RDT:PrintError("RegisterMob: Invalid parameters")
+        return
+    end
+    
+    if mobDatabase[key] then
+        RDT:PrintError("RegisterMob: Mob already registered: " .. key)
+        return
+    end
+    
+    mobDatabase[key] = mobData
+    RDT:DebugPrint("Registered mob: " .. key)
+end
 
 --------------------------------------------------------------------------------
--- Mob Database Access Functions
+-- Access Functions
 --------------------------------------------------------------------------------
+
+--- Get dungeon data by name
+-- @param name string Dungeon name
+-- @return table Dungeon data or nil
+function Data:GetDungeon(name)
+    return dungeons[name]
+end
+
+--- Get all registered dungeons
+-- @return table Array of dungeon names
+function Data:GetDungeonList()
+    local list = {}
+    for name, _ in pairs(dungeons) do
+        table.insert(list, name)
+    end
+    table.sort(list)
+    return list
+end
+
+--- Get all registered dungeon names (alias for GetDungeonList)
+-- @return table Array of dungeon names
+function Data:GetDungeonNames()
+    return self:GetDungeonList()
+end
+
+--- Check if a dungeon is registered
+-- @param name string Dungeon name
+-- @return boolean True if dungeon exists
+function Data:DungeonExists(name)
+    return dungeons[name] ~= nil
+end
 
 --- Get mob definition by key
 -- @param mobKey string Mob identifier
--- @return table Mob data {name, count, creatureId} or nil
+-- @return table Mob data {name, count, creatureId, displayIcon, scale} or nil
 function Data:GetMob(mobKey)
     return mobDatabase[mobKey]
 end
@@ -141,463 +149,275 @@ function Data:GetAllMobs()
     return mobDatabase
 end
 
---- Add or update a mob definition
--- @param mobKey string Mob identifier
--- @param mobData table Mob data {name, count, creatureId}
--- @return boolean Success status
-function Data:SetMob(mobKey, mobData)
-    if type(mobKey) ~= "string" or mobKey == "" then
-        if RDT.PrintError then
-            RDT:PrintError("Invalid mob key")
-        end
-        return false
-    end
-    
-    if type(mobData) ~= "table" then
-        if RDT.PrintError then
-            RDT:PrintError("Invalid mob data")
-        end
-        return false
-    end
-    
-    mobDatabase[mobKey] = mobData
-    return true
-end
-
---- Calculate pack count from mob composition
--- @param mobs table Map of {mobKey = quantity}
--- @return number Total enemy forces count (decimal)
-function Data:CalculatePackCount(mobs)
-    if type(mobs) ~= "table" then
-        return 0
-    end
-    
-    local total = 0
-    for mobKey, quantity in pairs(mobs) do
-        local mobDef = mobDatabase[mobKey]
-        if mobDef and mobDef.count then
-            total = total + (mobDef.count * quantity)
-        else
-            if RDT.PrintError then
-                RDT:PrintError("Unknown mob key: " .. tostring(mobKey))
-            end
-        end
-    end
-    
-    return total
-end
-
---------------------------------------------------------------------------------
--- Data Access Functions
---------------------------------------------------------------------------------
-
---- Get list of all dungeon names
--- @return table Array of dungeon names
-function Data:GetDungeonNames()
-    local names = {}
-    for name in pairs(dungeons) do
-        tinsert(names, name)
-    end
-    table.sort(names)
-    return names
-end
-
---- Get dungeon data by name
+--- Get the required enemy forces count for a dungeon
 -- @param dungeonName string Name of the dungeon
--- @return table Dungeon data or nil if not found
-function Data:GetDungeon(dungeonName)
-    return dungeons[dungeonName]
+-- @return number Required count (e.g., 100) or nil if not found
+function Data:GetDungeonRequiredCount(dungeonName)
+    local dungeon = self:GetDungeon(dungeonName)
+    if dungeon and dungeon.totalCount then
+        return dungeon.totalCount
+    end
+    return nil
 end
 
---- Check if dungeon exists
+--- Get dungeon data with calculated pack counts (processes mob counts)
 -- @param dungeonName string Name of the dungeon
--- @return boolean True if dungeon exists
-function Data:DungeonExists(dungeonName)
-    return dungeons[dungeonName] ~= nil
-end
-
---- Get dungeon data with calculated pack counts
--- This processes the raw pack data and adds calculated count values
--- @param dungeonName string Name of the dungeon
--- @return table Processed dungeon data with calculated counts
+-- @return table Dungeon data with pack.count added for each pack, or nil
 function Data:GetProcessedDungeon(dungeonName)
-    local dungeon = dungeons[dungeonName]
+    local dungeon = self:GetDungeon(dungeonName)
     if not dungeon then
         return nil
     end
     
-    -- Create a copy with calculated counts
+    -- Create a deep copy to avoid modifying the original
     local processed = {
         texture = dungeon.texture,
+        tiles = dungeon.tiles,
+        totalCount = dungeon.totalCount,
         packData = {}
     }
     
-    for i, pack in ipairs(dungeon.packData) do
-        local processedPack = {
+    -- Process each pack and calculate total count
+    for _, pack in ipairs(dungeon.packData or {}) do
+        local packCopy = {
             id = pack.id,
             x = pack.x,
             y = pack.y,
             mobs = pack.mobs,
-            count = self:CalculatePackCount(pack.mobs)
+            count = 0  -- Will be calculated
         }
-        tinsert(processed.packData, processedPack)
+        
+        -- Calculate pack count from mobs
+        if pack.mobs then
+            for mobKey, quantity in pairs(pack.mobs) do
+                local mobDef = self:GetMob(mobKey)
+                if mobDef and mobDef.count then
+                    packCopy.count = packCopy.count + (mobDef.count * quantity)
+                end
+            end
+        end
+        
+        table.insert(processed.packData, packCopy)
     end
     
     return processed
 end
 
---- Get total available forces for a dungeon
--- @param dungeonName string Name of the dungeon
--- @return number Total enemy forces count (decimal)
-function Data:GetDungeonTotalForces(dungeonName)
-    local dungeon = dungeons[dungeonName]
-    if not dungeon or not dungeon.packData then
-        return 0
-    end
-    
-    local total = 0
-    for _, pack in ipairs(dungeon.packData) do
-        total = total + self:CalculatePackCount(pack.mobs)
-    end
-    return total
-end
+--------------------------------------------------------------------------------
+-- Built-in Generic Mobs (fallbacks)
+--------------------------------------------------------------------------------
 
---- Get required enemy forces count to complete dungeon (100%)
--- @param dungeonName string Name of the dungeon
--- @return number Required count for 100% completion
-function Data:GetDungeonRequiredCount(dungeonName)
-    local dungeon = dungeons[dungeonName]
+-- Register some generic fallback mobs for testing
+local genericMobs = {
+    ["generic_trash_mob"] = {
+        name = "Generic Trash",
+        count = 1.0,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 0.8,
+    },
+    ["generic_big_mob"] = {
+        name = "Generic Big Mob",
+        count = 2.0,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 1.0,
+    },
+    ["generic_elite_mob"] = {
+        name = "Generic Elite",
+        count = 3.0,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 1.0,
+    },
+    ["generic_boss"] = {
+        name = "Generic Boss",
+        count = 5.0,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 1.0,
+    },
+}
+
+Data:RegisterMobs(genericMobs)
+
+--------------------------------------------------------------------------------
+-- Validation
+--------------------------------------------------------------------------------
+
+--- Validate a dungeon's data structure
+-- @param dungeonName string Name to validate
+-- @return boolean, string Success status and error message
+function Data:ValidateDungeon(dungeonName)
+    local dungeon = self:GetDungeon(dungeonName)
     if not dungeon then
-        return 100  -- Default to 100
-    end
-    return dungeon.totalCount or 100
-end
-
---- Get number of packs in a dungeon
--- @param dungeonName string Name of the dungeon
--- @return number Number of packs
-function Data:GetDungeonPackCount(dungeonName)
-    local dungeon = dungeons[dungeonName]
-    if not dungeon or not dungeon.packData then
-        return 0
-    end
-    return #dungeon.packData
-end
-
---- Add a custom dungeon (for future user-created dungeons)
--- @param dungeonName string Name of the dungeon
--- @param dungeonData table Dungeon data structure
--- @return boolean Success status
-function Data:AddDungeon(dungeonName, dungeonData)
-    if type(dungeonName) ~= "string" or dungeonName == "" then
-        if RDT.PrintError then
-            RDT:PrintError("Invalid dungeon name")
-        end
-        return false
+        return false, "Dungeon not found: " .. dungeonName
     end
     
-    if type(dungeonData) ~= "table" then
-        if RDT.PrintError then
-            RDT:PrintError("Invalid dungeon data")
-        end
-        return false
+    -- Check for map data
+    if not dungeon.texture and not dungeon.tiles then
+        return false, "No map texture or tiles defined"
     end
     
-    if dungeons[dungeonName] then
-        if RDT.Print then
-            RDT:Print("Warning: Overwriting existing dungeon '" .. dungeonName .. "'")
-        end
+    -- Check for total count
+    if not dungeon.totalCount or dungeon.totalCount <= 0 then
+        return false, "Invalid totalCount: " .. tostring(dungeon.totalCount)
     end
     
-    dungeons[dungeonName] = dungeonData
-    return true
-end
-
---------------------------------------------------------------------------------
--- Data Validation
---------------------------------------------------------------------------------
-
---- Validate a pack data entry
--- @param pack table Pack data {id, x, y, mobs}
--- @return boolean isValid, string errorMessage
-local function ValidatePack(pack)
-    if type(pack) ~= "table" then
-        return false, "Pack is not a table"
-    end
-    
-    if type(pack.id) ~= "number" then
-        return false, "Pack ID must be a number"
-    end
-    
-    if type(pack.x) ~= "number" or pack.x < 0 or pack.x > 1 then
-        return false, string.format("Pack %d has invalid x coordinate: %s", pack.id, tostring(pack.x))
-    end
-    
-    if type(pack.y) ~= "number" or pack.y < 0 or pack.y > 1 then
-        return false, string.format("Pack %d has invalid y coordinate: %s", pack.id, tostring(pack.y))
-    end
-    
-    if type(pack.mobs) ~= "table" then
-        return false, string.format("Pack %d has invalid mobs table", pack.id)
-    end
-    
-    -- Validate mob references
-    for mobKey, quantity in pairs(pack.mobs) do
-        if type(mobKey) ~= "string" then
-            return false, string.format("Pack %d has invalid mob key type", pack.id)
-        end
-        
-        if not mobDatabase[mobKey] then
-            return false, string.format("Pack %d references unknown mob: %s", pack.id, mobKey)
-        end
-        
-        if type(quantity) ~= "number" or quantity < 0 then
-            return false, string.format("Pack %d has invalid mob quantity for %s", pack.id, mobKey)
-        end
-    end
-    
-    return true, nil
-end
-
---- Validate dungeon data structure
--- @param dungeonName string Name of the dungeon
--- @param dungeonData table Dungeon data
--- @return boolean isValid, string errorMessage
-function Data:ValidateDungeon(dungeonName, dungeonData)
-    if type(dungeonData) ~= "table" then
-        return false, "Dungeon data is not a table"
-    end
-    
-    if type(dungeonData.texture) ~= "string" then
-        return false, "Dungeon missing texture path"
-    end
-    
-    if type(dungeonData.packData) ~= "table" then
-        return false, "Dungeon missing packData table"
-    end
-    
-    if #dungeonData.packData == 0 then
-        return false, "Dungeon has no packs defined"
+    -- Check for pack data
+    if not dungeon.packData or #dungeon.packData == 0 then
+        return false, "No pack data defined"
     end
     
     -- Validate each pack
-    local packIds = {}
-    for i, pack in ipairs(dungeonData.packData) do
-        local isValid, err = ValidatePack(pack)
-        if not isValid then
-            return false, string.format("%s (pack index %d)", err, i)
+    for i, pack in ipairs(dungeon.packData) do
+        if not pack.id then
+            return false, "Pack " .. i .. " missing id"
+        end
+        if not pack.x or not pack.y then
+            return false, "Pack " .. pack.id .. " missing coordinates"
+        end
+        if not pack.mobs or not next(pack.mobs) then
+            return false, "Pack " .. pack.id .. " has no mobs"
         end
         
-        -- Check for duplicate IDs
-        if packIds[pack.id] then
-            return false, string.format("Duplicate pack ID: %d", pack.id)
-        end
-        packIds[pack.id] = true
-    end
-    
-    return true, nil
-end
-
---- Validate all dungeons
--- @return boolean Success status
-function Data:ValidateAll()
-    local hasErrors = false
-    
-    for name, data in pairs(dungeons) do
-        local isValid, err = self:ValidateDungeon(name, data)
-        if not isValid then
-            if RDT.PrintError then
-                RDT:PrintError(string.format("Dungeon '%s' validation failed: %s", name, err))
+        -- Check if all mob keys exist
+        for mobKey, count in pairs(pack.mobs) do
+            if not self:GetMob(mobKey) then
+                return false, "Pack " .. pack.id .. " references unknown mob: " .. mobKey
             end
-            hasErrors = true
         end
     end
     
-    if not hasErrors then
-        if RDT.DebugPrint then
-            RDT:DebugPrint(string.format("Validated %d dungeons successfully", self:GetDungeonCount()))
-        end
-    end
-    
-    return not hasErrors
+    return true, "Valid"
 end
 
---- Get total number of dungeons
--- @return number Number of dungeons
-function Data:GetDungeonCount()
-    local count = 0
-    for _ in pairs(dungeons) do
-        count = count + 1
-    end
-    return count
-end
-
---------------------------------------------------------------------------------
--- Data Export (for addon developers)
---------------------------------------------------------------------------------
-
---- Export dungeon data as Lua table string (for debugging/sharing)
--- @param dungeonName string Name of the dungeon
--- @return string Lua code representing the dungeon
-function Data:ExportDungeonAsLua(dungeonName)
-    local dungeon = dungeons[dungeonName]
-    if not dungeon then
-        return nil
-    end
-    
-    local lines = {
-        string.format('dungeons["%s"] = {', dungeonName),
-        string.format('    texture = "%s",', dungeon.texture),
-        '    packData = {',
+--- Validate all registered dungeons
+-- @return table Results {total, valid, invalid, errors}
+function Data:ValidateAll()
+    local results = {
+        total = 0,
+        valid = 0,
+        invalid = 0,
+        errors = {}
     }
     
-    for _, pack in ipairs(dungeon.packData) do
-        tinsert(lines, string.format('        {'))
-        tinsert(lines, string.format('            id = %d,', pack.id))
-        tinsert(lines, string.format('            x = %.2f,', pack.x))
-        tinsert(lines, string.format('            y = %.2f,', pack.y))
-        tinsert(lines, string.format('            mobs = {'))
-        
-        for mobKey, quantity in pairs(pack.mobs) do
-            tinsert(lines, string.format('                ["%s"] = %d,', mobKey, quantity))
+    local dungeonList = self:GetDungeonList()
+    results.total = #dungeonList
+    
+    for _, name in ipairs(dungeonList) do
+        local success, msg = self:ValidateDungeon(name)
+        if success then
+            results.valid = results.valid + 1
+            RDT:DebugPrint("✓ Validated: " .. name)
+        else
+            results.invalid = results.invalid + 1
+            results.errors[name] = msg
+            RDT:PrintError("✗ Validation failed for " .. name .. ": " .. msg)
         end
-        
-        tinsert(lines, string.format('            },'))
-        tinsert(lines, string.format('        },'))
     end
     
-    tinsert(lines, '    },')
-    tinsert(lines, '}')
+    -- Summary
+    if results.invalid == 0 then
+        RDT:DebugPrint(string.format("All %d dungeons validated successfully", results.valid))
+    else
+        RDT:PrintError(string.format("Validation: %d valid, %d invalid out of %d total", 
+            results.valid, results.invalid, results.total))
+    end
     
-    return table.concat(lines, "\n")
+    return results
 end
 
 --------------------------------------------------------------------------------
 -- Statistics
 --------------------------------------------------------------------------------
 
---- Get statistics about all dungeons
--- @return table Statistics table
-function Data:GetStatistics()
-    local stats = {
-        totalDungeons = 0,
-        totalPacks = 0,
-        totalForces = 0,
-        avgPacksPerDungeon = 0,
-        avgForcesPerDungeon = 0,
-        totalMobTypes = 0,
-    }
+--- Get statistics about registered data
+-- @return table Stats {dungeonCount, mobCount, totalPacks}
+function Data:GetStats()
+    local dungeonCount = 0
+    local totalPacks = 0
     
-    for name, data in pairs(dungeons) do
-        stats.totalDungeons = stats.totalDungeons + 1
-        local packCount = #(data.packData or {})
-        stats.totalPacks = stats.totalPacks + packCount
-        stats.totalForces = stats.totalForces + self:GetDungeonTotalForces(name)
+    for name, dungeon in pairs(dungeons) do
+        dungeonCount = dungeonCount + 1
+        if dungeon.packData then
+            totalPacks = totalPacks + #dungeon.packData
+        end
     end
     
-    -- Count mob types
+    local mobCount = 0
     for _ in pairs(mobDatabase) do
-        stats.totalMobTypes = stats.totalMobTypes + 1
+        mobCount = mobCount + 1
     end
     
-    if stats.totalDungeons > 0 then
-        stats.avgPacksPerDungeon = stats.totalPacks / stats.totalDungeons
-        stats.avgForcesPerDungeon = stats.totalForces / stats.totalDungeons
+    return {
+        dungeonCount = dungeonCount,
+        mobCount = mobCount,
+        totalPacks = totalPacks,
+    }
+end
+
+--------------------------------------------------------------------------------
+-- Export Functions (for ImportExport module)
+--------------------------------------------------------------------------------
+
+--- Export dungeon data as Lua table string (for debugging/sharing)
+-- @param dungeonName string Name of dungeon to export
+-- @return string Serialized dungeon data or nil
+function Data:ExportDungeon(dungeonName)
+    local dungeon = self:GetDungeon(dungeonName)
+    if not dungeon then
+        RDT:PrintError("ExportDungeon: Dungeon not found: " .. dungeonName)
+        return nil
     end
     
-    return stats
+    -- Use AceSerializer if available
+    local AceSerializer = LibStub:GetLibrary("AceSerializer-3.0", true)
+    if AceSerializer then
+        return AceSerializer:Serialize(dungeon)
+    end
+    
+    -- Fallback: basic string conversion
+    return "-- Export not available without AceSerializer"
+end
+
+--- Export all registered dungeons
+-- @return table List of {name, data} pairs
+function Data:ExportAll()
+    local exports = {}
+    for name, data in pairs(dungeons) do
+        table.insert(exports, {
+            name = name,
+            data = data,
+        })
+    end
+    return exports
 end
 
 --------------------------------------------------------------------------------
 -- Debug Commands
 --------------------------------------------------------------------------------
 
---- Print dungeon information
--- @param dungeonName string Name of the dungeon
-function Data:PrintDungeonInfo(dungeonName)
-    local dungeon = self:GetDungeon(dungeonName)
-    if not dungeon then
-        if RDT.PrintError then
-            RDT:PrintError("Dungeon not found: " .. tostring(dungeonName))
-        end
-        return
-    end
-    
-    if RDT.Print then
-        local totalForces = self:GetDungeonTotalForces(dungeonName)
-        local requiredCount = self:GetDungeonRequiredCount(dungeonName)
-        local percentage = (totalForces / requiredCount) * 100
-        
-        RDT:Print(string.format("Dungeon: %s", dungeonName))
-        RDT:Print(string.format("  Packs: %d", #dungeon.packData))
-        RDT:Print(string.format("  Total Forces: %.1f/%.0f (%.1f%%)", totalForces, requiredCount, percentage))
-        RDT:Print(string.format("  Texture: %s", dungeon.texture))
+--- Print all registered dungeons
+function Data:ListDungeons()
+    local list = self:GetDungeonList()
+    RDT:Print("Registered dungeons (" .. #list .. "):")
+    for _, name in ipairs(list) do
+        local dungeon = self:GetDungeon(name)
+        local packCount = dungeon.packData and #dungeon.packData or 0
+        RDT:Print("  - " .. name .. " (" .. packCount .. " packs)")
     end
 end
 
---- Print all dungeon names
-function Data:PrintDungeonList()
-    local names = self:GetDungeonNames()
-    if RDT.Print then
-        RDT:Print(string.format("Available Dungeons (%d):", #names))
-        for _, name in ipairs(names) do
-            local packCount = self:GetDungeonPackCount(name)
-            local totalForces = self:GetDungeonTotalForces(name)
-            local requiredCount = self:GetDungeonRequiredCount(name)
-            local percentage = (totalForces / requiredCount) * 100
-            RDT:Print(string.format("  - %s (%d packs, %.1f/%.0f forces = %.1f%%)", name, packCount, totalForces, requiredCount, percentage))
-        end
+--- Print all registered mobs
+function Data:ListMobs()
+    local count = 0
+    RDT:Print("Registered mobs:")
+    for key, mob in pairs(mobDatabase) do
+        count = count + 1
+        RDT:Print(string.format("  - [%s] %s (count: %.1f)", key, mob.name, mob.count))
     end
+    RDT:Print("Total: " .. count .. " mob types")
 end
 
---- Print pack details (including mob composition)
--- @param dungeonName string Name of the dungeon
--- @param packId number Pack ID to inspect
-function Data:PrintPackInfo(dungeonName, packId)
-    local dungeon = self:GetDungeon(dungeonName)
-    if not dungeon then
-        if RDT.PrintError then
-            RDT:PrintError("Dungeon not found: " .. tostring(dungeonName))
-        end
-        return
-    end
-    
-    local pack = nil
-    for _, p in ipairs(dungeon.packData) do
-        if p.id == packId then
-            pack = p
-            break
-        end
-    end
-    
-    if not pack then
-        if RDT.PrintError then
-            RDT:PrintError("Pack not found: " .. tostring(packId))
-        end
-        return
-    end
-    
-    if RDT.Print then
-        RDT:Print(string.format("Pack %d:", packId))
-        RDT:Print(string.format("  Position: (%.2f, %.2f)", pack.x, pack.y))
-        RDT:Print(string.format("  Total Count: %.1f", self:CalculatePackCount(pack.mobs)))
-        RDT:Print("  Mobs:")
-        
-        for mobKey, quantity in pairs(pack.mobs) do
-            local mobDef = mobDatabase[mobKey]
-            if mobDef then
-                RDT:Print(string.format("    - %dx %s (%.1f each = %.1f total)", 
-                    quantity, mobDef.name, mobDef.count, quantity * mobDef.count))
-            else
-                RDT:Print(string.format("    - %dx %s (UNKNOWN MOB)", quantity, mobKey))
-            end
-        end
-    end
-end
+--------------------------------------------------------------------------------
+-- Module Initialization
+--------------------------------------------------------------------------------
 
--- Module loaded message
-if RDT.DebugPrint then
-    local stats = Data:GetStatistics()
-    RDT:DebugPrint(string.format("Data.lua loaded: %d dungeons, %d mob types", 
-        Data:GetDungeonCount(), stats.totalMobTypes))
-end
+RDT:Print("Data registry initialized (dungeons will be loaded from modules)")

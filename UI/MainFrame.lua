@@ -23,7 +23,6 @@ local titleText
 local versionText
 local dropdownFrame
 local buttonContainer
-local floorButtons = {}  -- New: floor selection buttons
 
 --------------------------------------------------------------------------------
 -- Helper Functions
@@ -504,9 +503,8 @@ function UI:ClearMapTiles()
 end
 
 --- Load and display a tiled map
--- @param tileData table Table with tile information
--- @param floor number Floor number to display (optional)
-function UI:LoadTiledMap(tileData, floor)
+-- @param tileData table Table with tile information (tileWidth, tileHeight, cols, rows, tiles)
+function UI:LoadTiledMap(tileData)
     if not mapContainer then return end
     
     -- Hide legacy single texture
@@ -517,16 +515,9 @@ function UI:LoadTiledMap(tileData, floor)
     -- Clear existing tiles
     self:ClearMapTiles()
     
-    floor = floor or 1
-    local floorData = tileData.floors and tileData.floors[floor]
-    if not floorData then
-        RDT:PrintError("Floor " .. floor .. " not found in tile data")
-        return
-    end
-    
-    local tiles = floorData.tiles
+    local tiles = tileData.tiles
     if not tiles then
-        RDT:PrintError("No tiles found for floor " .. floor)
+        RDT:PrintError("No tiles found in tile data")
         return
     end
     
@@ -575,7 +566,7 @@ function UI:LoadTiledMap(tileData, floor)
         tile:Show()
     end
     
-    RDT:DebugPrint(string.format("Loaded %d tiles for floor %d", #tiles, floor))
+    RDT:DebugPrint(string.format("Loaded %d tiles", #tiles))
 end
 
 --- Load a single texture map (legacy mode)
@@ -611,48 +602,10 @@ function UI:LoadSingleTextureMap(texturePath)
     RDT:Print("Map texture loaded, shown, size: " .. mapTexture:GetWidth() .. "x" .. mapTexture:GetHeight())
 end
 
---- Create floor selection buttons
--- @param numFloors number Number of floors in the dungeon
-function UI:CreateFloorButtons(numFloors)
-    -- Clear existing floor buttons
-    for _, btn in pairs(floorButtons) do
-        btn:Hide()
-    end
-    
-    if not numFloors or numFloors <= 1 then
-        return  -- No floor buttons needed
-    end
-    
-    -- Create floor buttons
-    for floor = 1, numFloors do
-        local btn = floorButtons[floor]
-        if not btn then
-            btn = CreateFrame("Button", "RDT_FloorButton" .. floor, mapContainer)
-            btn:SetSize(40, 24)
-            StyleSquareButton(btn)
-            btn:SetText("Floor " .. floor)
-            floorButtons[floor] = btn
-        end
-        
-        -- Position buttons vertically on the right side
-        btn:ClearAllPoints()
-        btn:SetPoint("TOPRIGHT", mapContainer, "TOPRIGHT", -10, -10 - ((floor - 1) * 28))
-        
-        -- Set click handler
-        btn:SetScript("OnClick", function()
-            if RDT.State and RDT.State.currentDungeon then
-                UI:UpdateMapForDungeon(RDT.State.currentDungeon, floor)
-            end
-        end)
-        
-        btn:Show()
-    end
-end
 
 --- Update the map for a dungeon (handles both tiled and single-texture maps)
 -- @param dungeonName string Name of the dungeon
--- @param floor number Floor number (optional, defaults to 1)
-function UI:UpdateMapForDungeon(dungeonName, floor)
+function UI:UpdateMapForDungeon(dungeonName)
     if not RDT.Data or not dungeonName then
         RDT:PrintError("UpdateMapForDungeon: Invalid parameters")
         return
@@ -665,24 +618,17 @@ function UI:UpdateMapForDungeon(dungeonName, floor)
         return
     end
     
-    RDT:Print("UpdateMapForDungeon: " .. dungeonName .. " (Floor " .. (floor or 1) .. ")")
+    RDT:Print("UpdateMapForDungeon: " .. dungeonName)
     
     -- Check if this dungeon uses tiles
     if dungeonData.tiles then
         RDT:Print("Using tiled map")
         -- Load tiled map
-        self:LoadTiledMap(dungeonData.tiles, floor or 1)
-        
-        -- Create floor buttons if multiple floors exist
-        local numFloors = dungeonData.tiles.floors and #dungeonData.tiles.floors or 1
-        self:CreateFloorButtons(numFloors)
+        self:LoadTiledMap(dungeonData.tiles)
     elseif dungeonData.texture then
         RDT:Print("Using single texture: " .. dungeonData.texture)
         -- Load single texture (legacy mode)
         self:LoadSingleTextureMap(dungeonData.texture)
-        
-        -- Hide floor buttons
-        self:CreateFloorButtons(0)
     else
         RDT:PrintError("No map data found for: " .. dungeonName)
     end

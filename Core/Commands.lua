@@ -183,6 +183,66 @@ local commands = {
         end
     end,
     
+    -- List all registered dungeons
+    ["list"] = function()
+        if RDT.Data then
+            RDT.Data:ListDungeons()
+        else
+            RDT:PrintError("Data module not loaded")
+        end
+    end,
+    
+    -- List all registered mobs
+    ["mobs"] = function()
+        if RDT.Data then
+            RDT.Data:ListMobs()
+        else
+            RDT:PrintError("Data module not loaded")
+        end
+    end,
+    
+    -- Show registry statistics
+    ["stats"] = function()
+        if RDT.Data then
+            local stats = RDT.Data:GetStats()
+            RDT:Print("=== Data Registry Statistics ===")
+            RDT:Print("Dungeons: " .. stats.dungeonCount)
+            RDT:Print("Mob types: " .. stats.mobCount)
+            RDT:Print("Total packs: " .. stats.totalPacks)
+        else
+            RDT:PrintError("Data module not loaded")
+        end
+    end,
+    
+    -- Validate a dungeon
+    ["validate"] = function(args)
+        if not RDT.Data then
+            RDT:PrintError("Data module not loaded")
+            return
+        end
+        
+        if not args or args == "" then
+            -- Validate all if no specific dungeon given
+            local results = RDT.Data:ValidateAll()
+            if results.invalid == 0 then
+                RDT:Print(string.format("|cFF00FF00✓ All %d dungeons validated successfully|r", results.valid))
+            else
+                RDT:PrintError(string.format("Validation complete: %d valid, %d invalid", results.valid, results.invalid))
+                for name, error in pairs(results.errors) do
+                    RDT:PrintError("  - " .. name .. ": " .. error)
+                end
+            end
+        else
+            -- Validate specific dungeon
+            local success, msg = RDT.Data:ValidateDungeon(args)
+            if success then
+                RDT:Print("✓ Dungeon validated: " .. args)
+            else
+                RDT:PrintError("✗ Validation failed: " .. msg)
+            end
+        end
+    end,
+    
     -- Help text
     ["help"] = function()
         RDT:Print(L["SLASH_HELP"])
@@ -204,6 +264,13 @@ local commands = {
         RDT:Print("  delete <name> - Delete profile")
         RDT:Print("  copy <source> - Copy from profile")
         RDT:Print("  reset - Reset current profile")
+        RDT:Print(" ")
+        RDT:Print("|cFFFFFF00Development Commands:|r")
+        RDT:Print("/rdt list - List all registered dungeons")
+        RDT:Print("/rdt mobs - List all registered mobs")
+        RDT:Print("/rdt stats - Show registry statistics")
+        RDT:Print("/rdt validate - Validate all dungeons")
+        RDT:Print("/rdt validate <name> - Validate specific dungeon")
     end,
     
     ["?"] = function()
