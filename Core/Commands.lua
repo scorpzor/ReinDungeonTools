@@ -243,6 +243,33 @@ local commands = {
         end
     end,
     
+    -- Development Tools: Coordinate Picker
+    ["coords"] = function()
+        if not RDT.DevTools then
+            RDT:PrintError("DevTools module not loaded")
+            return
+        end
+        RDT.DevTools:ToggleCoordinatePicker()
+    end,
+    
+    -- Development Tools: Map Info
+    ["mapinfo"] = function()
+        if not RDT.DevTools then
+            RDT:PrintError("DevTools module not loaded")
+            return
+        end
+        RDT.DevTools:PrintMapInfo()
+    end,
+    
+    -- Development Tools: List Pack Coordinates
+    ["packcoords"] = function()
+        if not RDT.DevTools then
+            RDT:PrintError("DevTools module not loaded")
+            return
+        end
+        RDT.DevTools:ListPackCoordinates()
+    end,
+    
     -- Help text
     ["help"] = function()
         RDT:Print(L["SLASH_HELP"])
@@ -271,6 +298,11 @@ local commands = {
         RDT:Print("/rdt stats - Show registry statistics")
         RDT:Print("/rdt validate - Validate all dungeons")
         RDT:Print("/rdt validate <name> - Validate specific dungeon")
+        RDT:Print(" ")
+        RDT:Print("|cFF00FFFFDevTools:|r")
+        RDT:Print("/rdt coords - Toggle coordinate picker (click map to get coordinates)")
+        RDT:Print("/rdt mapinfo - Show current map information")
+        RDT:Print("/rdt packcoords - List all pack coordinates for current dungeon")
     end,
     
     ["?"] = function()

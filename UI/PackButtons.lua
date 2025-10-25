@@ -97,7 +97,9 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     -- Set container size to encompass the circle
     local containerSize = radius * 2 + MOB_ICON_SIZE
     packGroup:SetSize(containerSize, containerSize)
+    
     -- Anchor to TOPLEFT (standard UI coordinates: 0,0 = top-left, 1,1 = bottom-right)
+    -- Use the passed mapWidth/mapHeight which come from GetMapDimensions (container size)
     packGroup:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", data.x * mapWidth, -(data.y * mapHeight))
     
     -- Create individual mob icons
