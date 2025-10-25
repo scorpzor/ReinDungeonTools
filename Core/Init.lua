@@ -196,9 +196,14 @@ function RDT:LoadDungeon(dungeonName)
     if self.UI then
         -- Load map first
         if self.UI.UpdateMapForDungeon then
-            self.UI:UpdateMapForDungeon(dungeonName, 1)  -- Load floor 1 by default
+            self.UI:UpdateMapForDungeon(dungeonName)
         elseif self.UI.UpdateMapTexture then
             self.UI:UpdateMapTexture(dungeonData.texture)  -- Fallback to legacy method
+        end
+        
+        -- Force layout update before creating packs (don't show the main window!)
+        if self.UI.mapContainer then
+            self.UI.mapContainer:Show()
         end
         
         -- Then create packs (they anchor to the map texture)

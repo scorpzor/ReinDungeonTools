@@ -97,7 +97,8 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     -- Set container size to encompass the circle
     local containerSize = radius * 2 + MOB_ICON_SIZE
     packGroup:SetSize(containerSize, containerSize)
-    packGroup:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", data.x * mapWidth, data.y * mapHeight)
+    -- Anchor to TOPLEFT (standard UI coordinates: 0,0 = top-left, 1,1 = bottom-right)
+    packGroup:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", data.x * mapWidth, -(data.y * mapHeight))
     
     -- Create individual mob icons
     for iconIndex, mobInfo in ipairs(mobList) do
@@ -415,7 +416,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     -- Position and size the border (relative to map)
     border:SetSize(width, height)
     border:ClearAllPoints()
-    border:SetPoint("CENTER", UI.mapTexture, "BOTTOMLEFT", centerX, centerY)
+    border:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", centerX, centerY)
     border:SetBackdropBorderColor(r, g, b, alpha)
     border:Show()
 end
