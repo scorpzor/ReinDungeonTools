@@ -24,6 +24,51 @@ local dropdownFrame
 local buttonContainer
 
 --------------------------------------------------------------------------------
+-- Helper Functions
+--------------------------------------------------------------------------------
+
+--- Style a button with square gray appearance
+-- @param button Button Button to style
+local function StyleSquareButton(button)
+    button:SetNormalFontObject("GameFontNormal")
+    button:SetHighlightFontObject("GameFontHighlight")
+    button:SetDisabledFontObject("GameFontDisable")
+    
+    -- Set backdrop for square gray appearance
+    button:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    
+    -- Normal state: dark gray
+    button:SetBackdropColor(0.15, 0.15, 0.15, 1)
+    button:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    
+    -- Hover state: lighter gray
+    button:SetScript("OnEnter", function(self)
+        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+    end)
+    
+    button:SetScript("OnLeave", function(self)
+        self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    end)
+    
+    -- Pressed state: darker gray
+    button:SetScript("OnMouseDown", function(self)
+        self:SetBackdropColor(0.1, 0.1, 0.1, 1)
+    end)
+    
+    button:SetScript("OnMouseUp", function(self)
+        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+    end)
+end
+
+--------------------------------------------------------------------------------
 -- Main Frame Creation
 --------------------------------------------------------------------------------
 
@@ -60,12 +105,12 @@ function UI:CreateMainFrame()
     mainFrame:SetBackdropBorderColor(0.15, 0.15, 0.15, 1)
     mainFrame:Hide()
 
-    -- Title bar background
+    -- Title bar background (matches main window)
     local titleBg = mainFrame:CreateTexture(nil, "ARTWORK")
     titleBg:SetPoint("TOPLEFT", 2, -2)
     titleBg:SetPoint("TOPRIGHT", -2, -2)
     titleBg:SetHeight(36)
-    titleBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
+    titleBg:SetColorTexture(0.05, 0.05, 0.05, 0.95)
     mainFrame.titleBg = titleBg  -- Store reference
 
     -- Title text (centered)
@@ -76,9 +121,26 @@ function UI:CreateMainFrame()
     titleText:SetJustifyH("CENTER")
 
     -- Close button (in title bar)
-    local closeButton = CreateFrame("Button", nil, mainFrame, "UIPanelCloseButton")
-    closeButton:SetPoint("TOPRIGHT", -5, -5)
-    closeButton:SetSize(24, 24)
+    local closeButton = CreateFrame("Button", nil, mainFrame)
+    closeButton:SetPoint("TOPRIGHT", -8, -8)
+    closeButton:SetSize(20, 20)
+    closeButton:SetText("×")
+    closeButton:SetNormalFontObject("GameFontNormalLarge")
+    StyleSquareButton(closeButton)
+    -- Make the X bigger and override font color
+    local closeFont = closeButton:GetFontString()
+    closeFont:SetFont("Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
+    closeFont:SetTextColor(0.8, 0.8, 0.8)
+    local origCloseOnEnter = closeButton:GetScript("OnEnter")
+    closeButton:SetScript("OnEnter", function(self)
+        if origCloseOnEnter then origCloseOnEnter(self) end
+        self:GetFontString():SetTextColor(1, 0.3, 0.3)  -- Red on hover
+    end)
+    local origCloseOnLeave = closeButton:GetScript("OnLeave")
+    closeButton:SetScript("OnLeave", function(self)
+        if origCloseOnLeave then origCloseOnLeave(self) end
+        self:GetFontString():SetTextColor(0.8, 0.8, 0.8)  -- Gray when not hovering
+    end)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
     -- Create dungeon dropdown
@@ -93,12 +155,12 @@ function UI:CreateMainFrame()
     -- Create pulls panel (below button container, right side)
     self:CreatePullsPanel(mainFrame)
     
-    -- Bottom bar background
+    -- Bottom bar background (matches main window)
     local bottomBg = mainFrame:CreateTexture(nil, "ARTWORK")
     bottomBg:SetPoint("BOTTOMLEFT", 2, 2)
     bottomBg:SetPoint("BOTTOMRIGHT", -2, 2)
     bottomBg:SetHeight(16)
-    bottomBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
+    bottomBg:SetColorTexture(0.05, 0.05, 0.05, 0.95)
     mainFrame.bottomBg = bottomBg  -- Store reference
 
     -- Help text at bottom (left side)
@@ -123,47 +185,183 @@ end
 -- Dungeon Dropdown
 --------------------------------------------------------------------------------
 
---- Create dungeon selection dropdown
+--- Create dungeon selection dropdown (custom modern design)
 -- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
-    dropdownFrame = CreateFrame("Frame", "RDT_DungeonDropdown", parent, "UIDropDownMenuTemplate")
-    dropdownFrame:SetPoint("TOPLEFT", -10, -10)
-    UIDropDownMenu_SetWidth(dropdownFrame, 220)
+    -- Create main button
+    dropdownFrame = CreateFrame("Button", "RDT_DungeonDropdown", parent)
+    dropdownFrame:SetPoint("TOPLEFT", 5, -8)
+    dropdownFrame:SetSize(220, 24)
+    StyleSquareButton(dropdownFrame)
     
+    -- Dropdown text
+    local dropdownText = dropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    dropdownText:SetPoint("LEFT", 8, 0)
+    dropdownText:SetPoint("RIGHT", -20, 0)
+    dropdownText:SetJustifyH("LEFT")
+    dropdownFrame.text = dropdownText
+    
+    -- Dropdown arrow (using simple triangle made with text)
+    local arrow = dropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    arrow:SetPoint("RIGHT", -5, 0)
+    arrow:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    arrow:SetText("v")  -- Simple 'v' character works on all clients
+    arrow:SetTextColor(0.7, 0.7, 0.7)
+    
+    -- Set initial text
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
-    UIDropDownMenu_SetText(dropdownFrame, currentDungeon)
-
-    UIDropDownMenu_Initialize(dropdownFrame, function(self, level, menuList)
-        local info = UIDropDownMenu_CreateInfo()
-        
-        if not RDT.Data then
-            info.text = "No dungeons available"
-            info.disabled = true
-            UIDropDownMenu_AddButton(info)
-            return
-        end
-        
-        local activeDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
-        local dungeonNames = RDT.Data:GetDungeonNames()
-        
-        for _, name in ipairs(dungeonNames) do
-            info.text = name
-            info.func = function()
-                if RDT:LoadDungeon(name) then
-                    UIDropDownMenu_SetText(dropdownFrame, name)
-                end
-            end
-            info.checked = (name == activeDungeon)
-            UIDropDownMenu_AddButton(info)
+    dropdownText:SetText(currentDungeon)
+    
+    -- Create dropdown menu frame
+    local menuFrame = CreateFrame("Frame", "RDT_DropdownMenu", UIParent)
+    menuFrame:SetSize(220, 200)
+    menuFrame:SetFrameStrata("DIALOG")
+    menuFrame:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    menuFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.98)
+    menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    menuFrame:Hide()
+    menuFrame:SetScript("OnShow", function(self)
+        self:SetFrameLevel(dropdownFrame:GetFrameLevel() + 10)
+    end)
+    
+    -- Scroll frame for menu items
+    local scrollFrame = CreateFrame("ScrollFrame", "RDT_DropdownScroll", menuFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", 4, -4)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
+    
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetSize(190, 1)
+    scrollFrame:SetScrollChild(scrollChild)
+    
+    menuFrame.scrollFrame = scrollFrame
+    menuFrame.scrollChild = scrollChild
+    menuFrame.buttons = {}
+    
+    -- Click handler to toggle menu
+    dropdownFrame:SetScript("OnClick", function(self)
+        if menuFrame:IsShown() then
+            menuFrame:Hide()
+        else
+            -- Position menu below button
+            menuFrame:ClearAllPoints()
+            menuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+            
+            -- Populate menu
+            UI:PopulateDropdownMenu(menuFrame)
+            menuFrame:Show()
         end
     end)
+    
+    -- Close menu when clicking outside
+    menuFrame:SetScript("OnShow", function(self)
+        self:SetFrameLevel(dropdownFrame:GetFrameLevel() + 10)
+        self:EnableMouse(true)
+    end)
+    
+    menuFrame:SetScript("OnHide", function(self)
+        self:EnableMouse(false)
+    end)
+    
+    dropdownFrame.menuFrame = menuFrame
+end
+
+--- Populate the dropdown menu with dungeons
+-- @param menuFrame Frame The menu frame to populate
+function UI:PopulateDropdownMenu(menuFrame)
+    local scrollChild = menuFrame.scrollChild
+    
+    -- Clear existing buttons
+    for _, btn in ipairs(menuFrame.buttons) do
+        btn:Hide()
+    end
+    
+    if not RDT.Data then
+        return
+    end
+    
+    local activeDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
+    local dungeonNames = RDT.Data:GetDungeonNames()
+    table.sort(dungeonNames)
+    
+    local yOffset = 0
+    for i, name in ipairs(dungeonNames) do
+        local btn = menuFrame.buttons[i]
+        if not btn then
+            btn = CreateFrame("Button", nil, scrollChild)
+            btn:SetSize(190, 22)
+            
+            btn:SetBackdrop({
+                bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+                edgeFile = nil,
+                tile = false,
+                insets = { left = 0, right = 0, top = 0, bottom = 0 }
+            })
+            btn:SetBackdropColor(0, 0, 0, 0)
+            
+            local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            text:SetPoint("LEFT", 8, 0)
+            text:SetJustifyH("LEFT")
+            btn.text = text
+            
+            local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            checkmark:SetPoint("RIGHT", -5, 0)
+            checkmark:SetText("<")
+            checkmark:SetTextColor(0, 1, 0)
+            btn.checkmark = checkmark
+            
+            btn:SetScript("OnEnter", function(self)
+                self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
+            end)
+            
+            btn:SetScript("OnLeave", function(self)
+                if self.isSelected then
+                    self:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+                else
+                    self:SetBackdropColor(0, 0, 0, 0)
+                end
+            end)
+            
+            menuFrame.buttons[i] = btn
+        end
+        
+        btn:SetPoint("TOPLEFT", 0, -yOffset)
+        btn.text:SetText(name)
+        btn.dungeonName = name
+        btn.isSelected = (name == activeDungeon)
+        
+        if btn.isSelected then
+            btn.checkmark:Show()
+            btn:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+        else
+            btn.checkmark:Hide()
+            btn:SetBackdropColor(0, 0, 0, 0)
+        end
+        
+        btn:SetScript("OnClick", function(self)
+            if RDT:LoadDungeon(self.dungeonName) then
+                dropdownFrame.text:SetText(self.dungeonName)
+                menuFrame:Hide()
+            end
+        end)
+        
+        btn:Show()
+        yOffset = yOffset + 22
+    end
+    
+    scrollChild:SetHeight(math.max(yOffset, 1))
 end
 
 --- Update the dungeon dropdown text
 -- @param dungeonName string Name to display
 function UI:UpdateDropdownText(dungeonName)
-    if dropdownFrame and dungeonName then
-        UIDropDownMenu_SetText(dropdownFrame, dungeonName)
+    if dropdownFrame and dropdownFrame.text and dungeonName then
+        dropdownFrame.text:SetText(dungeonName)
     end
 end
 
@@ -275,11 +473,16 @@ function UI:CreateButtonContainer(parent)
     buttonContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
     -- New Pull button (top)
-    local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer, "UIPanelButtonTemplate")
+    local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer)
     newPullButton:SetPoint("TOP", buttonContainer, "TOP", 0, -14)
     newPullButton:SetSize(240, 28)
     newPullButton:SetText("New Pull")
-    newPullButton:SetScript("OnClick", function()
+    newPullButton:RegisterForClicks("LeftButtonUp")
+    StyleSquareButton(newPullButton)
+    -- Hook click after styling
+    local origOnClick = newPullButton:GetScript("OnClick")
+    newPullButton:SetScript("OnClick", function(self, button, ...)
+        if origOnClick then origOnClick(self, button, ...) end
         if RDT.RouteManager then
             RDT.RouteManager:NewPull()
         end
@@ -287,22 +490,30 @@ function UI:CreateButtonContainer(parent)
     UI.newPullButton = newPullButton
 
     -- Reset button
-    local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer, "UIPanelButtonTemplate")
+    local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer)
     resetButton:SetPoint("TOP", newPullButton, "BOTTOM", 0, -5)
     resetButton:SetSize(240, 26)
     resetButton:SetText(L["RESET_ALL"])
-    resetButton:SetScript("OnClick", function()
+    resetButton:RegisterForClicks("LeftButtonUp")
+    StyleSquareButton(resetButton)
+    local origResetClick = resetButton:GetScript("OnClick")
+    resetButton:SetScript("OnClick", function(self, button, ...)
+        if origResetClick then origResetClick(self, button, ...) end
         if RDT.RouteManager then
             RDT.RouteManager:ResetPulls()
         end
     end)
 
     -- Export button (left side of pair)
-    local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer, "UIPanelButtonTemplate")
+    local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer)
     exportButton:SetPoint("TOPLEFT", resetButton, "BOTTOMLEFT", 0, -5)
     exportButton:SetSize(117, 24)
     exportButton:SetText("Export")
-    exportButton:SetScript("OnClick", function()
+    exportButton:RegisterForClicks("LeftButtonUp")
+    StyleSquareButton(exportButton)
+    local origExportClick = exportButton:GetScript("OnClick")
+    exportButton:SetScript("OnClick", function(self, button, ...)
+        if origExportClick then origExportClick(self, button, ...) end
         if not RDT.ImportExport then
             RDT:PrintError("ImportExport module not loaded")
             return
@@ -315,11 +526,15 @@ function UI:CreateButtonContainer(parent)
     end)
 
     -- Import button (right side of pair)
-    local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer, "UIPanelButtonTemplate")
+    local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer)
     importButton:SetPoint("TOPRIGHT", resetButton, "BOTTOMRIGHT", 0, -5)
     importButton:SetSize(117, 24)
     importButton:SetText("Import")
-    importButton:SetScript("OnClick", function()
+    importButton:RegisterForClicks("LeftButtonUp")
+    StyleSquareButton(importButton)
+    local origImportClick = importButton:GetScript("OnClick")
+    importButton:SetScript("OnClick", function(self, button, ...)
+        if origImportClick then origImportClick(self, button, ...) end
         if RDT.Dialogs and RDT.Dialogs.ShowImport then
             RDT.Dialogs:ShowImport()
         else
