@@ -484,7 +484,7 @@ function UI:CreateMapContainer(parent)
     mapTexture:SetHeight(MAP_HEIGHT - 2)
     mapTexture:SetTexture("Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
-    mapTexture:SetTexCoord(0, 1, 0, 0.9)
+    mapTexture:SetTexCoord(0, 1, 0, 0.67)
     
     -- Store reference for pack buttons to anchor to
     UI.mapContainer = mapContainer
@@ -581,15 +581,34 @@ end
 --- Load a single texture map (legacy mode)
 -- @param texturePath string Path to texture
 function UI:LoadSingleTextureMap(texturePath)
-    if not mapTexture or not mapContainer then return end
+    if not mapTexture then
+        RDT:PrintError("LoadSingleTextureMap: mapTexture is nil!")
+        return
+    end
+    
+    if not mapContainer then
+        RDT:PrintError("LoadSingleTextureMap: mapContainer is nil!")
+        return
+    end
+    
+    RDT:Print("Loading single texture map: " .. tostring(texturePath))
     
     -- Hide all tiles
     self:ClearMapTiles()
+    
+    -- Clear all points and reanchor (in case it got disconnected)
+    mapTexture:ClearAllPoints()
+    mapTexture:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", 1, -1)
+    mapTexture:SetPoint("TOPRIGHT", mapContainer, "TOPRIGHT", -1, -1)
+    mapTexture:SetHeight(MAP_HEIGHT - 2)
     
     -- Show and set legacy texture
     mapTexture:Show()
     mapTexture:SetTexture(texturePath or "Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
+    mapTexture:SetTexCoord(0, 1, 0, 0.67)
+    
+    RDT:Print("Map texture loaded, shown, size: " .. mapTexture:GetWidth() .. "x" .. mapTexture:GetHeight())
 end
 
 --- Create floor selection buttons
@@ -634,7 +653,10 @@ end
 -- @param dungeonName string Name of the dungeon
 -- @param floor number Floor number (optional, defaults to 1)
 function UI:UpdateMapForDungeon(dungeonName, floor)
-    if not RDT.Data or not dungeonName then return end
+    if not RDT.Data or not dungeonName then
+        RDT:PrintError("UpdateMapForDungeon: Invalid parameters")
+        return
+    end
     
     -- Use the proper Data module method to get dungeon data
     local dungeonData = RDT.Data:GetDungeon(dungeonName)
@@ -643,10 +665,11 @@ function UI:UpdateMapForDungeon(dungeonName, floor)
         return
     end
     
-    RDT:DebugPrint("Loading map for: " .. dungeonName .. " (Floor " .. (floor or 1) .. ")")
+    RDT:Print("UpdateMapForDungeon: " .. dungeonName .. " (Floor " .. (floor or 1) .. ")")
     
     -- Check if this dungeon uses tiles
     if dungeonData.tiles then
+        RDT:Print("Using tiled map")
         -- Load tiled map
         self:LoadTiledMap(dungeonData.tiles, floor or 1)
         
@@ -654,6 +677,7 @@ function UI:UpdateMapForDungeon(dungeonName, floor)
         local numFloors = dungeonData.tiles.floors and #dungeonData.tiles.floors or 1
         self:CreateFloorButtons(numFloors)
     elseif dungeonData.texture then
+        RDT:Print("Using single texture: " .. dungeonData.texture)
         -- Load single texture (legacy mode)
         self:LoadSingleTextureMap(dungeonData.texture)
         

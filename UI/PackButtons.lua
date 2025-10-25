@@ -10,9 +10,9 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 -- Pack button styling constants
-local MOB_ICON_SIZE = 32
-local MOB_ICON_SPACING = 6
-local MOB_HIGHLIGHT_SIZE = 36
+local MOB_ICON_SIZE = 20  -- Reduced from 32 to 20 for better scaling on larger maps
+local MOB_ICON_SPACING = 1  -- Reduced spacing
+local MOB_HIGHLIGHT_SIZE = 24  -- Adjusted to match new icon size
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 -- Pull border frames (one per pull, encompasses all packs)

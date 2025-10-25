@@ -1,5 +1,5 @@
 -- Data.lua
--- Dungeon definitions and data management module with mob dictionary support
+-- Dungeon definitions and data management module with mob dictionary
 -- NOTE: This file loads AFTER Core/Init.lua, so RDT object already exists
 --
 -- MAP TEXTURE FORMATS:
@@ -70,7 +70,7 @@ local mobDatabase = {
         count = 2,
         creatureId = 10003,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 9.0, -- Full size elite
+        scale = 0.9, -- Full size elite
     },
     ["generic_elite_mob"] = {
         name = "Generic Elite Mob",
@@ -85,7 +85,7 @@ local mobDatabase = {
         creatureId = 10003,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
         scale = 1.0, -- Full size elite
-    }
+    },
 }
 
 --------------------------------------------------------------------------------
@@ -93,6 +93,7 @@ local mobDatabase = {
 --------------------------------------------------------------------------------
 
 dungeons["Stratholme"] = {
+    --texture = "Interface\\GLUES\\LOADINGSCREENS\\LoadScreenNorthrend", -- Test with known working texture
     texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Classic\\stratholme",
     packData = {
         -- First room
@@ -114,8 +115,8 @@ dungeons["Stratholme"] = {
                 ["generic_big_mob"] = 1,
                 ["generic_elite_mob"] = 1,
             }
-        }
-    }
+        },
+    },
 }
 
 --------------------------------------------------------------------------------
