@@ -29,14 +29,16 @@ RDT.State = {
 }
 
 --------------------------------------------------------------------------------
--- Pull Colors (4-color repeating cycle)
+-- Pull Colors (6-color repeating cycle)
 --------------------------------------------------------------------------------
 
 local basePullColors = {
-    {0.0, 0.8, 1.0},  -- Cyan/Aqua - Pull 1, 5, 9, ...
-    {1.0, 0.5, 0.0},  -- Orange - Pull 2, 6, 10, ...
-    {0.6, 0.2, 1.0},  -- Purple - Pull 3, 7, 11, ...
-    {0.0, 1.0, 0.4},  -- Green - Pull 4, 8, 12, ...
+    {0.2, 0.8, 1.0},  -- Bright Cyan - Pull 1, 5, 9, ...
+    {1.0, 0.6, 0.1},  -- Vibrant Orange - Pull 2, 6, 10, ...
+    {0.8, 0.3, 1.0},  -- Vivid Purple - Pull 3, 7, 11, ...
+    {0.3, 1.0, 0.5},  -- Bright Green - Pull 4, 8, 12, ...
+    {1.0, 0.2, 0.5},  -- Hot Pink - Pull 5, 9, 13, ...
+    {1.0, 1.0, 0.2},  -- Bright Yellow - Pull 6, 10, 14, ...
 }
 
 local unassignedColor = {0.5, 0.5, 0.5}  -- Gray for unassigned packs
@@ -192,6 +194,9 @@ function RDT:LoadDungeon(dungeonName)
         return false
     end
     
+    -- Save current dungeon to DB BEFORE updating UI (so UI can read the correct dungeon)
+    self.db.profile.currentDungeon = dungeonName
+    
     -- Update UI (load map FIRST, then create packs)
     if self.UI then
         -- Load map first
@@ -220,10 +225,11 @@ function RDT:LoadDungeon(dungeonName)
         if self.UI.UpdatePullList then
             self.UI:UpdatePullList()
         end
+        -- Explicitly update total forces after everything is loaded
+        if self.UI.UpdateTotalForces then
+            self.UI:UpdateTotalForces()
+        end
     end
-    
-    -- Save current dungeon to DB
-    self.db.profile.currentDungeon = dungeonName
     
     self:DebugPrint("Dungeon loaded successfully")
     return true

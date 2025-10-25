@@ -50,7 +50,7 @@ local mainGate = {
             "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_main_gate\\tile_5",
         }
     },
-    totalCount = 30,
+    totalCount = 110,
     packData = {
         {
             id = 1,

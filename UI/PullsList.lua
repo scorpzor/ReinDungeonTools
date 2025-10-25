@@ -81,15 +81,47 @@ end
 function UI:InitializePullsList(panel)
     pullsPanel = panel
 
-    -- Total forces display (at top)
-    totalForcesLabel = pullsPanel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    totalForcesLabel:SetPoint("TOP", 0, -12)
-    totalForcesLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
-    totalForcesLabel:SetText(L["TOTAL_FORCES"] .. ": 0%")
+    -- Total forces progress bar (at top)
+    local progressBarFrame = CreateFrame("Frame", "RDT_ForcesProgressBar", pullsPanel)
+    progressBarFrame:SetPoint("TOP", 0, -8)
+    progressBarFrame:SetSize(240, 24)
+    
+    -- Background
+    progressBarFrame.bg = progressBarFrame:CreateTexture(nil, "BACKGROUND")
+    progressBarFrame.bg:SetAllPoints()
+    progressBarFrame.bg:SetColorTexture(0.1, 0.1, 0.1, 0.8)
+    
+    -- Border
+    progressBarFrame.border = progressBarFrame:CreateTexture(nil, "BORDER")
+    progressBarFrame.border:SetAllPoints()
+    progressBarFrame.border:SetColorTexture(0.3, 0.3, 0.3, 1)
+    progressBarFrame.bg:SetPoint("TOPLEFT", 1, -1)
+    progressBarFrame.bg:SetPoint("BOTTOMRIGHT", -1, 1)
+    
+    -- Progress fill bar (starts at 0 width)
+    progressBarFrame.fill = progressBarFrame:CreateTexture(nil, "ARTWORK")
+    progressBarFrame.fill:SetPoint("LEFT", 1, 0)
+    progressBarFrame.fill:SetHeight(22)
+    progressBarFrame.fill:SetWidth(0)
+    progressBarFrame.fill:SetColorTexture(0.3, 1.0, 0.3, 0.6)
+    
+    -- Text overlay
+    progressBarFrame.text = progressBarFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    progressBarFrame.text:SetPoint("CENTER")
+    progressBarFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    progressBarFrame.text:SetText("0/100 (0.0%)")
+    progressBarFrame.text:SetTextColor(1.0, 1.0, 1.0)
+    
+    -- Store reference for compatibility
+    totalForcesLabel = progressBarFrame
+    
+    -- Initialize the bar to 0
+    progressBarFrame.fill:SetWidth(0)
+    progressBarFrame.fill:SetColorTexture(1.0, 0.3, 0.3, 0.7)
 
     -- ScrollFrame for pulls list
     pullsScrollFrame = CreateFrame("ScrollFrame", "RDT_PullsScroll", pullsPanel, "UIPanelScrollFrameTemplate")
-    pullsScrollFrame:SetPoint("TOPLEFT", 2, -35)
+    pullsScrollFrame:SetPoint("TOPLEFT", 2, -40)
     pullsScrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
 
     pullsScrollChild = CreateFrame("Frame", "RDT_PullsScrollChild", pullsScrollFrame)
@@ -206,12 +238,13 @@ function UI:RenderPullEntry(pullNum, yOffset)
     table.sort(packDetails, function(a, b) return a.id < b.id end)
     
     local startYOffset = yOffset
-    local entryHeight = 28  -- Fixed height for each pull entry
+    local entryHeight = 34  -- Fixed height for each pull entry
     
     -- Get pull color
     local r, g, b = unpack(RDT:GetPullColor(pullNum))
     if isCurrentPull then
-        r, g, b = math.min(1, r * 1.5), math.min(1, g * 1.5), math.min(1, b * 1.5)
+        -- Brighten the text color for selected pull
+        r, g, b = math.min(1, r * 1.3), math.min(1, g * 1.3), math.min(1, b * 1.3)
     end
     
     -- Create/get the button first (so we can anchor text to it)
@@ -226,6 +259,14 @@ function UI:RenderPullEntry(pullNum, yOffset)
         bgTexture:SetAllPoints(pullButton)
         bgTexture:SetColorTexture(0, 0, 0, 0)
         pullButton.bgTexture = bgTexture
+        
+        -- Create selection highlight border (left edge indicator)
+        local highlightBorder = pullButton:CreateTexture(nil, "OVERLAY")
+        highlightBorder:SetPoint("TOPLEFT", pullButton, "TOPLEFT", 0, 0)
+        highlightBorder:SetPoint("BOTTOMLEFT", pullButton, "BOTTOMLEFT", 0, 0)
+        highlightBorder:SetWidth(4)
+        highlightBorder:SetColorTexture(1, 1, 1, 0)  -- Start hidden
+        pullButton.highlightBorder = highlightBorder
         
         -- Set up hover handlers with tooltip
         pullButton:SetScript("OnEnter", function(self)
@@ -277,21 +318,30 @@ function UI:RenderPullEntry(pullNum, yOffset)
     if pullButton.bgTexture then
         local bgR, bgG, bgB = unpack(RDT:GetPullColor(pullNum))
         -- Fade the color significantly for background
-        local fadeAlpha = isCurrentPull and 0.25 or 0.15
+        local fadeAlpha = isCurrentPull and 0.35 or 0.15
         pullButton.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
+    end
+    
+    -- Update selection highlight border
+    if pullButton.highlightBorder then
+        if isCurrentPull then
+            local highlightR, highlightG, highlightB = unpack(RDT:GetPullColor(pullNum))
+            pullButton.highlightBorder:SetColorTexture(highlightR, highlightG, highlightB, 1.0)
+        else
+            pullButton.highlightBorder:SetColorTexture(1, 1, 1, 0)  -- Hide
+        end
     end
     
     pullButton:Show()
     
     -- Now add text elements anchored to the button
     -- Left: Pull number
-    local prefix = isCurrentPull and "> " or ""
     local pullLabel = fontStringPool:Acquire()
     pullLabel:SetParent(pullButton)
     pullLabel:SetPoint("LEFT", pullButton, "LEFT", 8, 0)
     pullLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     pullLabel:SetJustifyH("LEFT")
-    pullLabel:SetText(string.format("|cFFFFFFFF%s%s %d|r", prefix, L["PULL"], pullNum))
+    pullLabel:SetText(string.format("|cFFFFFFFF%s %d|r", L["PULL"], pullNum))
     pullLabel:SetTextColor(r, g, b)
     
     -- Center: Pack list or "empty"
@@ -361,7 +411,10 @@ end
 
 --- Update the total forces counter
 function UI:UpdateTotalForces()
-    if not totalForcesLabel then return end
+    -- Safety check: ensure progress bar is initialized
+    if not totalForcesLabel or not totalForcesLabel.fill or not totalForcesLabel.text then 
+        return 
+    end
     
     -- Get current count
     local currentCount = 0
@@ -378,17 +431,27 @@ function UI:UpdateTotalForces()
     -- Calculate percentage
     local percentage = (currentCount / requiredCount) * 100
     
-    -- Format: "50.5/100 (50.5%)"
-    totalForcesLabel:SetText(string.format("%s: %.1f/%.0f (%.1f%%)", L["TOTAL_FORCES"], currentCount, requiredCount, percentage))
+    -- Calculate bar width (max 238 pixels to account for 1px border on each side)
+    local maxBarWidth = 238
+    local barWidth = math.min(maxBarWidth, (percentage / 100) * maxBarWidth)
+    totalForcesLabel.fill:SetWidth(barWidth)
     
-    -- Color based on completion (100% is the goal)
+    -- Update text: "50.5/100 (50.5%)"
+    totalForcesLabel.text:SetText(string.format("%.1f/%.0f (%.1f%%)", currentCount, requiredCount, percentage))
+    
+    -- Color the fill bar based on completion (100% is the goal)
+    local r, g, b
     if percentage < 100 then
-        totalForcesLabel:SetTextColor(1.0, 0.3, 0.3)  -- Red - under 100%
-    elseif percentage >= 100 and percentage < 101 then
-        totalForcesLabel:SetTextColor(0.3, 1.0, 0.3)  -- Green - around 100%
+        r, g, b = 1.0, 0.3, 0.3  -- Red - under 100%
+    elseif percentage >= 100 and percentage <= 105 then
+        r, g, b = 0.3, 1.0, 0.3  -- Green - around 100%
     else
-        totalForcesLabel:SetTextColor(1.0, 0.8, 0.2)  -- Yellow - over 100%
+        r, g, b = 1.0, 0.8, 0.2  -- Yellow/Orange - over 105%
     end
+    totalForcesLabel.fill:SetColorTexture(r, g, b, 0.7)
+    
+    -- Text color (always white with outline for readability)
+    totalForcesLabel.text:SetTextColor(1.0, 1.0, 1.0)
 end
 
 --- Get current total forces value
