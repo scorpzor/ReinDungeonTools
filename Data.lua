@@ -45,7 +45,8 @@ local Data = RDT.Data
 local dungeons = {}
 
 -- Mob definitions (shared across all dungeons)
--- Each mob has: name, count (enemy forces %), creatureId (optional), displayIcon (optional), scale (optional)
+-- Each mob has: name, count (enemy forces value, decimal), creatureId (optional), displayIcon (optional), scale (optional)
+-- count: decimal value representing enemy forces (e.g., 0.5 for weak trash, 2.0 for elite)
 -- displayIcon can be: SetPortraitTexture for 3D portrait, or explicit texture path
 -- If no displayIcon, defaults to question mark icon
 -- scale: visual size multiplier (0.6-1.0), defaults to 1.0. Smaller scale = less important mob
@@ -91,10 +92,15 @@ local mobDatabase = {
 --------------------------------------------------------------------------------
 -- Stratholme
 --------------------------------------------------------------------------------
+-- Dungeon structure:
+--   texture: Map texture path (single texture or tiles structure)
+--   totalCount: Required enemy forces count for 100% completion (e.g., 100)
+--   packData: Array of pack definitions with id, x, y, and mobs
 
 dungeons["Stratholme"] = {
     --texture = "Interface\\GLUES\\LOADINGSCREENS\\LoadScreenNorthrend", -- Test with known working texture
     texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Classic\\stratholme",
+    totalCount = 120,  -- Required enemy forces to complete (100%)
     packData = {
         -- First room
         {
@@ -161,7 +167,7 @@ end
 
 --- Calculate pack count from mob composition
 -- @param mobs table Map of {mobKey = quantity}
--- @return number Total enemy forces percentage
+-- @return number Total enemy forces count (decimal)
 function Data:CalculatePackCount(mobs)
     if type(mobs) ~= "table" then
         return 0
@@ -243,7 +249,7 @@ end
 
 --- Get total available forces for a dungeon
 -- @param dungeonName string Name of the dungeon
--- @return number Total enemy forces percentage
+-- @return number Total enemy forces count (decimal)
 function Data:GetDungeonTotalForces(dungeonName)
     local dungeon = dungeons[dungeonName]
     if not dungeon or not dungeon.packData then
@@ -255,6 +261,17 @@ function Data:GetDungeonTotalForces(dungeonName)
         total = total + self:CalculatePackCount(pack.mobs)
     end
     return total
+end
+
+--- Get required enemy forces count to complete dungeon (100%)
+-- @param dungeonName string Name of the dungeon
+-- @return number Required count for 100% completion
+function Data:GetDungeonRequiredCount(dungeonName)
+    local dungeon = dungeons[dungeonName]
+    if not dungeon then
+        return 100  -- Default to 100
+    end
+    return dungeon.totalCount or 100
 end
 
 --- Get number of packs in a dungeon
@@ -508,9 +525,13 @@ function Data:PrintDungeonInfo(dungeonName)
     end
     
     if RDT.Print then
+        local totalForces = self:GetDungeonTotalForces(dungeonName)
+        local requiredCount = self:GetDungeonRequiredCount(dungeonName)
+        local percentage = (totalForces / requiredCount) * 100
+        
         RDT:Print(string.format("Dungeon: %s", dungeonName))
         RDT:Print(string.format("  Packs: %d", #dungeon.packData))
-        RDT:Print(string.format("  Total Forces: %d%%", self:GetDungeonTotalForces(dungeonName)))
+        RDT:Print(string.format("  Total Forces: %.1f/%.0f (%.1f%%)", totalForces, requiredCount, percentage))
         RDT:Print(string.format("  Texture: %s", dungeon.texture))
     end
 end
@@ -523,7 +544,9 @@ function Data:PrintDungeonList()
         for _, name in ipairs(names) do
             local packCount = self:GetDungeonPackCount(name)
             local totalForces = self:GetDungeonTotalForces(name)
-            RDT:Print(string.format("  - %s (%d packs, %d%% forces)", name, packCount, totalForces))
+            local requiredCount = self:GetDungeonRequiredCount(name)
+            local percentage = (totalForces / requiredCount) * 100
+            RDT:Print(string.format("  - %s (%d packs, %.1f/%.0f forces = %.1f%%)", name, packCount, totalForces, requiredCount, percentage))
         end
     end
 end
@@ -558,13 +581,13 @@ function Data:PrintPackInfo(dungeonName, packId)
     if RDT.Print then
         RDT:Print(string.format("Pack %d:", packId))
         RDT:Print(string.format("  Position: (%.2f, %.2f)", pack.x, pack.y))
-        RDT:Print(string.format("  Total Count: %d%%", self:CalculatePackCount(pack.mobs)))
+        RDT:Print(string.format("  Total Count: %.1f", self:CalculatePackCount(pack.mobs)))
         RDT:Print("  Mobs:")
         
         for mobKey, quantity in pairs(pack.mobs) do
             local mobDef = mobDatabase[mobKey]
             if mobDef then
-                RDT:Print(string.format("    - %dx %s (%d%% each = %d%% total)", 
+                RDT:Print(string.format("    - %dx %s (%.1f each = %.1f total)", 
                     quantity, mobDef.name, mobDef.count, quantity * mobDef.count))
             else
                 RDT:Print(string.format("    - %dx %s (UNKNOWN MOB)", quantity, mobKey))

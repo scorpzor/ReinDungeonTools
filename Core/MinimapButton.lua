@@ -95,6 +95,23 @@ function MinimapButton:OnTooltipShow(tooltip)
             end
             tooltip:AddLine("|cFFFFAA00Pulls Planned:|r " .. pullCount, 1, 1, 0.7)
         end
+        
+        -- Add total forces if available
+        if RDT.RouteManager and RDT.Data then
+            local currentCount = RDT.RouteManager:CalculateTotalForces()
+            local requiredCount = RDT.Data:GetDungeonRequiredCount(currentDungeon)
+            local percentage = (currentCount / requiredCount) * 100
+            
+            local colorCode = "|cFFFF4444"  -- Red
+            if percentage >= 100 and percentage < 101 then
+                colorCode = "|cFF44FF44"  -- Green
+            elseif percentage > 100 then
+                colorCode = "|cFFFFCC44"  -- Yellow
+            end
+            
+            tooltip:AddLine(string.format("|cFFFFAA00Enemy Forces:|r %s%.1f/%.0f (%.1f%%)|r", 
+                colorCode, currentCount, requiredCount, percentage), 1, 1, 0.7)
+        end
     end
 end
 

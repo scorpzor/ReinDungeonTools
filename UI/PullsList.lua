@@ -315,12 +315,19 @@ function UI:RenderPullEntry(pullNum, yOffset)
     packList:SetText(centerText)
     packList:SetTextColor(0.8, 0.8, 0.8)
     
-    -- Right: Percentage
+    -- Right: Percentage (calculated based on dungeon's required count)
     local percentText
     if #packs == 0 then
         percentText = "(0%)"
     else
-        percentText = string.format("(%d%%)", totalCount)
+        -- Get required count for this dungeon
+        local requiredCount = 100  -- Default
+        if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.Data then
+            requiredCount = RDT.Data:GetDungeonRequiredCount(RDT.db.profile.currentDungeon)
+        end
+        
+        local percentage = (totalCount / requiredCount) * 100
+        percentText = string.format("(%.1f%%)", percentage)
     end
     
     local percentLabel = fontStringPool:Acquire()
@@ -356,18 +363,29 @@ end
 function UI:UpdateTotalForces()
     if not totalForcesLabel then return end
     
-    local totalForces = 0
+    -- Get current count
+    local currentCount = 0
     if RDT.RouteManager then
-        totalForces = RDT.RouteManager:CalculateTotalForces()
+        currentCount = RDT.RouteManager:CalculateTotalForces()
     end
     
-    totalForcesLabel:SetText(string.format("%s: %d%%", L["TOTAL_FORCES"], totalForces))
+    -- Get required count for this dungeon
+    local requiredCount = 100  -- Default
+    if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.Data then
+        requiredCount = RDT.Data:GetDungeonRequiredCount(RDT.db.profile.currentDungeon)
+    end
+    
+    -- Calculate percentage
+    local percentage = (currentCount / requiredCount) * 100
+    
+    -- Format: "50.5/100 (50.5%)"
+    totalForcesLabel:SetText(string.format("%s: %.1f/%.0f (%.1f%%)", L["TOTAL_FORCES"], currentCount, requiredCount, percentage))
     
     -- Color based on completion (100% is the goal)
-    if totalForces < 100 then
+    if percentage < 100 then
         totalForcesLabel:SetTextColor(1.0, 0.3, 0.3)  -- Red - under 100%
-    elseif totalForces == 100 then
-        totalForcesLabel:SetTextColor(0.3, 1.0, 0.3)  -- Green - exactly 100%
+    elseif percentage >= 100 and percentage < 101 then
+        totalForcesLabel:SetTextColor(0.3, 1.0, 0.3)  -- Green - around 100%
     else
         totalForcesLabel:SetTextColor(1.0, 0.8, 0.2)  -- Yellow - over 100%
     end

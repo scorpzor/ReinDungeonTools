@@ -276,15 +276,21 @@ function UI:OnMobIconEnter(button)
     -- Mob name as title
     if button.mobInfo then
         GameTooltip:SetText(button.mobInfo.name, 1, 1, 0.5, 1, true)
-        GameTooltip:AddLine("Enemy Forces: " .. button.mobInfo.count .. "%", 1, 1, 1)
+        GameTooltip:AddLine(string.format("Enemy Forces: %.1f", button.mobInfo.count), 1, 1, 1)
     end
     
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine(L["PACK"] .. " " .. button.packId, 0.7, 0.7, 0.7)
     
-    -- Show pack total
+    -- Show pack total with percentage
     if packGroup then
-        GameTooltip:AddLine("Pack Total: " .. packGroup.count .. "%", 1, 1, 1)
+        -- Calculate percentage based on dungeon's required count
+        local requiredCount = 100
+        if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.Data then
+            requiredCount = RDT.Data:GetDungeonRequiredCount(RDT.db.profile.currentDungeon)
+        end
+        local percentage = (packGroup.count / requiredCount) * 100
+        GameTooltip:AddLine(string.format("Pack Total: %.1f (%.1f%%)", packGroup.count, percentage), 1, 1, 1)
         
         -- Show pack composition
         if packGroup.mobs and next(packGroup.mobs) then
@@ -305,7 +311,7 @@ function UI:OnMobIconEnter(button)
                     local mobTotalCount = mobData.quantity * mobDef.count
                     GameTooltip:AddDoubleLine(
                         string.format("%dx %s", mobData.quantity, mobDef.name),
-                        string.format("%d%%", mobTotalCount),
+                        string.format("%.1f", mobTotalCount),
                         0.8, 0.8, 0.8,
                         0.8, 0.8, 0.8
                     )
