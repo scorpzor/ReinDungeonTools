@@ -199,78 +199,15 @@ function UI:RenderPullEntry(pullNum, yOffset)
     table.sort(packDetails, function(a, b) return a.id < b.id end)
     
     local startYOffset = yOffset
+    local entryHeight = 28  -- Fixed height for each pull entry
     
     -- Get pull color
     local r, g, b = unpack(RDT:GetPullColor(pullNum))
-    
-    -- Create pull header (clickable, highlight if current)
-    local header = fontStringPool:Acquire()
-    header:SetPoint("TOPLEFT", 8, yOffset)
-    header:SetWidth(PULLS_PANEL_WIDTH - 40)
-    header:SetJustifyH("LEFT")
-    header:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
-    
-    local prefix = isCurrentPull and "> " or ""
-    local headerText
-    if #packs == 0 then
-        -- Empty pull (current pull only)
-        headerText = string.format("|cFFFFFFFF%s%s %d|r (empty)", prefix, L["PULL"], pullNum)
-    else
-        headerText = string.format("|cFFFFFFFF%s%s %d|r (%d%%)", prefix, L["PULL"], pullNum, totalCount)
-    end
-    header:SetText(headerText)
-    
-    -- Brighten color if this is the current pull
     if isCurrentPull then
         r, g, b = math.min(1, r * 1.5), math.min(1, g * 1.5), math.min(1, b * 1.5)
     end
-    header:SetTextColor(r, g, b)
     
-    yOffset = yOffset - 18
-    
-    -- Create pack list (only if there are packs)
-    if #packs > 0 then
-        local packIds = {}
-        for _, pack in ipairs(packDetails) do
-            tinsert(packIds, string.format("#%d (%d%%)", pack.id, pack.count))
-        end
-        
-        local packListText = table.concat(packIds, ", ")
-        
-        -- Word wrap if too long
-        local maxCharsPerLine = 35
-        if #packListText > maxCharsPerLine then
-            packListText = self:WrapText(packListText, maxCharsPerLine)
-        end
-        
-        local packList = fontStringPool:Acquire()
-        packList:SetPoint("TOPLEFT", 18, yOffset)
-        packList:SetWidth(PULLS_PANEL_WIDTH - 50)
-        packList:SetJustifyH("LEFT")
-        packList:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-        packList:SetText(packListText)
-        packList:SetTextColor(0.8, 0.8, 0.8)
-        
-        -- Calculate height of text (approximate)
-        local lines = select(2, packListText:gsub("\n", "\n")) + 1
-        yOffset = yOffset - (lines * 12)
-    else
-        -- Empty pull - show "Click packs to add" message
-        local emptyMsg = fontStringPool:Acquire()
-        emptyMsg:SetPoint("TOPLEFT", 18, yOffset)
-        emptyMsg:SetWidth(PULLS_PANEL_WIDTH - 50)
-        emptyMsg:SetJustifyH("LEFT")
-        emptyMsg:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-        emptyMsg:SetText("|cFF888888Click packs to add...|r")
-        emptyMsg:SetTextColor(0.5, 0.5, 0.5)
-        yOffset = yOffset - 12
-    end
-    
-    -- Add spacing between pulls
-    yOffset = yOffset - 8
-    
-    -- Create invisible button overlay for hover/click interactions
-    local entryHeight = math.abs(startYOffset - yOffset)
+    -- Create/get the button first (so we can anchor text to it)
     local pullButton = pullButtons[pullNum]
     
     if not pullButton then
@@ -337,8 +274,56 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     pullButton:Show()
     
-    -- Add 1px spacing after this pull
-    yOffset = yOffset - 1
+    -- Now add text elements anchored to the button
+    -- Left: Pull number
+    local prefix = isCurrentPull and "> " or ""
+    local pullLabel = fontStringPool:Acquire()
+    pullLabel:SetParent(pullButton)
+    pullLabel:SetPoint("LEFT", pullButton, "LEFT", 8, 0)
+    pullLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    pullLabel:SetJustifyH("LEFT")
+    pullLabel:SetText(string.format("|cFFFFFFFF%s%s %d|r", prefix, L["PULL"], pullNum))
+    pullLabel:SetTextColor(r, g, b)
+    
+    -- Center: Pack list or "empty"
+    local centerText
+    if #packs == 0 then
+        centerText = "|cFF888888empty|r"
+    else
+        local packIds = {}
+        for _, pack in ipairs(packDetails) do
+            tinsert(packIds, string.format("#%d", pack.id))
+        end
+        centerText = "(" .. table.concat(packIds, ", ") .. ")"
+    end
+    
+    local packList = fontStringPool:Acquire()
+    packList:SetParent(pullButton)
+    packList:SetPoint("CENTER", pullButton, "CENTER", 0, 0)
+    packList:SetWidth(PULLS_PANEL_WIDTH - 120)
+    packList:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    packList:SetJustifyH("CENTER")
+    packList:SetText(centerText)
+    packList:SetTextColor(0.8, 0.8, 0.8)
+    
+    -- Right: Percentage
+    local percentText
+    if #packs == 0 then
+        percentText = "(0%)"
+    else
+        percentText = string.format("(%d%%)", totalCount)
+    end
+    
+    local percentLabel = fontStringPool:Acquire()
+    percentLabel:SetParent(pullButton)
+    percentLabel:SetPoint("RIGHT", pullButton, "RIGHT", -8, 0)
+    percentLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+    percentLabel:SetJustifyH("RIGHT")
+    percentLabel:SetText(percentText)
+    percentLabel:SetTextColor(r, g, b)
+    
+    -- Update yOffset for next entry
+    yOffset = yOffset - entryHeight - 2  -- 1px spacing
     
     return yOffset
 end
