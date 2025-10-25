@@ -392,7 +392,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if validPacks == 0 or not minX then return end
     
     -- Add padding around the bounding box
-    local padding = 8  -- Reduced from 20 for tighter fit
+    local padding = 0
     minX = minX - padding
     maxX = maxX + padding
     minY = minY - padding
