@@ -10,7 +10,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 _G.RDT = RDT
 
 -- Addon metadata
-RDT.Version = "1.0.0"
+RDT.Version = GetAddOnMetadata(ADDON_NAME, "Version") or "1.0.0"
 RDT.AddonName = ADDON_NAME
 
 -- Debug flag (will be set by Database module from saved vars)

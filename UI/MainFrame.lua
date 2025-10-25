@@ -9,8 +9,8 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 -- UI Constants
-local FRAME_WIDTH, FRAME_HEIGHT = 1350, 850
-local MAP_WIDTH, MAP_HEIGHT = 1050, 740
+local FRAME_WIDTH, FRAME_HEIGHT = 1350, 820
+local MAP_WIDTH, MAP_HEIGHT = 1050, 760
 local PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT = 260, 580
 local BUTTON_PANEL_HEIGHT = 140
 
@@ -31,6 +31,8 @@ local buttonContainer
 function UI:CreateMainFrame()
     if mainFrame then
         RDT:DebugPrint("MainFrame already exists")
+        -- Make sure textures are visible after reload
+        mainFrame:Show()
         return mainFrame
     end
     
@@ -51,19 +53,20 @@ function UI:CreateMainFrame()
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
         tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+        edgeSize = 2,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
     })
     mainFrame:SetBackdropColor(0.05, 0.05, 0.05, 0.95)
-    mainFrame:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
+    mainFrame:SetBackdropBorderColor(0.15, 0.15, 0.15, 1)
     mainFrame:Hide()
 
     -- Title bar background
-    local titleBg = mainFrame:CreateTexture(nil, "BACKGROUND")
-    titleBg:SetPoint("TOPLEFT", 1, -1)
-    titleBg:SetPoint("TOPRIGHT", -1, -1)
+    local titleBg = mainFrame:CreateTexture(nil, "ARTWORK")
+    titleBg:SetPoint("TOPLEFT", 2, -2)
+    titleBg:SetPoint("TOPRIGHT", -2, -2)
     titleBg:SetHeight(36)
     titleBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
+    mainFrame.titleBg = titleBg  -- Store reference
 
     -- Title text (centered)
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -72,9 +75,10 @@ function UI:CreateMainFrame()
     titleText:SetText(L["TITLE"])
     titleText:SetJustifyH("CENTER")
 
-    -- Close button
+    -- Close button (in title bar)
     local closeButton = CreateFrame("Button", nil, mainFrame, "UIPanelCloseButton")
-    closeButton:SetPoint("TOPRIGHT", -8, -8)
+    closeButton:SetPoint("TOPRIGHT", -5, -5)
+    closeButton:SetSize(24, 24)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
     -- Create dungeon dropdown
@@ -90,22 +94,23 @@ function UI:CreateMainFrame()
     self:CreatePullsPanel(mainFrame)
     
     -- Bottom bar background
-    local bottomBg = mainFrame:CreateTexture(nil, "BACKGROUND")
-    bottomBg:SetPoint("BOTTOMLEFT", 1, 1)
-    bottomBg:SetPoint("BOTTOMRIGHT", -1, 1)
-    bottomBg:SetHeight(20)
+    local bottomBg = mainFrame:CreateTexture(nil, "ARTWORK")
+    bottomBg:SetPoint("BOTTOMLEFT", 2, 2)
+    bottomBg:SetPoint("BOTTOMRIGHT", -2, 2)
+    bottomBg:SetHeight(16)
     bottomBg:SetColorTexture(0.1, 0.1, 0.15, 0.9)
+    mainFrame.bottomBg = bottomBg  -- Store reference
 
     -- Help text at bottom (left side)
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    helpText:SetPoint("BOTTOMLEFT", 8, 6)
+    helpText:SetPoint("BOTTOMLEFT", 7, 6)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
     helpText:SetText("Left-Click Pack: Add to Pull | Click Pull Sidebar: Switch Pull | Right-Click: Remove")
     helpText:SetTextColor(0.6, 0.6, 0.6)
     
     -- Version text (bottom right)
     versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    versionText:SetPoint("BOTTOMRIGHT", -8, 6)
+    versionText:SetPoint("BOTTOMRIGHT", -7, 6)
     versionText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
     versionText:SetText("|cFF888888v" .. RDT.Version .. "|r")
     versionText:SetTextColor(0.5, 0.5, 0.5)
@@ -122,8 +127,8 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
     dropdownFrame = CreateFrame("Frame", "RDT_DungeonDropdown", parent, "UIDropDownMenuTemplate")
-    dropdownFrame:SetPoint("TOPLEFT", -10, -24)
-    UIDropDownMenu_SetWidth(dropdownFrame, 240)
+    dropdownFrame:SetPoint("TOPLEFT", -10, -10)
+    UIDropDownMenu_SetWidth(dropdownFrame, 220)
     
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
     UIDropDownMenu_SetText(dropdownFrame, currentDungeon)
@@ -170,7 +175,7 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
-    mapContainer:SetPoint("TOPLEFT", 8, -46)
+    mapContainer:SetPoint("TOPLEFT", 5, -42)
     mapContainer:SetSize(MAP_WIDTH, MAP_HEIGHT)
     mapContainer:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -225,8 +230,9 @@ end
 -- @param parent Frame Parent frame
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
-    pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -8)
-    pullsPanel:SetPoint("BOTTOMLEFT", mapContainer, "BOTTOMRIGHT", 8, 0)
+    pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -4)
+    pullsPanel:SetPoint("BOTTOMLEFT", mapContainer, "BOTTOMRIGHT", 4, 0)
+    pullsPanel:SetPoint("BOTTOMRIGHT", -5, 22)
     pullsPanel:SetWidth(PULLS_PANEL_WIDTH)
     pullsPanel:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -255,8 +261,9 @@ end
 -- @param parent Frame Parent frame
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
-    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 8, 0)
-    buttonContainer:SetSize(PULLS_PANEL_WIDTH, BUTTON_PANEL_HEIGHT)
+    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 4, 0)
+    buttonContainer:SetPoint("TOPRIGHT", -5, -42)
+    buttonContainer:SetHeight(BUTTON_PANEL_HEIGHT)
     buttonContainer:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
