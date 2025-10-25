@@ -98,7 +98,6 @@ local mobDatabase = {
 --   packData: Array of pack definitions with id, x, y, and mobs
 
 dungeons["Stratholme"] = {
-    --texture = "Interface\\GLUES\\LOADINGSCREENS\\LoadScreenNorthrend", -- Test with known working texture
     texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Classic\\stratholme",
     totalCount = 120,  -- Required enemy forces to complete (100%)
     packData = {

@@ -440,26 +440,6 @@ function UI:WrapText(text, maxChars)
 end
 
 --------------------------------------------------------------------------------
--- Pull List Interaction (Future Feature)
---------------------------------------------------------------------------------
-
---- Scroll to a specific pull in the list
--- @param pullNum number Pull number to scroll to
-function UI:ScrollToPull(pullNum)
-    -- TODO: Calculate position and scroll
-    RDT:DebugPrint("ScrollToPull not yet implemented: " .. pullNum)
-end
-
---- Highlight a pull in the list
--- @param pullNum number Pull number to highlight
--- @param enable boolean True to enable, false to disable
-function UI:HighlightPullInList(pullNum, enable)
-    -- TODO: Add visual highlight to pull entry
-    -- This would require tracking FontString positions
-    RDT:DebugPrint("HighlightPullInList not yet implemented: " .. pullNum)
-end
-
---------------------------------------------------------------------------------
 -- Statistics Display (Optional Enhancement)
 --------------------------------------------------------------------------------
 
