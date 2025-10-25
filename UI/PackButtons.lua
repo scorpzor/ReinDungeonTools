@@ -92,7 +92,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     
     -- Calculate layout: biggest mob in center, others in clockwise circle
     local totalMobs = #mobList
-    local radius = 28 + (totalMobs * 2.5) -- Dynamic radius based on mob count
+    local radius = 24 + (totalMobs * 1.2) -- Dynamic radius based on mob count
     
     -- Set container size to encompass the circle
     local containerSize = radius * 2 + MOB_ICON_SIZE
@@ -386,7 +386,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if validPacks == 0 or not minX then return end
     
     -- Add padding around the bounding box
-    local padding = 20
+    local padding = 8  -- Reduced from 20 for tighter fit
     minX = minX - padding
     maxX = maxX + padding
     minY = minY - padding
@@ -406,8 +406,8 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
             bgFile = nil,
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
             tile = false,
-            edgeSize = 16,
-            insets = { left = 4, right = 4, top = 4, bottom = 4 }
+            edgeSize = 12,  -- Reduced from 16 for thinner border
+            insets = { left = 3, right = 3, top = 3, bottom = 3 }  -- Adjusted insets
         })
         pullBorders[pullNum] = border
     end
