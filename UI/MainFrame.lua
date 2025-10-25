@@ -17,11 +17,13 @@ local BUTTON_PANEL_HEIGHT = 140
 -- Local frame references
 local mainFrame
 local mapContainer
-local mapTexture
+local mapTexture  -- Legacy single texture (kept for compatibility)
+local mapTiles = {}  -- New: tile system for high-res maps
 local titleText
 local versionText
 local dropdownFrame
 local buttonContainer
+local floorButtons = {}  -- New: floor selection buttons
 
 --------------------------------------------------------------------------------
 -- Helper Functions
@@ -475,27 +477,197 @@ function UI:CreateMapContainer(parent)
     mapContainer:SetBackdropColor(0, 0, 0, 1)
     mapContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
-    -- Map texture
-    mapTexture = mapContainer:CreateTexture(nil, "BACKGROUND")
+    -- Map texture (legacy single texture - will be hidden when tiles are active)
+    mapTexture = mapContainer:CreateTexture(nil, "ARTWORK")
     mapTexture:SetPoint("TOPLEFT", 1, -1)
-    mapTexture:SetPoint("BOTTOMRIGHT", -1, 1)
+    mapTexture:SetPoint("TOPRIGHT", -1, -1)
+    mapTexture:SetHeight(MAP_HEIGHT - 2)
     mapTexture:SetTexture("Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
+    mapTexture:SetTexCoord(0, 1, 0, 0.9)
     
     -- Store reference for pack buttons to anchor to
     UI.mapContainer = mapContainer
     UI.mapTexture = mapTexture
 end
 
---- Update the map texture
--- @param texturePath string Path to texture file
-function UI:UpdateMapTexture(texturePath)
-    if not mapTexture then return end
+--------------------------------------------------------------------------------
+-- Tile-based Map Rendering (for high-res and multi-floor maps)
+--------------------------------------------------------------------------------
+
+--- Clear all map tiles
+function UI:ClearMapTiles()
+    for _, tile in pairs(mapTiles) do
+        tile:Hide()
+        tile:SetTexture(nil)
+    end
+end
+
+--- Load and display a tiled map
+-- @param tileData table Table with tile information
+-- @param floor number Floor number to display (optional)
+function UI:LoadTiledMap(tileData, floor)
+    if not mapContainer then return end
     
-    RDT:DebugPrint("Updating map texture: " .. tostring(texturePath))
+    -- Hide legacy single texture
+    if mapTexture then
+        mapTexture:Hide()
+    end
     
+    -- Clear existing tiles
+    self:ClearMapTiles()
+    
+    floor = floor or 1
+    local floorData = tileData.floors and tileData.floors[floor]
+    if not floorData then
+        RDT:PrintError("Floor " .. floor .. " not found in tile data")
+        return
+    end
+    
+    local tiles = floorData.tiles
+    if not tiles then
+        RDT:PrintError("No tiles found for floor " .. floor)
+        return
+    end
+    
+    -- Get tile configuration
+    local tileWidth = tileData.tileWidth or 1024
+    local tileHeight = tileData.tileHeight or 1024
+    local cols = tileData.cols or 2
+    local rows = tileData.rows or 2
+    
+    -- Calculate display size for each tile
+    local displayTileWidth = MAP_WIDTH / cols
+    local displayTileHeight = MAP_HEIGHT / rows
+    
+    -- Create and position tiles
+    for i, tileInfo in ipairs(tiles) do
+        local tile = mapTiles[i]
+        if not tile then
+            tile = mapContainer:CreateTexture(nil, "ARTWORK")
+            mapTiles[i] = tile
+        end
+        
+        -- Calculate grid position (0-indexed)
+        local col = (i - 1) % cols
+        local row = math.floor((i - 1) / cols)
+        
+        -- Position tile
+        local x = col * displayTileWidth + 1
+        local y = -(row * displayTileHeight) - 1
+        
+        tile:SetSize(displayTileWidth, displayTileHeight)
+        tile:ClearAllPoints()
+        tile:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", x, y)
+        
+        -- Set texture
+        local texturePath = tileInfo.texture or tileInfo
+        tile:SetTexture(texturePath)
+        tile:SetVertexColor(0.9, 0.9, 0.9)
+        
+        -- Apply texture coordinates if specified
+        if tileInfo.texCoord then
+            tile:SetTexCoord(unpack(tileInfo.texCoord))
+        else
+            tile:SetTexCoord(0, 1, 0, 1)
+        end
+        
+        tile:Show()
+    end
+    
+    RDT:DebugPrint(string.format("Loaded %d tiles for floor %d", #tiles, floor))
+end
+
+--- Load a single texture map (legacy mode)
+-- @param texturePath string Path to texture
+function UI:LoadSingleTextureMap(texturePath)
+    if not mapTexture or not mapContainer then return end
+    
+    -- Hide all tiles
+    self:ClearMapTiles()
+    
+    -- Show and set legacy texture
+    mapTexture:Show()
     mapTexture:SetTexture(texturePath or "Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
+end
+
+--- Create floor selection buttons
+-- @param numFloors number Number of floors in the dungeon
+function UI:CreateFloorButtons(numFloors)
+    -- Clear existing floor buttons
+    for _, btn in pairs(floorButtons) do
+        btn:Hide()
+    end
+    
+    if not numFloors or numFloors <= 1 then
+        return  -- No floor buttons needed
+    end
+    
+    -- Create floor buttons
+    for floor = 1, numFloors do
+        local btn = floorButtons[floor]
+        if not btn then
+            btn = CreateFrame("Button", "RDT_FloorButton" .. floor, mapContainer)
+            btn:SetSize(40, 24)
+            StyleSquareButton(btn)
+            btn:SetText("Floor " .. floor)
+            floorButtons[floor] = btn
+        end
+        
+        -- Position buttons vertically on the right side
+        btn:ClearAllPoints()
+        btn:SetPoint("TOPRIGHT", mapContainer, "TOPRIGHT", -10, -10 - ((floor - 1) * 28))
+        
+        -- Set click handler
+        btn:SetScript("OnClick", function()
+            if RDT.State and RDT.State.currentDungeon then
+                UI:UpdateMapForDungeon(RDT.State.currentDungeon, floor)
+            end
+        end)
+        
+        btn:Show()
+    end
+end
+
+--- Update the map for a dungeon (handles both tiled and single-texture maps)
+-- @param dungeonName string Name of the dungeon
+-- @param floor number Floor number (optional, defaults to 1)
+function UI:UpdateMapForDungeon(dungeonName, floor)
+    if not RDT.Data or not dungeonName then return end
+    
+    -- Use the proper Data module method to get dungeon data
+    local dungeonData = RDT.Data:GetDungeon(dungeonName)
+    if not dungeonData then
+        RDT:PrintError("Dungeon data not found: " .. dungeonName)
+        return
+    end
+    
+    RDT:DebugPrint("Loading map for: " .. dungeonName .. " (Floor " .. (floor or 1) .. ")")
+    
+    -- Check if this dungeon uses tiles
+    if dungeonData.tiles then
+        -- Load tiled map
+        self:LoadTiledMap(dungeonData.tiles, floor or 1)
+        
+        -- Create floor buttons if multiple floors exist
+        local numFloors = dungeonData.tiles.floors and #dungeonData.tiles.floors or 1
+        self:CreateFloorButtons(numFloors)
+    elseif dungeonData.texture then
+        -- Load single texture (legacy mode)
+        self:LoadSingleTextureMap(dungeonData.texture)
+        
+        -- Hide floor buttons
+        self:CreateFloorButtons(0)
+    else
+        RDT:PrintError("No map data found for: " .. dungeonName)
+    end
+end
+
+--- Update the map texture (legacy method, kept for compatibility)
+-- @param texturePath string Path to texture file
+function UI:UpdateMapTexture(texturePath)
+    self:LoadSingleTextureMap(texturePath)
 end
 
 --- Get map dimensions for pack button positioning

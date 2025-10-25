@@ -1,6 +1,36 @@
 -- Data.lua
 -- Dungeon definitions and data management module with mob dictionary support
 -- NOTE: This file loads AFTER Core/Init.lua, so RDT object already exists
+--
+-- MAP TEXTURE FORMATS:
+-- ====================
+-- 1. SINGLE TEXTURE (Simple, for small dungeons):
+--    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\dungeon"
+--
+-- 2. TILED MAP (High-res, multi-floor support):
+--    tiles = {
+--        tileWidth = 1024,     -- Each tile texture size (must be power-of-2)
+--        tileHeight = 1024,
+--        cols = 2,             -- Number of tile columns
+--        rows = 2,             -- Number of tile rows
+--        floors = {
+--            [1] = {           -- Floor 1 data
+--                tiles = {
+--                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile1",
+--                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile2",
+--                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile3",
+--                    "Interface\\AddOns\\ReinDungeonTools\\Textures\\DungeonName\\Floor1_Tile4",
+--                }
+--            },
+--            [2] = {           -- Floor 2 data (if dungeon has multiple floors)
+--                tiles = { ... }
+--            }
+--        }
+--    }
+--    
+-- Tiles are arranged left-to-right, top-to-bottom in the grid.
+-- For a 2x2 grid: [1][2]
+--                 [3][4]
 
 local RDT = _G.RDT
 if not RDT then
@@ -21,210 +51,49 @@ local dungeons = {}
 -- scale: visual size multiplier (0.6-1.0), defaults to 1.0. Smaller scale = less important mob
 local mobDatabase = {
     -- Example mobs for Test Dungeon
-    ["test_trash_1"] = {
-        name = "Weak Trash Mob",
-        count = 2,
+    ["generic_trash_mob"] = {
+        name = "Generic Trash Mob",
+        count = 0.5,
         creatureId = 10001,
         displayIcon = "Interface\\Icons\\INV_Misc_QuestionMark",
-        scale = 0.7, -- Small weak mob
+        scale = 0.5, -- Small weak mob
     },
-    ["test_trash_2"] = {
-        name = "Strong Trash Mob", 
-        count = 3,
+    ["generic_normal_mob"] = {
+        name = "Generic Normal Mob", 
+        count = 1,
         creatureId = 10002,
         displayIcon = "Interface\\Icons\\Ability_Warrior_Savageblow",
-        scale = 0.9, -- Medium sized
+        scale = 0.7, -- Medium sized
     },
-    ["test_elite"] = {
-        name = "Elite Guard",
-        count = 5,
+    ["generic_big_mob"] = {
+        name = "Generic Big Mob",
+        count = 2,
+        creatureId = 10003,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 9.0, -- Full size elite
+    },
+    ["generic_elite_mob"] = {
+        name = "Generic Elite Mob",
+        count = 2,
         creatureId = 10003,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
         scale = 1.0, -- Full size elite
     },
-    
-    -- Utgarde Keep mobs (using thematic WotLK icons)
-    ["uk_vrykul_warrior"] = {
-        name = "Vrykul Warrior",
-        count = 4,
-        creatureId = 23970,
-        displayIcon = "Interface\\Icons\\INV_Sword_68", -- Warrior sword
-        scale = 0.9, -- Medium elite
-    },
-    ["uk_vrykul_necromancer"] = {
-        name = "Vrykul Necromancer",
-        count = 4,
-        creatureId = 23954,
-        displayIcon = "Interface\\Icons\\Spell_Shadow_AnimateDead", -- Necromancer
-        scale = 1.0, -- Dangerous caster - full size
-    },
-    ["uk_dragonflayer_forge_master"] = {
-        name = "Dragonflayer Forge Master",
-        count = 4,
-        creatureId = 24079,
-        displayIcon = "Interface\\Icons\\INV_Hammer_20", -- Blacksmith hammer
-        scale = 0.85, -- Medium threat
-    },
-    ["uk_dragonflayer_runecaster"] = {
-        name = "Dragonflayer Runecaster",
-        count = 4,
-        creatureId = 23960,
-        displayIcon = "Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- Caster
-        scale = 1.0, -- Dangerous caster - full size
-    },
-    ["uk_dragonflayer_ironhelm"] = {
-        name = "Dragonflayer Ironhelm",
-        count = 4,
-        creatureId = 23961,
-        displayIcon = "Interface\\Icons\\INV_Helmet_08", -- Helmet
-        scale = 0.85, -- Medium threat
-    },
-    ["uk_proto_drake"] = {
-        name = "Proto-Drake",
-        count = 4,
-        creatureId = 24082,
-        displayIcon = "Interface\\Icons\\Ability_Mount_Drake_Proto", -- Drake mount
-        scale = 1.0, -- Big dangerous drake - full size
-    },
-    ["uk_tunneling_ghoul"] = {
-        name = "Tunneling Ghoul",
-        count = 1,
-        creatureId = 23632,
-        displayIcon = "Interface\\Icons\\Spell_Shadow_RaiseDead", -- Ghoul
-        scale = 0.65, -- Small trash mob
-    },
-    ["uk_dragonflayer_bonecrusher"] = {
-        name = "Dragonflayer Bonecrusher",
-        count = 4,
-        creatureId = 24069,
-        displayIcon = "Interface\\Icons\\INV_Mace_12", -- Mace/crusher
-        scale = 0.9, -- Medium elite
-    },
-    ["uk_savage_worg"] = {
-        name = "Savage Worg",
-        count = 1,
-        creatureId = 23644,
-        displayIcon = "Interface\\Icons\\Ability_Mount_WhiteDireWolf", -- Worg/wolf
-        scale = 0.65, -- Small trash mob
-    },
+    ["generic_boss"] = {
+        name = "Generic Boss",
+        count = 2,
+        creatureId = 10003,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
+        scale = 1.0, -- Full size elite
+    }
 }
 
 --------------------------------------------------------------------------------
--- Example Dungeon: Test Dungeon
+-- Stratholme
 --------------------------------------------------------------------------------
 
-dungeons["Test Dungeon"] = {
-    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\TestDungeon",
-    packData = {
-        -- New format: {id, x, y, mobs = {mobKey = count}}
-        -- Pack count is auto-calculated from mob counts
-        {
-            id = 1, 
-            x = 0.2, 
-            y = 0.3, 
-            mobs = {
-                ["test_trash_1"] = 2,  -- 2 weak trash (2 * 2 = 4%)
-                ["test_trash_2"] = 1,  -- 1 strong trash (1 * 3 = 3%)
-            }
-            -- Total: 7%
-        },
-        {
-            id = 2, 
-            x = 0.3, 
-            y = 0.4, 
-            mobs = {
-                ["test_trash_2"] = 2,  -- 2 strong trash (2 * 3 = 6%)
-                ["test_elite"] = 1,     -- 1 elite (1 * 5 = 5%)
-            }
-            -- Total: 11%
-        },
-        {
-            id = 3, 
-            x = 0.5, 
-            y = 0.5, 
-            mobs = {
-                ["test_elite"] = 2,     -- 2 elites (2 * 5 = 10%)
-            }
-            -- Total: 10%
-        },
-        {
-            id = 4, 
-            x = 0.6, 
-            y = 0.3, 
-            mobs = {
-                ["test_trash_1"] = 3,  -- 3 weak trash (3 * 2 = 6%)
-            }
-            -- Total: 6%
-        },
-        {
-            id = 5, 
-            x = 0.7, 
-            y = 0.6, 
-            mobs = {
-                ["test_trash_2"] = 2,  -- 2 strong trash (2 * 3 = 6%)
-                ["test_elite"] = 1,     -- 1 elite (1 * 5 = 5%)
-            }
-            -- Total: 11%
-        },
-        {
-            id = 6, 
-            x = 0.4, 
-            y = 0.7, 
-            mobs = {
-                ["test_trash_1"] = 1,  -- 1 weak trash (1 * 2 = 2%)
-                ["test_trash_2"] = 2,  -- 2 strong trash (2 * 3 = 6%)
-                ["test_elite"] = 1,     -- 1 elite (1 * 5 = 5%)
-            }
-            -- Total: 13%
-        },
-        {
-            id = 7, 
-            x = 0.8, 
-            y = 0.4, 
-            mobs = {
-                ["test_elite"] = 2,     -- 2 elites (2 * 5 = 10%)
-                ["test_trash_2"] = 1,  -- 1 strong trash (1 * 3 = 3%)
-            }
-            -- Total: 13%
-        },
-        {
-            id = 8, 
-            x = 0.3, 
-            y = 0.6, 
-            mobs = {
-                ["test_trash_1"] = 4,  -- 4 weak trash (4 * 2 = 8%)
-            }
-            -- Total: 8%
-        },
-        {
-            id = 9, 
-            x = 0.6, 
-            y = 0.7, 
-            mobs = {
-                ["test_trash_2"] = 3,  -- 3 strong trash (3 * 3 = 9%)
-                ["test_elite"] = 1,     -- 1 elite (1 * 5 = 5%)
-            }
-            -- Total: 14%
-        },
-        {
-            id = 10, 
-            x = 0.5, 
-            y = 0.3, 
-            mobs = {
-                ["test_trash_1"] = 2,  -- 2 weak trash (2 * 2 = 4%)
-                ["test_trash_2"] = 1,  -- 1 strong trash (1 * 3 = 3%)
-            }
-            -- Total: 7%
-        },
-    },
-}
-
---------------------------------------------------------------------------------
--- Example Dungeon: Utgarde Keep (WotLK Heroic)
---------------------------------------------------------------------------------
-
-dungeons["Utgarde Keep"] = {
-    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\UtgardeKeep",
+dungeons["Stratholme"] = {
+    texture = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Classic\\stratholme",
     packData = {
         -- First room
         {
@@ -232,130 +101,21 @@ dungeons["Utgarde Keep"] = {
             x = 0.5, 
             y = 0.15, 
             mobs = {
-                ["uk_vrykul_warrior"] = 2,      -- 2 warriors (2 * 4 = 8%)
-                ["uk_tunneling_ghoul"] = 3,     -- 3 ghouls (3 * 1 = 3%)
+                ["generic_trash_mob"] = 2,
+                ["generic_big_mob"] = 1,
             }
-            -- Total: 11%
         },
         {
             id = 2, 
             x = 0.45, 
             y = 0.25, 
             mobs = {
-                ["uk_vrykul_warrior"] = 1,           -- 1 warrior (1 * 4 = 4%)
-                ["uk_vrykul_necromancer"] = 1,       -- 1 necromancer (1 * 4 = 4%)
-                ["uk_dragonflayer_ironhelm"] = 1,    -- 1 ironhelm (1 * 4 = 4%)
+                ["generic_trash_mob"] = 3,
+                ["generic_big_mob"] = 1,
+                ["generic_elite_mob"] = 1,
             }
-            -- Total: 12%
-        },
-        {
-            id = 3, 
-            x = 0.55, 
-            y = 0.25, 
-            mobs = {
-                ["uk_dragonflayer_runecaster"] = 2,  -- 2 runecasters (2 * 4 = 8%)
-                ["uk_dragonflayer_ironhelm"] = 1,    -- 1 ironhelm (1 * 4 = 4%)
-            }
-            -- Total: 12%
-        },
-        
-        -- Before first boss
-        {
-            id = 4, 
-            x = 0.5, 
-            y = 0.35, 
-            mobs = {
-                ["uk_dragonflayer_bonecrusher"] = 2, -- 2 bonecrusher (2 * 4 = 8%)
-                ["uk_savage_worg"] = 4,              -- 4 worgs (4 * 1 = 4%)
-            }
-            -- Total: 12%
-        },
-        {
-            id = 5, 
-            x = 0.4, 
-            y = 0.4, 
-            mobs = {
-                ["uk_vrykul_necromancer"] = 1,       -- 1 necromancer (1 * 4 = 4%)
-                ["uk_tunneling_ghoul"] = 5,          -- 5 ghouls (5 * 1 = 5%)
-            }
-            -- Total: 9%
-        },
-        {
-            id = 6, 
-            x = 0.6, 
-            y = 0.4, 
-            mobs = {
-                ["uk_dragonflayer_forge_master"] = 1, -- 1 forge master (1 * 4 = 4%)
-                ["uk_dragonflayer_ironhelm"] = 1,     -- 1 ironhelm (1 * 4 = 4%)
-            }
-            -- Total: 8%
-        },
-        
-        -- After first boss
-        {
-            id = 7, 
-            x = 0.5, 
-            y = 0.5, 
-            mobs = {
-                ["uk_vrykul_warrior"] = 2,           -- 2 warriors (2 * 4 = 8%)
-                ["uk_savage_worg"] = 2,              -- 2 worgs (2 * 1 = 2%)
-            }
-            -- Total: 10%
-        },
-        {
-            id = 8, 
-            x = 0.45, 
-            y = 0.55, 
-            mobs = {
-                ["uk_proto_drake"] = 2,              -- 2 proto-drakes (2 * 4 = 8%)
-                ["uk_dragonflayer_runecaster"] = 1,  -- 1 runecaster (1 * 4 = 4%)
-            }
-            -- Total: 12%
-        },
-        {
-            id = 9, 
-            x = 0.55, 
-            y = 0.55, 
-            mobs = {
-                ["uk_proto_drake"] = 2,              -- 2 proto-drakes (2 * 4 = 8%)
-                ["uk_dragonflayer_ironhelm"] = 1,    -- 1 ironhelm (1 * 4 = 4%)
-            }
-            -- Total: 12%
-        },
-        
-        -- Before second boss
-        {
-            id = 10, 
-            x = 0.5, 
-            y = 0.65, 
-            mobs = {
-                ["uk_proto_drake"] = 3,              -- 3 proto-drakes (3 * 4 = 12%)
-            }
-            -- Total: 12%
-        },
-        {
-            id = 11, 
-            x = 0.4, 
-            y = 0.7, 
-            mobs = {
-                ["uk_dragonflayer_bonecrusher"] = 2, -- 2 bonecrusher (2 * 4 = 8%)
-            }
-            -- Total: 8%
-        },
-        
-        -- Final area
-        {
-            id = 12, 
-            x = 0.5, 
-            y = 0.8, 
-            mobs = {
-                ["uk_vrykul_warrior"] = 2,           -- 2 warriors (2 * 4 = 8%)
-                ["uk_vrykul_necromancer"] = 1,       -- 1 necromancer (1 * 4 = 4%)
-                ["uk_dragonflayer_ironhelm"] = 1,    -- 1 ironhelm (1 * 4 = 4%)
-            }
-            -- Total: 16%
-        },
-    },
+        }
+    }
 }
 
 --------------------------------------------------------------------------------

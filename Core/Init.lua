@@ -197,8 +197,10 @@ function RDT:LoadDungeon(dungeonName)
         if self.UI.CreatePacks then
             self.UI:CreatePacks(dungeonData.packData)
         end
-        if self.UI.UpdateMapTexture then
-            self.UI:UpdateMapTexture(dungeonData.texture)
+        if self.UI.UpdateMapForDungeon then
+            self.UI:UpdateMapForDungeon(dungeonName, 1)  -- Load floor 1 by default
+        elseif self.UI.UpdateMapTexture then
+            self.UI:UpdateMapTexture(dungeonData.texture)  -- Fallback to legacy method
         end
         if self.UI.UpdateTitle then
             self.UI:UpdateTitle(dungeonName)
