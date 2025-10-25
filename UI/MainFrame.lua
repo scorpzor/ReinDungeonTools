@@ -68,6 +68,93 @@ local function StyleSquareButton(button)
     end)
 end
 
+--- Style a scrollbar with modern square gray appearance
+-- @param scrollFrame ScrollFrame The scroll frame to style
+function UI:StyleScrollBar(scrollFrame)
+    local scrollBar = _G[scrollFrame:GetName().."ScrollBar"]
+    if not scrollBar then return end
+    
+    -- Remove default textures
+    local scrollUpButton = _G[scrollFrame:GetName().."ScrollBarScrollUpButton"]
+    local scrollDownButton = _G[scrollFrame:GetName().."ScrollBarScrollDownButton"]
+    local thumbTexture = _G[scrollFrame:GetName().."ScrollBarThumbTexture"]
+    
+    if scrollUpButton then
+        scrollUpButton:SetNormalTexture(nil)
+        scrollUpButton:SetPushedTexture(nil)
+        scrollUpButton:SetHighlightTexture(nil)
+        scrollUpButton:SetDisabledTexture(nil)
+        scrollUpButton:SetSize(16, 16)
+        
+        -- Style as square button
+        scrollUpButton:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = false,
+            edgeSize = 1,
+            insets = { left = 1, right = 1, top = 1, bottom = 1 }
+        })
+        scrollUpButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        scrollUpButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        
+        -- Add arrow text
+        local upArrow = scrollUpButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        upArrow:SetPoint("CENTER", 0, 0)
+        upArrow:SetText("^")
+        upArrow:SetTextColor(0.7, 0.7, 0.7)
+        
+        scrollUpButton:SetScript("OnEnter", function(self)
+            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        end)
+        scrollUpButton:SetScript("OnLeave", function(self)
+            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        end)
+    end
+    
+    if scrollDownButton then
+        scrollDownButton:SetNormalTexture(nil)
+        scrollDownButton:SetPushedTexture(nil)
+        scrollDownButton:SetHighlightTexture(nil)
+        scrollDownButton:SetDisabledTexture(nil)
+        scrollDownButton:SetSize(16, 16)
+        
+        -- Style as square button
+        scrollDownButton:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = false,
+            edgeSize = 1,
+            insets = { left = 1, right = 1, top = 1, bottom = 1 }
+        })
+        scrollDownButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        scrollDownButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        
+        -- Add arrow text
+        local downArrow = scrollDownButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        downArrow:SetPoint("CENTER", 0, 0)
+        downArrow:SetText("v")
+        downArrow:SetTextColor(0.7, 0.7, 0.7)
+        
+        scrollDownButton:SetScript("OnEnter", function(self)
+            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        end)
+        scrollDownButton:SetScript("OnLeave", function(self)
+            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        end)
+    end
+    
+    if thumbTexture then
+        thumbTexture:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
+        thumbTexture:SetVertexColor(0.3, 0.3, 0.3, 1)
+        thumbTexture:SetWidth(16)
+    end
+    
+    -- Style the track background
+    local trackBG = scrollBar:CreateTexture(nil, "BACKGROUND")
+    trackBG:SetAllPoints(scrollBar)
+    trackBG:SetColorTexture(0.05, 0.05, 0.05, 0.8)
+end
+
 --------------------------------------------------------------------------------
 -- Main Frame Creation
 --------------------------------------------------------------------------------
@@ -238,6 +325,9 @@ function UI:CreateDungeonDropdown(parent)
     local scrollChild = CreateFrame("Frame", nil, scrollFrame)
     scrollChild:SetSize(190, 1)
     scrollFrame:SetScrollChild(scrollChild)
+    
+    -- Style the scrollbar
+    UI:StyleScrollBar(scrollFrame)
     
     menuFrame.scrollFrame = scrollFrame
     menuFrame.scrollChild = scrollChild

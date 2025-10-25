@@ -97,6 +97,11 @@ function UI:InitializePullsList(panel)
     local scrollWidth = pullsScrollFrame:GetWidth() or (PULLS_PANEL_WIDTH - 28)
     pullsScrollChild:SetSize(scrollWidth, 1)
     pullsScrollFrame:SetScrollChild(pullsScrollChild)
+    
+    -- Style the scrollbar (use UI.StyleScrollBar from MainFrame)
+    if RDT.UI and RDT.UI.StyleScrollBar then
+        RDT.UI:StyleScrollBar(pullsScrollFrame)
+    end
 
     -- Initialize FontString pool
     fontStringPool = CreateFontStringPool(pullsScrollChild)
