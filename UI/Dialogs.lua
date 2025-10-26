@@ -16,9 +16,9 @@ local exportFrame
 local importFrame
 
 -- Dialog constants
-local DIALOG_WIDTH = 500
-local DIALOG_HEIGHT = 200
-local IMPORT_DIALOG_HEIGHT = 250
+local DIALOG_WIDTH = 600
+local DIALOG_HEIGHT = 300
+local IMPORT_DIALOG_HEIGHT = 350
 
 --------------------------------------------------------------------------------
 -- Styling Helper Functions (Use UIHelpers)
@@ -85,20 +85,22 @@ function Dialogs:CreateExportDialog()
     instructions:SetPoint("TOP", 0, -40)
     instructions:SetText("Copy this string and share it:")
     
-    -- Scroll frame for the export string
+    -- Scroll frame for the export string (with proper insets for scrollbar)
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOP", instructions, "BOTTOM", 0, -10)
-    scrollFrame:SetSize(460, 80)
+    scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -70)
+    scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)  -- Extra space for scrollbar
+    scrollFrame:SetHeight(150)
     
     -- Style the scrollbar with modern appearance
     if UIHelpers and UIHelpers.StyleScrollBar then
         UIHelpers:StyleScrollBar(scrollFrame)
     end
     
-    -- Edit box (multiline)
+    -- Edit box (multiline) - width will be set by scrollFrame's width
     local editBox = CreateFrame("EditBox", nil, scrollFrame)
     editBox:SetMultiLine(true)
-    editBox:SetSize(460, 200)
+    editBox:SetWidth(scrollFrame:GetWidth() or 540)
+    editBox:SetHeight(300)
     editBox:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     editBox:SetAutoFocus(false)
     editBox:SetTextColor(1, 1, 1)
@@ -118,10 +120,17 @@ function Dialogs:CreateExportDialog()
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
     
-    -- Select All button
+    -- Copy hint text (Ctrl+C) - positioned above buttons
+    local copyHint = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    copyHint:SetPoint("BOTTOM", frame, "BOTTOM", 0, 45)
+    copyHint:SetText("Press Ctrl+C to copy")
+    copyHint:SetTextColor(0.7, 0.7, 0.7)
+    
+    -- Buttons horizontally aligned at the bottom
+    -- Select All button (left side)
     local selectAllButton = CreateFrame("Button", nil, frame)
-    selectAllButton:SetSize(100, 25)
-    selectAllButton:SetPoint("BOTTOM", 50, 40)
+    selectAllButton:SetSize(120, 30)
+    selectAllButton:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
     selectAllButton:SetText("Select All")
     StyleModernButton(selectAllButton)
     selectAllButton:SetScript("OnClick", function()
@@ -129,16 +138,10 @@ function Dialogs:CreateExportDialog()
         editBox:SetFocus()
     end)
     
-    -- Copy hint text (Ctrl+C)
-    local copyHint = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    copyHint:SetPoint("TOP", selectAllButton, "BOTTOM", 0, -2)
-    copyHint:SetText("Press Ctrl+C to copy")
-    copyHint:SetTextColor(0.7, 0.7, 0.7)
-    
-    -- Close button (bottom)
+    -- Close button (right side)
     local closeButton = CreateFrame("Button", nil, frame)
-    closeButton:SetSize(100, 25)
-    closeButton:SetPoint("BOTTOM", -50, 10)
+    closeButton:SetSize(120, 30)
+    closeButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
     closeButton:SetText("Close")
     StyleModernButton(closeButton)
     closeButton:SetScript("OnClick", function() frame:Hide() end)
@@ -222,20 +225,22 @@ function Dialogs:CreateImportDialog()
     instructions:SetPoint("TOP", 0, -40)
     instructions:SetText("Paste the import string below:")
     
-    -- Scroll frame for the import string
+    -- Scroll frame for the import string (with proper insets for scrollbar)
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOP", instructions, "BOTTOM", 0, -10)
-    scrollFrame:SetSize(460, 100)
+    scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -70)
+    scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)  -- Extra space for scrollbar
+    scrollFrame:SetHeight(200)
     
     -- Style the scrollbar with modern appearance
     if UIHelpers and UIHelpers.StyleScrollBar then
         UIHelpers:StyleScrollBar(scrollFrame)
     end
     
-    -- Edit box (multiline)
+    -- Edit box (multiline) - width will be set by scrollFrame's width
     local editBox = CreateFrame("EditBox", nil, scrollFrame)
     editBox:SetMultiLine(true)
-    editBox:SetSize(460, 200)
+    editBox:SetWidth(scrollFrame:GetWidth() or 540)
+    editBox:SetHeight(400)
     editBox:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     editBox:SetAutoFocus(true)
     editBox:SetTextColor(1, 1, 1)
@@ -254,16 +259,17 @@ function Dialogs:CreateImportDialog()
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
     
-    -- Warning text
+    -- Warning text - positioned above buttons
     local warning = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    warning:SetPoint("TOP", scrollFrame, "BOTTOM", 0, -10)
-    warning:SetText("|cFFFFFF00Warning:|r This will overwrite your current route!")
+    warning:SetPoint("BOTTOM", frame, "BOTTOM", 0, 50)
+    warning:SetText("|cFFFFFF00Warning:|r This will create a new route with the imported data")
     warning:SetTextColor(1, 0.8, 0)
     
-    -- Import button
+    -- Buttons horizontally aligned at the bottom
+    -- Import button (left side)
     local importButton = CreateFrame("Button", nil, frame)
-    importButton:SetSize(100, 25)
-    importButton:SetPoint("BOTTOM", 50, 10)
+    importButton:SetSize(120, 30)
+    importButton:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
     importButton:SetText("Import")
     StyleModernButton(importButton)
     importButton:SetScript("OnClick", function()
@@ -287,10 +293,10 @@ function Dialogs:CreateImportDialog()
         -- Errors are printed by ImportExport module
     end)
     
-    -- Cancel button
+    -- Cancel button (right side)
     local cancelButton = CreateFrame("Button", nil, frame)
-    cancelButton:SetSize(100, 25)
-    cancelButton:SetPoint("BOTTOM", -50, 10)
+    cancelButton:SetSize(120, 30)
+    cancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
     cancelButton:SetText("Cancel")
     StyleModernButton(cancelButton)
     cancelButton:SetScript("OnClick", function() 
