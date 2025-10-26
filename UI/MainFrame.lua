@@ -234,6 +234,9 @@ function UI:CreateMainFrame()
     -- Create dungeon dropdown
     self:CreateDungeonDropdown(mainFrame)
     
+    -- Create route dropdown and buttons
+    self:CreateRouteDropdown(mainFrame)
+    
     -- Create map container
     self:CreateMapContainer(mainFrame)
     
@@ -453,6 +456,202 @@ end
 function UI:UpdateDropdownText(dungeonName)
     if dropdownFrame and dropdownFrame.text and dungeonName then
         dropdownFrame.text:SetText(dungeonName)
+    end
+end
+
+--------------------------------------------------------------------------------
+-- Route Dropdown
+--------------------------------------------------------------------------------
+
+local routeDropdownFrame
+local routeScrollFrame, routeScrollChild
+
+--- Create route selection dropdown and buttons
+--- @param parent Frame Parent frame
+function UI:CreateRouteDropdown(parent)
+    -- Route dropdown button (positioned to the right of dungeon dropdown)
+    routeDropdownFrame = CreateFrame("Button", "RDT_RouteDropdown", parent)
+    routeDropdownFrame:SetPoint("TOPLEFT", 230, -8)
+    routeDropdownFrame:SetSize(180, 24)
+    StyleSquareButton(routeDropdownFrame)
+    
+    -- Dropdown text
+    routeDropdownFrame.text = routeDropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    routeDropdownFrame.text:SetPoint("LEFT", 6, 0)
+    routeDropdownFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
+    routeDropdownFrame.text:SetText("Route 1")
+    routeDropdownFrame.text:SetTextColor(1, 1, 1)
+    
+    -- Dropdown arrow
+    local arrow = routeDropdownFrame:CreateTexture(nil, "ARTWORK")
+    arrow:SetPoint("RIGHT", -6, 0)
+    arrow:SetSize(12, 12)
+    arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
+    
+    -- Create scroll frame for route list (initially hidden)
+    routeScrollFrame = CreateFrame("ScrollFrame", "RDT_RouteScroll", parent, "UIPanelScrollFrameTemplate")
+    routeScrollFrame:SetPoint("TOPLEFT", routeDropdownFrame, "BOTTOMLEFT", 0, -2)
+    routeScrollFrame:SetSize(180, 150)
+    routeScrollFrame:SetFrameLevel(parent:GetFrameLevel() + 10)
+    routeScrollFrame:Hide()
+    
+    -- Backdrop for scroll frame
+    routeScrollFrame:SetBackdrop({
+        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 12,
+        insets = { left = 2, right = 2, top = 2, bottom = 2 }
+    })
+    routeScrollFrame:SetBackdropColor(0, 0, 0, 0.95)
+    routeScrollFrame:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    
+    routeScrollChild = CreateFrame("Frame", "RDT_RouteScrollChild", routeScrollFrame)
+    routeScrollChild:SetSize(160, 1)
+    routeScrollFrame:SetScrollChild(routeScrollChild)
+    
+    -- Click handler for dropdown
+    routeDropdownFrame:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            if routeScrollFrame:IsShown() then
+                routeScrollFrame:Hide()
+            else
+                UI:PopulateRouteDropdown()
+                routeScrollFrame:Show()
+            end
+        end
+    end)
+    
+    -- New Route button (small button next to route dropdown)
+    local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", parent)
+    newRouteBtn:SetPoint("LEFT", routeDropdownFrame, "RIGHT", 3, 0)
+    newRouteBtn:SetSize(50, 24)
+    StyleSquareButton(newRouteBtn)
+    newRouteBtn.text = newRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    newRouteBtn.text:SetAllPoints()
+    newRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    newRouteBtn.text:SetText("New")
+    newRouteBtn.text:SetTextColor(0.2, 1, 0.2)
+    
+    newRouteBtn:SetScript("OnClick", function()
+        if RDT.Dialogs and RDT.Dialogs.ShowNewRoute then
+            RDT.Dialogs:ShowNewRoute()
+        else
+            -- Fallback: create route with default name
+            local dungeonName = RDT.db.profile.currentDungeon
+            if dungeonName and RDT.RouteManager then
+                local newRouteName = RDT.RouteManager:CreateRoute(dungeonName)
+                if newRouteName then
+                    UI:UpdateRouteDropdown()
+                    UI:RefreshUI()
+                end
+            end
+        end
+    end)
+    
+    -- Rename Route button (small button next to New)
+    local renameRouteBtn = CreateFrame("Button", "RDT_RenameRouteButton", parent)
+    renameRouteBtn:SetPoint("LEFT", newRouteBtn, "RIGHT", 3, 0)
+    renameRouteBtn:SetSize(60, 24)
+    StyleSquareButton(renameRouteBtn)
+    renameRouteBtn.text = renameRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    renameRouteBtn.text:SetAllPoints()
+    renameRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    renameRouteBtn.text:SetText("Rename")
+    renameRouteBtn.text:SetTextColor(0.8, 0.8, 1)
+    
+    renameRouteBtn:SetScript("OnClick", function()
+        if RDT.Dialogs and RDT.Dialogs.ShowRenameRoute then
+            RDT.Dialogs:ShowRenameRoute()
+        end
+    end)
+end
+
+--- Populate the route dropdown with current routes
+function UI:PopulateRouteDropdown()
+    if not routeScrollChild then return end
+    
+    -- Clear existing buttons
+    for _, child in ipairs({routeScrollChild:GetChildren()}) do
+        child:Hide()
+        child:SetParent(nil)
+    end
+    
+    local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+    if not dungeonName or not RDT.RouteManager then return end
+    
+    local routes = RDT.RouteManager:GetRouteNames(dungeonName)
+    local currentRouteName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
+    
+    local yOffset = 0
+    for _, routeName in ipairs(routes) do
+        local btn = CreateFrame("Button", nil, routeScrollChild)
+        btn:SetSize(160, 22)
+        btn:SetPoint("TOPLEFT", 0, yOffset)
+        
+        -- Button background
+        local bg = btn:CreateTexture(nil, "BACKGROUND")
+        bg:SetAllPoints()
+        if routeName == currentRouteName then
+            bg:SetColorTexture(0.2, 0.4, 0.6, 0.8)  -- Highlight current
+        else
+            bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
+        end
+        btn.bg = bg
+        
+        -- Text
+        local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        text:SetPoint("LEFT", 4, 0)
+        text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+        text:SetText(routeName)
+        text:SetTextColor(1, 1, 1)
+        
+        -- Hover effect
+        btn:SetScript("OnEnter", function(self)
+            if routeName ~= currentRouteName then
+                self.bg:SetColorTexture(0.3, 0.3, 0.3, 0.8)
+            end
+        end)
+        btn:SetScript("OnLeave", function(self)
+            if routeName ~= currentRouteName then
+                self.bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
+            end
+        end)
+        
+        -- Click to switch route
+        btn:SetScript("OnClick", function()
+            if RDT.RouteManager:SwitchRoute(dungeonName, routeName) then
+                UI:UpdateRouteDropdown()
+                UI:RefreshUI()
+            end
+            routeScrollFrame:Hide()
+        end)
+        
+        btn:Show()
+        yOffset = yOffset - 22
+    end
+    
+    routeScrollChild:SetHeight(math.max(math.abs(yOffset), 1))
+end
+
+--- Update the route dropdown text to show current route
+function UI:UpdateRouteDropdown()
+    if not routeDropdownFrame or not routeDropdownFrame.text then return end
+    
+    local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+    if not dungeonName or not RDT.RouteManager then return end
+    
+    local currentRouteName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
+    if currentRouteName then
+        routeDropdownFrame.text:SetText(currentRouteName)
+    end
+end
+
+--- Refresh all UI elements after route change
+function UI:RefreshUI()
+    -- Reload current dungeon to refresh all packs/pulls
+    if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.LoadDungeon then
+        RDT:LoadDungeon(RDT.db.profile.currentDungeon)
     end
 end
 

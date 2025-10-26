@@ -169,9 +169,16 @@ function RDT:LoadDungeon(dungeonName)
         return false
     end
     
-    -- Ensure routes table structure exists
-    self.db.profile.routes[dungeonName] = self.db.profile.routes[dungeonName] or {pulls = {}}
-    self.State.currentRoute = self.db.profile.routes[dungeonName]
+    -- Ensure dungeon has at least one route
+    self.RouteManager:EnsureRouteExists(dungeonName)
+    
+    -- Get current route for this dungeon
+    self.State.currentRoute = self.RouteManager:GetCurrentRoute(dungeonName)
+    
+    if not self.State.currentRoute then
+        self:PrintError("Failed to get route for dungeon")
+        return false
+    end
     
     -- Clear old UI state
     if self.UI and self.UI.ClearPacks then
@@ -228,6 +235,10 @@ function RDT:LoadDungeon(dungeonName)
         -- Explicitly update total forces after everything is loaded
         if self.UI.UpdateTotalForces then
             self.UI:UpdateTotalForces()
+        end
+        -- Update route dropdown to show current route
+        if self.UI.UpdateRouteDropdown then
+            self.UI:UpdateRouteDropdown()
         end
     end
     

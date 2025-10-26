@@ -25,11 +25,22 @@ function IE:Export()
     end
     
     local dungeonName = RDT.db.profile.currentDungeon
+    if not dungeonName then
+        RDT:PrintError("No dungeon selected")
+        return nil
+    end
+    
+    -- Get current route name
+    local routeName = "Unnamed"
+    if RDT.RouteManager then
+        routeName = RDT.RouteManager:GetCurrentRouteName(dungeonName) or "Unnamed"
+    end
     
     local exportData = {
         version = EXPORT_VERSION,
         addonVersion = RDT.Version,
         dungeon = dungeonName,
+        routeName = routeName,
         pulls = RDT.State.currentRoute.pulls,
         timestamp = time(),
         author = UnitName("player") .. "-" .. GetRealmName(),
@@ -159,6 +170,9 @@ function IE:Import(importString)
     -- Step 6: Show import info
     RDT:Print("|cFFFFFF00Importing route:|r")
     RDT:Print("  Dungeon: |cFFFFAA00" .. data.dungeon .. "|r")
+    if data.routeName then
+        RDT:Print("  Route Name: " .. data.routeName)
+    end
     if data.author then
         RDT:Print("  Author: " .. data.author)
     end
@@ -181,18 +195,36 @@ function IE:Import(importString)
         return false
     end
     
-    -- Step 8: Apply the pulls
+    -- Step 8: Create a new route for the imported data
+    if not RDT.RouteManager then
+        RDT:PrintError("RouteManager not available")
+        return false
+    end
+    
+    -- Generate route name (use imported name or generate new one)
+    local importedRouteName = data.routeName or "Imported Route"
+    local newRouteName = RDT.RouteManager:CreateRoute(data.dungeon, importedRouteName)
+    
+    if not newRouteName then
+        RDT:PrintError("Failed to create new route")
+        return false
+    end
+    
+    -- Step 9: Apply the pulls to the new route
+    if not RDT.State.currentRoute then
+        RDT:PrintError("Failed to get current route")
+        return false
+    end
+    
     wipe(RDT.State.currentRoute.pulls)
     for packId, pullNum in pairs(data.pulls) do
         RDT.State.currentRoute.pulls[packId] = pullNum
     end
     
     -- Recalculate current pull
-    if RDT.RouteManager then
-        RDT.State.currentPull = RDT.RouteManager:GetNextPull(RDT.State.currentRoute.pulls)
-    end
+    RDT.State.currentPull = RDT.RouteManager:GetNextPull(RDT.State.currentRoute.pulls)
     
-    -- Step 9: Update UI
+    -- Step 10: Update UI to show the new route
     if RDT.UI then
         if RDT.UI.UpdateLabels then
             RDT.UI:UpdateLabels()
@@ -200,9 +232,15 @@ function IE:Import(importString)
         if RDT.UI.UpdatePullList then
             RDT.UI:UpdatePullList()
         end
+        if RDT.UI.UpdateRouteDropdown then
+            RDT.UI:UpdateRouteDropdown()
+        end
+        if RDT.UI.UpdateTotalForces then
+            RDT.UI:UpdateTotalForces()
+        end
     end
     
-    RDT:Print("|cFF00FF00Route imported successfully!|r")
+    RDT:Print("|cFF00FF00Route imported successfully to: " .. newRouteName .. "|r")
     return true
 end
 

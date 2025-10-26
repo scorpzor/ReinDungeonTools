@@ -367,6 +367,89 @@ end
 --------------------------------------------------------------------------------
 
 --- Cleanup dialog resources
+--------------------------------------------------------------------------------
+-- Route Management Dialogs
+--------------------------------------------------------------------------------
+
+--- Show dialog to create a new route
+function Dialogs:ShowNewRoute()
+    local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+    if not dungeonName then
+        RDT:PrintError("No dungeon selected")
+        return
+    end
+    
+    StaticPopupDialogs["RDT_NEW_ROUTE"] = {
+        text = "Enter name for new route:",
+        button1 = "Create",
+        button2 = "Cancel",
+        hasEditBox = true,
+        OnShow = function(self)
+            self.editBox:SetFocus()
+            self.editBox:SetText("")
+        end,
+        OnAccept = function(self)
+            local routeName = self.editBox:GetText()
+            if routeName and routeName ~= "" then
+                local newRouteName = RDT.RouteManager:CreateRoute(dungeonName, routeName)
+                if newRouteName and RDT.UI then
+                    RDT.UI:UpdateRouteDropdown()
+                    RDT.UI:RefreshUI()
+                end
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("RDT_NEW_ROUTE")
+end
+
+--- Show dialog to rename current route
+function Dialogs:ShowRenameRoute()
+    local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+    if not dungeonName or not RDT.RouteManager then
+        RDT:PrintError("No dungeon selected")
+        return
+    end
+    
+    local oldName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
+    if not oldName then
+        RDT:PrintError("No route selected")
+        return
+    end
+    
+    StaticPopupDialogs["RDT_RENAME_ROUTE"] = {
+        text = "Rename '" .. oldName .. "' to:",
+        button1 = "Rename",
+        button2 = "Cancel",
+        hasEditBox = true,
+        OnShow = function(self)
+            self.editBox:SetFocus()
+            self.editBox:SetText(oldName)
+            self.editBox:HighlightText()
+        end,
+        OnAccept = function(self)
+            local newName = self.editBox:GetText()
+            if newName and newName ~= "" and newName ~= oldName then
+                if RDT.RouteManager:RenameRoute(dungeonName, oldName, newName) and RDT.UI then
+                    RDT.UI:UpdateRouteDropdown()
+                end
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("RDT_RENAME_ROUTE")
+end
+
+--------------------------------------------------------------------------------
+-- Cleanup
+--------------------------------------------------------------------------------
+
 function Dialogs:Cleanup()
     self:HideAll()
     

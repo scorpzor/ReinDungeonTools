@@ -13,7 +13,7 @@ local defaults = {
         -- Current dungeon selection (will be set to first available dungeon on load)
         currentDungeon = nil,
         
-        -- Routes storage: [dungeonName] = { pulls = { [packId] = pullNumber } }
+        -- Routes storage: [dungeonName] = { currentRoute = "Route 1", routeList = { ["Route 1"] = { pulls = {...} } } }
         routes = {},
         
         -- Debug mode toggle

@@ -345,4 +345,237 @@ function RM:GetRouteStats()
     }
 end
 
+--------------------------------------------------------------------------------
+-- Route Storage Management (Multiple Routes per Dungeon)
+--------------------------------------------------------------------------------
+
+--- Ensure a dungeon has at least one route initialized
+-- @param dungeonName string Name of the dungeon
+function RM:EnsureRouteExists(dungeonName)
+    if not RDT.db or not RDT.db.profile then return end
+    
+    -- Initialize dungeon entry if it doesn't exist
+    if not RDT.db.profile.routes[dungeonName] then
+        RDT.db.profile.routes[dungeonName] = {
+            currentRoute = "Route 1",
+            routeList = {
+                ["Route 1"] = { pulls = {} }
+            }
+        }
+        RDT:DebugPrint("Created default route for: " .. dungeonName)
+    end
+    
+    -- Ensure routeList exists
+    if not RDT.db.profile.routes[dungeonName].routeList then
+        RDT.db.profile.routes[dungeonName].routeList = {}
+    end
+    
+    -- If no routes exist, create default
+    local hasRoutes = false
+    for _ in pairs(RDT.db.profile.routes[dungeonName].routeList) do
+        hasRoutes = true
+        break
+    end
+    
+    if not hasRoutes then
+        RDT.db.profile.routes[dungeonName].routeList["Route 1"] = { pulls = {} }
+        RDT.db.profile.routes[dungeonName].currentRoute = "Route 1"
+    end
+    
+    -- Ensure currentRoute is set and valid
+    if not RDT.db.profile.routes[dungeonName].currentRoute then
+        -- Set to first available route
+        for routeName in pairs(RDT.db.profile.routes[dungeonName].routeList) do
+            RDT.db.profile.routes[dungeonName].currentRoute = routeName
+            break
+        end
+    end
+end
+
+--- Get the current route data for a dungeon
+-- @param dungeonName string Name of the dungeon
+-- @return table Route data {pulls = {...}} or nil
+function RM:GetCurrentRoute(dungeonName)
+    if not RDT.db or not RDT.db.profile then return nil end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    if not dungeonData then return nil end
+    
+    local routeName = dungeonData.currentRoute
+    if not routeName then return nil end
+    
+    return dungeonData.routeList[routeName]
+end
+
+--- Get list of all route names for a dungeon
+-- @param dungeonName string Name of the dungeon
+-- @return table Array of route names
+function RM:GetRouteNames(dungeonName)
+    if not RDT.db or not RDT.db.profile then return {} end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    if not dungeonData or not dungeonData.routeList then return {} end
+    
+    local names = {}
+    for name in pairs(dungeonData.routeList) do
+        table.insert(names, name)
+    end
+    table.sort(names)
+    return names
+end
+
+--- Get the currently selected route name
+-- @param dungeonName string Name of the dungeon
+-- @return string Current route name or nil
+function RM:GetCurrentRouteName(dungeonName)
+    if not RDT.db or not RDT.db.profile then return nil end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    return dungeonData and dungeonData.currentRoute or nil
+end
+
+--- Switch to a different route
+-- @param dungeonName string Name of the dungeon
+-- @param routeName string Name of the route to switch to
+-- @return boolean Success status
+function RM:SwitchRoute(dungeonName, routeName)
+    if not RDT.db or not RDT.db.profile then return false end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    if not dungeonData or not dungeonData.routeList[routeName] then
+        RDT:PrintError("Route '" .. routeName .. "' not found")
+        return false
+    end
+    
+    dungeonData.currentRoute = routeName
+    RDT.State.currentRoute = dungeonData.routeList[routeName]
+    
+    RDT:Print("Switched to: " .. routeName)
+    return true
+end
+
+--- Create a new route
+-- @param dungeonName string Name of the dungeon
+-- @param routeName string Name for the new route (optional, will auto-generate if nil)
+-- @return string|nil New route name or nil if failed
+function RM:CreateRoute(dungeonName, routeName)
+    if not RDT.db or not RDT.db.profile then return nil end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    
+    -- Auto-generate name if not provided
+    if not routeName or routeName == "" then
+        local counter = 1
+        repeat
+            routeName = "Route " .. counter
+            counter = counter + 1
+        until not dungeonData.routeList[routeName]
+    end
+    
+    -- Check if route already exists
+    if dungeonData.routeList[routeName] then
+        RDT:PrintError("Route '" .. routeName .. "' already exists")
+        return nil
+    end
+    
+    -- Create new route
+    dungeonData.routeList[routeName] = { pulls = {} }
+    dungeonData.currentRoute = routeName
+    RDT.State.currentRoute = dungeonData.routeList[routeName]
+    
+    RDT:Print("Created new route: " .. routeName)
+    return routeName
+end
+
+--- Rename a route
+-- @param dungeonName string Name of the dungeon
+-- @param oldName string Current route name
+-- @param newName string New route name
+-- @return boolean Success status
+function RM:RenameRoute(dungeonName, oldName, newName)
+    if not RDT.db or not RDT.db.profile then return false end
+    if not newName or newName == "" then
+        RDT:PrintError("Route name cannot be empty")
+        return false
+    end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    if not dungeonData.routeList[oldName] then
+        RDT:PrintError("Route '" .. oldName .. "' not found")
+        return false
+    end
+    
+    if dungeonData.routeList[newName] then
+        RDT:PrintError("Route '" .. newName .. "' already exists")
+        return false
+    end
+    
+    -- Copy route to new name and delete old
+    dungeonData.routeList[newName] = dungeonData.routeList[oldName]
+    dungeonData.routeList[oldName] = nil
+    
+    -- Update currentRoute if it was the renamed one
+    if dungeonData.currentRoute == oldName then
+        dungeonData.currentRoute = newName
+    end
+    
+    RDT:Print("Renamed route: " .. oldName .. " → " .. newName)
+    return true
+end
+
+--- Delete a route
+-- @param dungeonName string Name of the dungeon
+-- @param routeName string Name of the route to delete
+-- @return boolean Success status
+function RM:DeleteRoute(dungeonName, routeName)
+    if not RDT.db or not RDT.db.profile then return false end
+    
+    self:EnsureRouteExists(dungeonName)
+    
+    local dungeonData = RDT.db.profile.routes[dungeonName]
+    
+    -- Count routes
+    local routeCount = 0
+    for _ in pairs(dungeonData.routeList) do
+        routeCount = routeCount + 1
+    end
+    
+    -- Don't allow deleting the last route
+    if routeCount <= 1 then
+        RDT:PrintError("Cannot delete the last route")
+        return false
+    end
+    
+    if not dungeonData.routeList[routeName] then
+        RDT:PrintError("Route '" .. routeName .. "' not found")
+        return false
+    end
+    
+    -- Delete route
+    dungeonData.routeList[routeName] = nil
+    
+    -- If we deleted the current route, switch to first available
+    if dungeonData.currentRoute == routeName then
+        for name in pairs(dungeonData.routeList) do
+            self:SwitchRoute(dungeonName, name)
+            break
+        end
+    end
+    
+    RDT:Print("Deleted route: " .. routeName)
+    return true
+end
+
 RDT:DebugPrint("RouteManager.lua loaded")
