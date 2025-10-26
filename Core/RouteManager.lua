@@ -480,12 +480,18 @@ function RM:CreateRoute(dungeonName, routeName)
             routeName = "Route " .. counter
             counter = counter + 1
         until not dungeonData.routeList[routeName]
-    end
-    
-    -- Check if route already exists
-    if dungeonData.routeList[routeName] then
-        RDT:PrintError("Route '" .. routeName .. "' already exists")
-        return nil
+    else
+        -- Check if route name already exists and find an available variant
+        if dungeonData.routeList[routeName] then
+            local baseName = routeName
+            local counter = 1
+            repeat
+                routeName = baseName .. " " .. counter
+                counter = counter + 1
+            until not dungeonData.routeList[routeName]
+            
+            RDT:Print("Route name already exists, using: " .. routeName)
+        end
     end
     
     -- Create new route
