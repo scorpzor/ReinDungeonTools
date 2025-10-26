@@ -85,13 +85,32 @@ end
 --- Style a scrollbar with modern square gray appearance
 -- @param scrollFrame ScrollFrame The scroll frame to style
 function UIHelpers:StyleScrollBar(scrollFrame)
-    local scrollBar = _G[scrollFrame:GetName().."ScrollBar"]
+    -- Try to get scrollbar by name (for named frames) or directly (for unnamed frames)
+    local scrollBar
+    local frameName = scrollFrame:GetName()
+    
+    if frameName then
+        -- Named frame - use global lookup
+        scrollBar = _G[frameName.."ScrollBar"]
+    else
+        -- Unnamed frame - try direct property access (UIPanelScrollFrameTemplate)
+        scrollBar = scrollFrame.ScrollBar
+    end
+    
     if not scrollBar then return end
     
-    -- Remove default textures
-    local scrollUpButton = _G[scrollFrame:GetName().."ScrollBarScrollUpButton"]
-    local scrollDownButton = _G[scrollFrame:GetName().."ScrollBarScrollDownButton"]
-    local thumbTexture = _G[scrollFrame:GetName().."ScrollBarThumbTexture"]
+    -- Get child elements (try both methods)
+    local scrollUpButton, scrollDownButton, thumbTexture
+    
+    if frameName then
+        scrollUpButton = _G[frameName.."ScrollBarScrollUpButton"]
+        scrollDownButton = _G[frameName.."ScrollBarScrollDownButton"]
+        thumbTexture = _G[frameName.."ScrollBarThumbTexture"]
+    else
+        scrollUpButton = scrollBar.ScrollUpButton
+        scrollDownButton = scrollBar.ScrollDownButton
+        thumbTexture = scrollBar.ThumbTexture
+    end
     
     if scrollUpButton then
         scrollUpButton:SetNormalTexture(nil)
@@ -111,11 +130,14 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         scrollUpButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
         scrollUpButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
         
-        -- Add arrow text
-        local upArrow = scrollUpButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        upArrow:SetPoint("CENTER", 0, 0)
-        upArrow:SetText("^")
-        upArrow:SetTextColor(0.7, 0.7, 0.7)
+        -- Add arrow text (check if it already exists to avoid duplicates)
+        if not scrollUpButton.styledArrow then
+            local upArrow = scrollUpButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            upArrow:SetPoint("CENTER", 0, 0)
+            upArrow:SetText("^")
+            upArrow:SetTextColor(0.7, 0.7, 0.7)
+            scrollUpButton.styledArrow = upArrow
+        end
         
         scrollUpButton:SetScript("OnEnter", function(self)
             self:SetBackdropColor(0.25, 0.25, 0.25, 1)
@@ -143,11 +165,14 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         scrollDownButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
         scrollDownButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
         
-        -- Add arrow text
-        local downArrow = scrollDownButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        downArrow:SetPoint("CENTER", 0, 0)
-        downArrow:SetText("v")
-        downArrow:SetTextColor(0.7, 0.7, 0.7)
+        -- Add arrow text (check if it already exists to avoid duplicates)
+        if not scrollDownButton.styledArrow then
+            local downArrow = scrollDownButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            downArrow:SetPoint("CENTER", 0, 0)
+            downArrow:SetText("v")
+            downArrow:SetTextColor(0.7, 0.7, 0.7)
+            scrollDownButton.styledArrow = downArrow
+        end
         
         scrollDownButton:SetScript("OnEnter", function(self)
             self:SetBackdropColor(0.25, 0.25, 0.25, 1)

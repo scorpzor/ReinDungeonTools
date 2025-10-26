@@ -90,6 +90,11 @@ function Dialogs:CreateExportDialog()
     scrollFrame:SetPoint("TOP", instructions, "BOTTOM", 0, -10)
     scrollFrame:SetSize(460, 80)
     
+    -- Style the scrollbar with modern appearance
+    if UIHelpers and UIHelpers.StyleScrollBar then
+        UIHelpers:StyleScrollBar(scrollFrame)
+    end
+    
     -- Edit box (multiline)
     local editBox = CreateFrame("EditBox", nil, scrollFrame)
     editBox:SetMultiLine(true)
@@ -221,6 +226,11 @@ function Dialogs:CreateImportDialog()
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOP", instructions, "BOTTOM", 0, -10)
     scrollFrame:SetSize(460, 100)
+    
+    -- Style the scrollbar with modern appearance
+    if UIHelpers and UIHelpers.StyleScrollBar then
+        UIHelpers:StyleScrollBar(scrollFrame)
+    end
     
     -- Edit box (multiline)
     local editBox = CreateFrame("EditBox", nil, scrollFrame)

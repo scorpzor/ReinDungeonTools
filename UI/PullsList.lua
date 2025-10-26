@@ -130,9 +130,9 @@ function UI:InitializePullsList(panel)
     pullsScrollChild:SetSize(scrollWidth, 1)
     pullsScrollFrame:SetScrollChild(pullsScrollChild)
     
-    -- Style the scrollbar (use UI.StyleScrollBar from MainFrame)
-    if RDT.UI and RDT.UI.StyleScrollBar then
-        RDT.UI:StyleScrollBar(pullsScrollFrame)
+    -- Style the scrollbar with modern appearance
+    if RDT.UIHelpers and RDT.UIHelpers.StyleScrollBar then
+        RDT.UIHelpers:StyleScrollBar(pullsScrollFrame)
     end
 
     -- Initialize FontString pool
