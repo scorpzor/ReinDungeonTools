@@ -303,6 +303,7 @@ function UIHelpers:CreateModernDropdown(config)
     text:SetPoint("RIGHT", -20, 0)
     text:SetJustifyH("LEFT")
     text:SetText(config.defaultText or "Select...")
+    text:SetTextColor(1, 1, 1, 1)  -- White text
     button.text = text
     
     -- Dropdown arrow
@@ -403,6 +404,7 @@ function UIHelpers:CreateModernDropdown(config)
                 local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
                 btnText:SetPoint("LEFT", 8, 0)
                 btnText:SetJustifyH("LEFT")
+                btnText:SetTextColor(1, 1, 1, 1)  -- White text
                 btn.text = btnText
                 
                 local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")

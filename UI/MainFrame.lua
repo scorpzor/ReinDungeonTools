@@ -78,10 +78,11 @@ function UI:CreateMainFrame()
     mainFrame.titleBg = titleBg
 
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("TOP", 0, -18)
+    titleText:SetPoint("CENTER", titleBg, "CENTER", 0, 0)  -- Vertically centered in title bar
     titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
     titleText:SetText(L["TITLE"])
     titleText:SetJustifyH("CENTER")
+    titleText:SetTextColor(1, 1, 1, 1)  -- White text
 
     local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
