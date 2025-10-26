@@ -446,9 +446,6 @@ function UI:CreateMainFrame()
     -- Create dungeon dropdown
     self:CreateDungeonDropdown(mainFrame)
     
-    -- Create route dropdown and buttons
-    self:CreateRouteDropdown(mainFrame)
-    
     -- Create map container
     self:CreateMapContainer(mainFrame)
     
@@ -562,18 +559,18 @@ end
 -- Route Dropdown
 --------------------------------------------------------------------------------
 
---- Create route selection dropdown and buttons
---- @param parent Frame Parent frame
-function UI:CreateRouteDropdown(parent)
+--- Create route selection dropdown and buttons in button container
+--- @param container Frame Button container frame
+function UI:CreateRouteDropdown(container)
     -- Create dropdown using the generic component
     routeDropdown = UI:CreateModernDropdown({
-        parent = parent,
+        parent = container,
         name = "RDT_RouteDropdown",
         point = "TOPLEFT",
-        x = 230,
+        x = 0,
         y = -8,
-        width = 180,
-        height = 24,
+        width = 290,  -- Default width, will be adjusted
+        height = 26,
         menuHeight = 150,
         defaultText = "Route 1",
         onItemClick = function(item)
@@ -588,13 +585,22 @@ function UI:CreateRouteDropdown(parent)
         end
     })
     
-    -- Override the button's OnClick to populate items before showing
+    -- Override positioning to use full width
+    routeDropdown.button:ClearAllPoints()
+    routeDropdown.button:SetPoint("TOPLEFT", container, "TOPLEFT", 0, -8)
+    routeDropdown.button:SetPoint("TOPRIGHT", container, "TOPRIGHT", 0, -8)
+    routeDropdown.button:SetHeight(26)
+    
+    -- Update menu width when dropdown is shown
     local originalButton = routeDropdown.button
     local originalMenuFrame = routeDropdown.menuFrame
     originalButton:SetScript("OnClick", function(self)
         if originalMenuFrame:IsShown() then
             originalMenuFrame:Hide()
         else
+            -- Update menu width to match button
+            originalMenuFrame:SetWidth(self:GetWidth())
+            
             -- Position menu below button
             originalMenuFrame:ClearAllPoints()
             originalMenuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
@@ -605,10 +611,18 @@ function UI:CreateRouteDropdown(parent)
         end
     end)
     
-    -- New Route button (small button next to route dropdown)
-    local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", parent)
-    newRouteBtn:SetPoint("LEFT", routeDropdown.button, "RIGHT", 3, 0)
-    newRouteBtn:SetSize(50, 24)
+    -- Row 1: Route action buttons (New, Rename, Delete)
+    local spacing = 3
+    local totalSpacing = spacing * 2  -- Two gaps between three buttons
+    
+    -- Calculate initial button width (will be recalculated on resize)
+    local containerWidth = container:GetWidth() or 290
+    local buttonWidth = (containerWidth - totalSpacing) / 3
+    
+    -- New Route button (left side, 1/3 width)
+    local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", container)
+    newRouteBtn:SetPoint("TOPLEFT", routeDropdown.button, "BOTTOMLEFT", 0, -5)
+    newRouteBtn:SetSize(buttonWidth, 24)
     StyleSquareButton(newRouteBtn)
     newRouteBtn.text = newRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     newRouteBtn.text:SetAllPoints()
@@ -632,10 +646,10 @@ function UI:CreateRouteDropdown(parent)
         end
     end)
     
-    -- Rename Route button (small button next to New)
-    local renameRouteBtn = CreateFrame("Button", "RDT_RenameRouteButton", parent)
-    renameRouteBtn:SetPoint("LEFT", newRouteBtn, "RIGHT", 3, 0)
-    renameRouteBtn:SetSize(60, 24)
+    -- Rename Route button (middle, 1/3 width)
+    local renameRouteBtn = CreateFrame("Button", "RDT_RenameRouteButton", container)
+    renameRouteBtn:SetPoint("LEFT", newRouteBtn, "RIGHT", spacing, 0)
+    renameRouteBtn:SetSize(buttonWidth, 24)
     StyleSquareButton(renameRouteBtn)
     renameRouteBtn.text = renameRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     renameRouteBtn.text:SetAllPoints()
@@ -649,10 +663,10 @@ function UI:CreateRouteDropdown(parent)
         end
     end)
     
-    -- Delete Route button (small button next to Rename)
-    local deleteRouteBtn = CreateFrame("Button", "RDT_DeleteRouteButton", parent)
-    deleteRouteBtn:SetPoint("LEFT", renameRouteBtn, "RIGHT", 3, 0)
-    deleteRouteBtn:SetSize(50, 24)
+    -- Delete Route button (right side, 1/3 width)
+    local deleteRouteBtn = CreateFrame("Button", "RDT_DeleteRouteButton", container)
+    deleteRouteBtn:SetPoint("LEFT", renameRouteBtn, "RIGHT", spacing, 0)
+    deleteRouteBtn:SetSize(buttonWidth, 24)
     StyleSquareButton(deleteRouteBtn)
     deleteRouteBtn.text = deleteRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     deleteRouteBtn.text:SetAllPoints()
@@ -665,6 +679,19 @@ function UI:CreateRouteDropdown(parent)
             RDT.Dialogs:ShowDeleteRoute()
         end
     end)
+    
+    -- Update button widths when container resizes
+    local function UpdateRouteButtonWidths()
+        local width = container:GetWidth()
+        local btnWidth = (width - totalSpacing) / 3
+        newRouteBtn:SetWidth(btnWidth)
+        renameRouteBtn:SetWidth(btnWidth)
+        deleteRouteBtn:SetWidth(btnWidth)
+    end
+    
+    container:HookScript("OnSizeChanged", UpdateRouteButtonWidths)
+    
+    return newRouteBtn  -- Return first button for anchoring next row
 end
 
 --- Populate the route dropdown with current routes
@@ -948,20 +975,18 @@ function UI:CreateButtonContainer(parent)
     buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 4, 0)
     buttonContainer:SetPoint("TOPRIGHT", -5, -42)
     buttonContainer:SetHeight(BUTTON_PANEL_HEIGHT)
-    buttonContainer:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
-    })
-    buttonContainer:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
-    buttonContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    -- No backdrop - buttons will be visible directly
 
-    -- New Pull button (top)
+    -- Create route dropdown and buttons at the top (returns first route button for anchoring)
+    local firstRouteBtn = UI:CreateRouteDropdown(buttonContainer)
+    
+    -- Row 2: New Pull and Reset All (on same line, split 50/50)
+    local spacing = 3
+    
+    -- New Pull button (left side)
     local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer)
-    newPullButton:SetPoint("TOP", buttonContainer, "TOP", 0, -14)
-    newPullButton:SetSize(240, 28)
+    newPullButton:SetPoint("TOPLEFT", firstRouteBtn, "BOTTOMLEFT", 0, -5)
+    newPullButton:SetHeight(26)
     newPullButton:SetText("New Pull")
     newPullButton:RegisterForClicks("LeftButtonUp")
     StyleSquareButton(newPullButton)
@@ -975,10 +1000,10 @@ function UI:CreateButtonContainer(parent)
     end)
     UI.newPullButton = newPullButton
 
-    -- Reset button
+    -- Reset All button (right side)
     local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer)
-    resetButton:SetPoint("TOP", newPullButton, "BOTTOM", 0, -5)
-    resetButton:SetSize(240, 26)
+    resetButton:SetPoint("LEFT", newPullButton, "RIGHT", spacing, 0)
+    resetButton:SetHeight(26)
     resetButton:SetText(L["RESET_ALL"])
     resetButton:RegisterForClicks("LeftButtonUp")
     StyleSquareButton(resetButton)
@@ -990,10 +1015,11 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Export button (left side of pair)
+    -- Row 3: Export and Import (on same line, split 50/50)
+    -- Export button (left side)
     local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer)
-    exportButton:SetPoint("TOPLEFT", resetButton, "BOTTOMLEFT", 0, -5)
-    exportButton:SetSize(117, 24)
+    exportButton:SetPoint("TOPLEFT", newPullButton, "BOTTOMLEFT", 0, -5)
+    exportButton:SetHeight(24)
     exportButton:SetText("Export")
     exportButton:RegisterForClicks("LeftButtonUp")
     StyleSquareButton(exportButton)
@@ -1011,10 +1037,10 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Import button (right side of pair)
+    -- Import button (right side)
     local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer)
-    importButton:SetPoint("TOPRIGHT", resetButton, "BOTTOMRIGHT", 0, -5)
-    importButton:SetSize(117, 24)
+    importButton:SetPoint("LEFT", exportButton, "RIGHT", spacing, 0)
+    importButton:SetHeight(24)
     importButton:SetText("Import")
     importButton:RegisterForClicks("LeftButtonUp")
     StyleSquareButton(importButton)
@@ -1027,6 +1053,32 @@ function UI:CreateButtonContainer(parent)
             RDT:PrintError("Import dialog not available")
         end
     end)
+    
+    -- Calculate initial widths
+    local containerWidth = buttonContainer:GetWidth() or 290
+    local halfWidth = (containerWidth - spacing) / 2
+    
+    -- Set initial widths for all buttons
+    newPullButton:SetWidth(halfWidth)
+    resetButton:SetWidth(halfWidth)
+    exportButton:SetWidth(halfWidth)
+    importButton:SetWidth(halfWidth)
+    
+    -- Update widths dynamically when container resizes
+    local function UpdatePullExportButtonWidths()
+        local width = buttonContainer:GetWidth()
+        local btnHalfWidth = (width - spacing) / 2
+        
+        -- Row 2: New Pull and Reset All
+        newPullButton:SetWidth(btnHalfWidth)
+        resetButton:SetWidth(btnHalfWidth)
+        
+        -- Row 3: Export and Import
+        exportButton:SetWidth(btnHalfWidth)
+        importButton:SetWidth(btnHalfWidth)
+    end
+    
+    buttonContainer:HookScript("OnSizeChanged", UpdatePullExportButtonWidths)
 end
 
 --- Update pull display (removed - no longer needed)
