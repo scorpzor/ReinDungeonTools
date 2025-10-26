@@ -56,13 +56,13 @@ For devs adding new dungeons/making changes:
 - [x] Pull border indication
 - [x] Basic pack information (mob names, forces)
 - [x] In-game coordinate picker for development
+- [x] Multiple routes per dungeon
 - [ ] Complete dungeon layouts
 - [ ] Detailed pack information (abilities, patrol paths)
-- [ ] Multiple route storage per dungeon
 - [ ] Route sharing in chat
 - [ ] Undo/Redo functionality
-- [ ] Statistics tracking
 - [ ] Dungeon timer integration
+- [ ] Statistics tracking
 
 ## Contributing
 
