@@ -27,26 +27,26 @@ function UIHelpers:StyleSquareButton(button)
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     
-    -- Normal state: dark gray
-    button:SetBackdropColor(0.15, 0.15, 0.15, 1)
-    button:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+    -- Normal state: lighter gray for better visibility
+    button:SetBackdropColor(0.25, 0.25, 0.25, 1)
+    button:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     
     -- Hover effect
     button:SetScript("OnEnter", function(self)
-        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        self:SetBackdropColor(0.35, 0.35, 0.35, 1)
     end)
     
     button:SetScript("OnLeave", function(self)
-        self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
     end)
     
-    -- Pressed state: darker gray
+    -- Pressed state
     button:HookScript("OnMouseDown", function(self)
-        self:SetBackdropColor(0.1, 0.1, 0.1, 1)
+        self:SetBackdropColor(0.18, 0.18, 0.18, 1)
     end)
     
     button:HookScript("OnMouseUp", function(self)
-        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        self:SetBackdropColor(0.35, 0.35, 0.35, 1)
     end)
 end
 
@@ -127,8 +127,8 @@ function UIHelpers:StyleScrollBar(scrollFrame)
             edgeSize = 1,
             insets = { left = 1, right = 1, top = 1, bottom = 1 }
         })
-        scrollUpButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        scrollUpButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        scrollUpButton:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        scrollUpButton:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
         
         -- Add arrow text (check if it already exists to avoid duplicates)
         if not scrollUpButton.styledArrow then
@@ -140,10 +140,10 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         end
         
         scrollUpButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+            self:SetBackdropColor(0.35, 0.35, 0.35, 1)
         end)
         scrollUpButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
         end)
     end
     
@@ -162,8 +162,8 @@ function UIHelpers:StyleScrollBar(scrollFrame)
             edgeSize = 1,
             insets = { left = 1, right = 1, top = 1, bottom = 1 }
         })
-        scrollDownButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        scrollDownButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        scrollDownButton:SetBackdropColor(0.25, 0.25, 0.25, 1)
+        scrollDownButton:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
         
         -- Add arrow text (check if it already exists to avoid duplicates)
         if not scrollDownButton.styledArrow then
@@ -175,23 +175,23 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         end
         
         scrollDownButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+            self:SetBackdropColor(0.35, 0.35, 0.35, 1)
         end)
         scrollDownButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
+            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
         end)
     end
     
     if thumbTexture then
         thumbTexture:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
-        thumbTexture:SetVertexColor(0.3, 0.3, 0.3, 1)
+        thumbTexture:SetVertexColor(0.4, 0.4, 0.4, 1)
         thumbTexture:SetWidth(16)
     end
     
     -- Style the track background
     local trackBG = scrollBar:CreateTexture(nil, "BACKGROUND")
     trackBG:SetAllPoints(scrollBar)
-    trackBG:SetColorTexture(0.05, 0.05, 0.05, 0.8)
+    trackBG:SetColorTexture(0.15, 0.15, 0.15, 0.8)
 end
 
 --------------------------------------------------------------------------------
@@ -323,7 +323,7 @@ function UIHelpers:CreateModernDropdown(config)
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-    menuFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.98)
+    menuFrame:SetBackdropColor(0.2, 0.2, 0.2, 0.98)
     menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     menuFrame:Hide()
     
