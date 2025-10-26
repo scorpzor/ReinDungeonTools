@@ -125,14 +125,6 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
         tinsert(packGroup.mobButtons, mobButton)
     end
     
-    -- Pack ID label (below pack)
-    local idLabel = packGroup:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    idLabel:SetPoint("TOP", packGroup, "BOTTOM", 0, -2)
-    idLabel:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
-    idLabel:SetText(tostring(data.id))
-    idLabel:SetTextColor(0.7, 0.7, 0.7)
-    packGroup.idLabel = idLabel
-    
     return packGroup
 end
 
