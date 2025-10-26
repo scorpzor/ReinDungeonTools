@@ -37,6 +37,7 @@ Core\DevTools.lua
 Modules\ImportExport.lua
 
 # UI Components
+UI\UIHelpers.lua
 UI\MainFrame.lua
 UI\PackButtons.lua
 UI\PullsList.lua

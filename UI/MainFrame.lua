@@ -8,6 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
+-- Local reference to UIHelpers
+local UIHelpers = RDT.UIHelpers
+
 -- UI Constants
 local FRAME_WIDTH, FRAME_HEIGHT = 1440, 820
 local MAP_WIDTH, MAP_HEIGHT = 1140, 760
@@ -26,135 +29,12 @@ local routeDropdown  -- Route dropdown object
 local buttonContainer
 
 --------------------------------------------------------------------------------
--- Helper Functions
+-- Helper Functions (Use UIHelpers for styling)
 --------------------------------------------------------------------------------
 
---- Style a button with square gray appearance
--- @param button Button Button to style
+-- Local convenience wrapper for button styling
 local function StyleSquareButton(button)
-    button:SetNormalFontObject("GameFontNormal")
-    button:SetHighlightFontObject("GameFontHighlight")
-    button:SetDisabledFontObject("GameFontDisable")
-    
-    -- Set backdrop for square gray appearance
-    button:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
-    })
-    
-    -- Normal state: dark gray
-    button:SetBackdropColor(0.15, 0.15, 0.15, 1)
-    button:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
-    
-    -- Hover state: lighter gray
-    button:SetScript("OnEnter", function(self)
-        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        self:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
-    end)
-    
-    button:SetScript("OnLeave", function(self)
-        self:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
-    end)
-    
-    -- Pressed state: darker gray
-    button:SetScript("OnMouseDown", function(self)
-        self:SetBackdropColor(0.1, 0.1, 0.1, 1)
-    end)
-    
-    button:SetScript("OnMouseUp", function(self)
-        self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-    end)
-end
-
---- Style a scrollbar with modern square gray appearance
--- @param scrollFrame ScrollFrame The scroll frame to style
-function UI:StyleScrollBar(scrollFrame)
-    local scrollBar = _G[scrollFrame:GetName().."ScrollBar"]
-    if not scrollBar then return end
-    
-    -- Remove default textures
-    local scrollUpButton = _G[scrollFrame:GetName().."ScrollBarScrollUpButton"]
-    local scrollDownButton = _G[scrollFrame:GetName().."ScrollBarScrollDownButton"]
-    local thumbTexture = _G[scrollFrame:GetName().."ScrollBarThumbTexture"]
-    
-    if scrollUpButton then
-        scrollUpButton:SetNormalTexture(nil)
-        scrollUpButton:SetPushedTexture(nil)
-        scrollUpButton:SetHighlightTexture(nil)
-        scrollUpButton:SetDisabledTexture(nil)
-        scrollUpButton:SetSize(16, 16)
-        
-        -- Style as square button
-        scrollUpButton:SetBackdrop({
-            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-            tile = false,
-            edgeSize = 1,
-            insets = { left = 1, right = 1, top = 1, bottom = 1 }
-        })
-        scrollUpButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        scrollUpButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
-        
-        -- Add arrow text
-        local upArrow = scrollUpButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        upArrow:SetPoint("CENTER", 0, 0)
-        upArrow:SetText("^")
-        upArrow:SetTextColor(0.7, 0.7, 0.7)
-        
-        scrollUpButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        end)
-        scrollUpButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        end)
-    end
-    
-    if scrollDownButton then
-        scrollDownButton:SetNormalTexture(nil)
-        scrollDownButton:SetPushedTexture(nil)
-        scrollDownButton:SetHighlightTexture(nil)
-        scrollDownButton:SetDisabledTexture(nil)
-        scrollDownButton:SetSize(16, 16)
-        
-        -- Style as square button
-        scrollDownButton:SetBackdrop({
-            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-            tile = false,
-            edgeSize = 1,
-            insets = { left = 1, right = 1, top = 1, bottom = 1 }
-        })
-        scrollDownButton:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        scrollDownButton:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
-        
-        -- Add arrow text
-        local downArrow = scrollDownButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        downArrow:SetPoint("CENTER", 0, 0)
-        downArrow:SetText("v")
-        downArrow:SetTextColor(0.7, 0.7, 0.7)
-        
-        scrollDownButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        end)
-        scrollDownButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        end)
-    end
-    
-    if thumbTexture then
-        thumbTexture:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
-        thumbTexture:SetVertexColor(0.3, 0.3, 0.3, 1)
-        thumbTexture:SetWidth(16)
-    end
-    
-    -- Style the track background
-    local trackBG = scrollBar:CreateTexture(nil, "BACKGROUND")
-    trackBG:SetAllPoints(scrollBar)
-    trackBG:SetColorTexture(0.05, 0.05, 0.05, 0.8)
+    UIHelpers:StyleSquareButton(button)
 end
 
 --------------------------------------------------------------------------------
@@ -227,7 +107,7 @@ function UI:CreateModernDropdown(config)
     scrollFrame:SetScrollChild(scrollChild)
     
     -- Style the scrollbar
-    UI:StyleScrollBar(scrollFrame)
+    UIHelpers:StyleScrollBar(scrollFrame)
     
     menuFrame.scrollFrame = scrollFrame
     menuFrame.scrollChild = scrollChild
@@ -421,26 +301,7 @@ function UI:CreateMainFrame()
     titleText:SetJustifyH("CENTER")
 
     -- Close button (in title bar)
-    local closeButton = CreateFrame("Button", nil, mainFrame)
-    closeButton:SetPoint("TOPRIGHT", -8, -8)
-    closeButton:SetSize(20, 20)
-    closeButton:SetText("×")
-    closeButton:SetNormalFontObject("GameFontNormalLarge")
-    StyleSquareButton(closeButton)
-    -- Make the X bigger and override font color
-    local closeFont = closeButton:GetFontString()
-    closeFont:SetFont("Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
-    closeFont:SetTextColor(0.8, 0.8, 0.8)
-    local origCloseOnEnter = closeButton:GetScript("OnEnter")
-    closeButton:SetScript("OnEnter", function(self)
-        if origCloseOnEnter then origCloseOnEnter(self) end
-        self:GetFontString():SetTextColor(1, 0.3, 0.3)  -- Red on hover
-    end)
-    local origCloseOnLeave = closeButton:GetScript("OnLeave")
-    closeButton:SetScript("OnLeave", function(self)
-        if origCloseOnLeave then origCloseOnLeave(self) end
-        self:GetFontString():SetTextColor(0.8, 0.8, 0.8)  -- Gray when not hovering
-    end)
+    local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
     -- Create dungeon dropdown

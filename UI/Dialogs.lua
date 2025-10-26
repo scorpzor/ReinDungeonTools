@@ -8,6 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 RDT.Dialogs = {}
 local Dialogs = RDT.Dialogs
 
+-- Local reference to UIHelpers
+local UIHelpers = RDT.UIHelpers
+
 -- Local references
 local exportFrame
 local importFrame
@@ -16,6 +19,23 @@ local importFrame
 local DIALOG_WIDTH = 500
 local DIALOG_HEIGHT = 200
 local IMPORT_DIALOG_HEIGHT = 250
+
+--------------------------------------------------------------------------------
+-- Styling Helper Functions (Use UIHelpers)
+--------------------------------------------------------------------------------
+
+-- Local convenience wrappers
+local function StyleModernButton(button)
+    UIHelpers:StyleSquareButton(button)
+end
+
+local function CreateModernCloseButton(parent)
+    return UIHelpers:CreateModernCloseButton(parent)
+end
+
+local function StyleStaticPopup(dialog)
+    UIHelpers:StyleStaticPopup(dialog)
+end
 
 --------------------------------------------------------------------------------
 -- Export Dialog
@@ -40,23 +60,24 @@ function Dialogs:CreateExportDialog()
     frame:SetClampedToScreen(true)
     frame:Hide()
     
-    -- Backdrop
+    -- Modern backdrop
     frame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 11, right = 12, top = 12, bottom = 11 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-    frame:SetBackdropColor(0, 0, 0, 1)
+    frame:SetBackdropColor(0.05, 0.05, 0.05, 0.98)
+    frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     
     -- Title
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText("Export Route")
     
-    -- Close button (X)
-    local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
-    closeBtn:SetPoint("TOPRIGHT", -5, -5)
+    -- Modern close button (X)
+    local closeBtn = CreateModernCloseButton(frame)
     closeBtn:SetScript("OnClick", function() frame:Hide() end)
     
     -- Instructions
@@ -75,19 +96,29 @@ function Dialogs:CreateExportDialog()
     editBox:SetSize(460, 200)
     editBox:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     editBox:SetAutoFocus(false)
+    editBox:SetTextColor(1, 1, 1)
     editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
     editBox:SetScript("OnTextChanged", function(self)
         -- Auto-select text when content changes
         self:HighlightText()
     end)
+    -- Dark background for editbox
+    editBox:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = nil,
+        tile = false,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
+    })
+    editBox:SetBackdropColor(0, 0, 0, 0.8)
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
     
     -- Select All button
-    local selectAllButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local selectAllButton = CreateFrame("Button", nil, frame)
     selectAllButton:SetSize(100, 25)
     selectAllButton:SetPoint("BOTTOM", 50, 40)
     selectAllButton:SetText("Select All")
+    StyleModernButton(selectAllButton)
     selectAllButton:SetScript("OnClick", function()
         editBox:HighlightText()
         editBox:SetFocus()
@@ -100,10 +131,11 @@ function Dialogs:CreateExportDialog()
     copyHint:SetTextColor(0.7, 0.7, 0.7)
     
     -- Close button (bottom)
-    local closeButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local closeButton = CreateFrame("Button", nil, frame)
     closeButton:SetSize(100, 25)
     closeButton:SetPoint("BOTTOM", -50, 10)
     closeButton:SetText("Close")
+    StyleModernButton(closeButton)
     closeButton:SetScript("OnClick", function() frame:Hide() end)
     
     exportFrame = frame
@@ -157,23 +189,24 @@ function Dialogs:CreateImportDialog()
     frame:SetClampedToScreen(true)
     frame:Hide()
     
-    -- Backdrop
+    -- Modern backdrop
     frame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 11, right = 12, top = 12, bottom = 11 }
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-    frame:SetBackdropColor(0, 0, 0, 1)
+    frame:SetBackdropColor(0.05, 0.05, 0.05, 0.98)
+    frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     
     -- Title
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText("Import Route")
     
-    -- Close button (X)
-    local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
-    closeBtn:SetPoint("TOPRIGHT", -5, -5)
+    -- Modern close button (X)
+    local closeBtn = CreateModernCloseButton(frame)
     closeBtn:SetScript("OnClick", function() 
         frame:Hide()
         frame.editBox:SetText("") -- Clear on close
@@ -195,10 +228,19 @@ function Dialogs:CreateImportDialog()
     editBox:SetSize(460, 200)
     editBox:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     editBox:SetAutoFocus(true)
+    editBox:SetTextColor(1, 1, 1)
     editBox:SetScript("OnEscapePressed", function() 
         frame:Hide()
         editBox:SetText("")
     end)
+    -- Dark background for editbox
+    editBox:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = nil,
+        tile = false,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 }
+    })
+    editBox:SetBackdropColor(0, 0, 0, 0.8)
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
     
@@ -209,10 +251,11 @@ function Dialogs:CreateImportDialog()
     warning:SetTextColor(1, 0.8, 0)
     
     -- Import button
-    local importButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local importButton = CreateFrame("Button", nil, frame)
     importButton:SetSize(100, 25)
     importButton:SetPoint("BOTTOM", 50, 10)
     importButton:SetText("Import")
+    StyleModernButton(importButton)
     importButton:SetScript("OnClick", function()
         local importString = editBox:GetText()
         
@@ -235,10 +278,11 @@ function Dialogs:CreateImportDialog()
     end)
     
     -- Cancel button
-    local cancelButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    local cancelButton = CreateFrame("Button", nil, frame)
     cancelButton:SetSize(100, 25)
     cancelButton:SetPoint("BOTTOM", -50, 10)
     cancelButton:SetText("Cancel")
+    StyleModernButton(cancelButton)
     cancelButton:SetScript("OnClick", function() 
         frame:Hide()
         editBox:SetText("")
@@ -387,6 +431,7 @@ function Dialogs:ShowNewRoute()
         OnShow = function(self)
             self.editBox:SetFocus()
             self.editBox:SetText("")
+            StyleStaticPopup(self)
         end,
         OnAccept = function(self)
             local routeName = self.editBox:GetText()
@@ -429,6 +474,7 @@ function Dialogs:ShowRenameRoute()
             self.editBox:SetFocus()
             self.editBox:SetText(oldName)
             self.editBox:HighlightText()
+            StyleStaticPopup(self)
         end,
         OnAccept = function(self)
             local newName = self.editBox:GetText()
@@ -474,6 +520,9 @@ function Dialogs:ShowDeleteRoute()
         text = "Delete route '" .. routeName .. "'?\n\n|cFFFF0000This cannot be undone!|r",
         button1 = "Delete",
         button2 = "Cancel",
+        OnShow = function(self)
+            StyleStaticPopup(self)
+        end,
         OnAccept = function()
             if RDT.RouteManager:DeleteRoute(dungeonName, routeName) and RDT.UI then
                 RDT.UI:UpdateRouteDropdown()
