@@ -21,7 +21,8 @@ local mapTexture  -- Legacy single texture (kept for compatibility)
 local mapTiles = {}  -- New: tile system for high-res maps
 local titleText
 local versionText
-local dropdownFrame
+local dungeonDropdown  -- Dungeon dropdown object
+local routeDropdown  -- Route dropdown object
 local buttonContainer
 
 --------------------------------------------------------------------------------
@@ -157,6 +158,217 @@ function UI:StyleScrollBar(scrollFrame)
 end
 
 --------------------------------------------------------------------------------
+-- Generic Dropdown Component
+--------------------------------------------------------------------------------
+
+--- Create a modern dropdown menu component
+-- @param config table Configuration with:
+--   - parent: Frame - Parent frame
+--   - name: string - Unique name for the dropdown
+--   - point: string - Anchor point (e.g., "TOPLEFT")
+--   - x: number - X offset
+--   - y: number - Y offset
+--   - width: number - Button width
+--   - height: number - Button height (default 24)
+--   - menuHeight: number - Menu height (default 200)
+--   - defaultText: string - Initial text
+--   - onItemClick: function(itemData) - Called when item is selected
+-- @return table Dropdown object with methods:
+--   - SetItems(items): Update dropdown items
+--   - SetText(text): Update button text
+--   - GetButton(): Get the main button frame
+--   - Show/Hide(): Control visibility
+function UI:CreateModernDropdown(config)
+    local dropdown = {}
+    
+    -- Create main button
+    local button = CreateFrame("Button", config.name, config.parent)
+    button:SetPoint(config.point or "TOPLEFT", config.x or 0, config.y or 0)
+    button:SetSize(config.width or 200, config.height or 24)
+    StyleSquareButton(button)
+    
+    -- Dropdown text
+    local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("LEFT", 8, 0)
+    text:SetPoint("RIGHT", -20, 0)
+    text:SetJustifyH("LEFT")
+    text:SetText(config.defaultText or "Select...")
+    button.text = text
+    
+    -- Dropdown arrow
+    local arrow = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    arrow:SetPoint("RIGHT", -5, 0)
+    arrow:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    arrow:SetText("v")
+    arrow:SetTextColor(0.7, 0.7, 0.7)
+    
+    -- Create dropdown menu frame
+    local menuFrame = CreateFrame("Frame", config.name.."Menu", UIParent)
+    menuFrame:SetSize(config.width or 200, config.menuHeight or 200)
+    menuFrame:SetFrameStrata("DIALOG")
+    menuFrame:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    menuFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.98)
+    menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    menuFrame:Hide()
+    
+    -- Scroll frame for menu items
+    local scrollFrame = CreateFrame("ScrollFrame", config.name.."Scroll", menuFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", 4, -4)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
+    
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetSize((config.width or 200) - 30, 1)
+    scrollFrame:SetScrollChild(scrollChild)
+    
+    -- Style the scrollbar
+    UI:StyleScrollBar(scrollFrame)
+    
+    menuFrame.scrollFrame = scrollFrame
+    menuFrame.scrollChild = scrollChild
+    menuFrame.buttons = {}
+    
+    -- Frame level management
+    menuFrame:SetScript("OnShow", function(self)
+        self:SetFrameLevel(button:GetFrameLevel() + 10)
+        self:EnableMouse(true)
+    end)
+    
+    menuFrame:SetScript("OnHide", function(self)
+        self:EnableMouse(false)
+    end)
+    
+    -- Click handler to toggle menu
+    button:SetScript("OnClick", function(self)
+        if menuFrame:IsShown() then
+            menuFrame:Hide()
+        else
+            -- Position menu below button
+            menuFrame:ClearAllPoints()
+            menuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+            
+            -- Show menu
+            menuFrame:Show()
+        end
+    end)
+    
+    button.menuFrame = menuFrame
+    
+    -- Public API
+    dropdown.button = button
+    dropdown.menuFrame = menuFrame
+    
+    --- Update dropdown items
+    -- @param items table Array of items, each with: { value = any, text = string, isSelected = boolean }
+    function dropdown:SetItems(items)
+        local scrollChild = menuFrame.scrollChild
+        
+        -- Clear existing buttons
+        for _, btn in ipairs(menuFrame.buttons) do
+            btn:Hide()
+        end
+        
+        local yOffset = 0
+        local itemWidth = (config.width or 200) - 30
+        
+        for i, item in ipairs(items) do
+            local btn = menuFrame.buttons[i]
+            if not btn then
+                btn = CreateFrame("Button", nil, scrollChild)
+                btn:SetSize(itemWidth, 22)
+                
+                btn:SetBackdrop({
+                    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+                    edgeFile = nil,
+                    tile = false,
+                    insets = { left = 0, right = 0, top = 0, bottom = 0 }
+                })
+                btn:SetBackdropColor(0, 0, 0, 0)
+                
+                local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                btnText:SetPoint("LEFT", 8, 0)
+                btnText:SetJustifyH("LEFT")
+                btn.text = btnText
+                
+                local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                checkmark:SetPoint("RIGHT", -5, 0)
+                checkmark:SetText("<")
+                checkmark:SetTextColor(0, 1, 0)
+                btn.checkmark = checkmark
+                
+                btn:SetScript("OnEnter", function(self)
+                    self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
+                end)
+                
+                btn:SetScript("OnLeave", function(self)
+                    if self.isSelected then
+                        self:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+                    else
+                        self:SetBackdropColor(0, 0, 0, 0)
+                    end
+                end)
+                
+                menuFrame.buttons[i] = btn
+            end
+            
+            btn:SetPoint("TOPLEFT", 0, yOffset)
+            btn.text:SetText(item.text or tostring(item.value))
+            btn.itemData = item
+            
+            -- Update selection state
+            btn.isSelected = item.isSelected
+            btn.checkmark:SetShown(item.isSelected)
+            if item.isSelected then
+                btn:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+            else
+                btn:SetBackdropColor(0, 0, 0, 0)
+            end
+            
+            -- Click handler
+            btn:SetScript("OnClick", function(self)
+                if config.onItemClick then
+                    config.onItemClick(self.itemData)
+                end
+                menuFrame:Hide()
+            end)
+            
+            btn:Show()
+            yOffset = yOffset - 22
+        end
+        
+        scrollChild:SetHeight(math.max(math.abs(yOffset), 1))
+    end
+    
+    --- Update button text
+    function dropdown:SetText(newText)
+        text:SetText(newText)
+    end
+    
+    --- Get the main button
+    function dropdown:GetButton()
+        return button
+    end
+    
+    --- Show the dropdown
+    function dropdown:Show()
+        button:Show()
+    end
+    
+    --- Hide the dropdown
+    function dropdown:Hide()
+        button:Hide()
+        menuFrame:Hide()
+    end
+    
+    return dropdown
+end
+
+--------------------------------------------------------------------------------
 -- Main Frame Creation
 --------------------------------------------------------------------------------
 
@@ -279,183 +491,70 @@ end
 --- Create dungeon selection dropdown (custom modern design)
 -- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
-    -- Create main button
-    dropdownFrame = CreateFrame("Button", "RDT_DungeonDropdown", parent)
-    dropdownFrame:SetPoint("TOPLEFT", 5, -8)
-    dropdownFrame:SetSize(220, 24)
-    StyleSquareButton(dropdownFrame)
-    
-    -- Dropdown text
-    local dropdownText = dropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    dropdownText:SetPoint("LEFT", 8, 0)
-    dropdownText:SetPoint("RIGHT", -20, 0)
-    dropdownText:SetJustifyH("LEFT")
-    dropdownFrame.text = dropdownText
-    
-    -- Dropdown arrow (using simple triangle made with text)
-    local arrow = dropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    arrow:SetPoint("RIGHT", -5, 0)
-    arrow:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-    arrow:SetText("v")  -- Simple 'v' character works on all clients
-    arrow:SetTextColor(0.7, 0.7, 0.7)
-    
-    -- Set initial text
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
-    dropdownText:SetText(currentDungeon)
     
-    -- Create dropdown menu frame
-    local menuFrame = CreateFrame("Frame", "RDT_DropdownMenu", UIParent)
-    menuFrame:SetSize(220, 200)
-    menuFrame:SetFrameStrata("DIALOG")
-    menuFrame:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    -- Create dropdown using the generic component
+    dungeonDropdown = UI:CreateModernDropdown({
+        parent = parent,
+        name = "RDT_DungeonDropdown",
+        point = "TOPLEFT",
+        x = 5,
+        y = -8,
+        width = 220,
+        height = 24,
+        menuHeight = 200,
+        defaultText = currentDungeon,
+        onItemClick = function(item)
+            -- Switch to selected dungeon
+            if item.value and RDT.LoadDungeon then
+                RDT:LoadDungeon(item.value)
+            end
+        end
     })
-    menuFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.98)
-    menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-    menuFrame:Hide()
-    menuFrame:SetScript("OnShow", function(self)
-        self:SetFrameLevel(dropdownFrame:GetFrameLevel() + 10)
-    end)
     
-    -- Scroll frame for menu items
-    local scrollFrame = CreateFrame("ScrollFrame", "RDT_DropdownScroll", menuFrame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", 4, -4)
-    scrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
-    
-    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
-    scrollChild:SetSize(190, 1)
-    scrollFrame:SetScrollChild(scrollChild)
-    
-    -- Style the scrollbar
-    UI:StyleScrollBar(scrollFrame)
-    
-    menuFrame.scrollFrame = scrollFrame
-    menuFrame.scrollChild = scrollChild
-    menuFrame.buttons = {}
-    
-    -- Click handler to toggle menu
-    dropdownFrame:SetScript("OnClick", function(self)
-        if menuFrame:IsShown() then
-            menuFrame:Hide()
+    -- Override the button's OnClick to populate items before showing
+    local originalButton = dungeonDropdown.button
+    local originalMenuFrame = dungeonDropdown.menuFrame
+    originalButton:SetScript("OnClick", function(self)
+        if originalMenuFrame:IsShown() then
+            originalMenuFrame:Hide()
         else
             -- Position menu below button
-            menuFrame:ClearAllPoints()
-            menuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+            originalMenuFrame:ClearAllPoints()
+            originalMenuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
             
-            -- Populate menu
-            UI:PopulateDropdownMenu(menuFrame)
-            menuFrame:Show()
+            -- Populate with dungeons
+            UI:PopulateDungeonDropdown()
+            originalMenuFrame:Show()
         end
     end)
-    
-    -- Close menu when clicking outside
-    menuFrame:SetScript("OnShow", function(self)
-        self:SetFrameLevel(dropdownFrame:GetFrameLevel() + 10)
-        self:EnableMouse(true)
-    end)
-    
-    menuFrame:SetScript("OnHide", function(self)
-        self:EnableMouse(false)
-    end)
-    
-    dropdownFrame.menuFrame = menuFrame
 end
 
---- Populate the dropdown menu with dungeons
--- @param menuFrame Frame The menu frame to populate
-function UI:PopulateDropdownMenu(menuFrame)
-    local scrollChild = menuFrame.scrollChild
-    
-    -- Clear existing buttons
-    for _, btn in ipairs(menuFrame.buttons) do
-        btn:Hide()
-    end
-    
-    if not RDT.Data then
-        return
-    end
+--- Populate the dungeon dropdown with current dungeons
+function UI:PopulateDungeonDropdown()
+    if not dungeonDropdown or not RDT.Data then return end
     
     local activeDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
     local dungeonNames = RDT.Data:GetDungeonNames()
     table.sort(dungeonNames)
     
-    local yOffset = 0
-    for i, name in ipairs(dungeonNames) do
-        local btn = menuFrame.buttons[i]
-        if not btn then
-            btn = CreateFrame("Button", nil, scrollChild)
-            btn:SetSize(190, 22)
-            
-            btn:SetBackdrop({
-                bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-                edgeFile = nil,
-                tile = false,
-                insets = { left = 0, right = 0, top = 0, bottom = 0 }
-            })
-            btn:SetBackdropColor(0, 0, 0, 0)
-            
-            local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            text:SetPoint("LEFT", 8, 0)
-            text:SetJustifyH("LEFT")
-            btn.text = text
-            
-            local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            checkmark:SetPoint("RIGHT", -5, 0)
-            checkmark:SetText("<")
-            checkmark:SetTextColor(0, 1, 0)
-            btn.checkmark = checkmark
-            
-            btn:SetScript("OnEnter", function(self)
-                self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
-            end)
-            
-            btn:SetScript("OnLeave", function(self)
-                if self.isSelected then
-                    self:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
-                else
-                    self:SetBackdropColor(0, 0, 0, 0)
-                end
-            end)
-            
-            menuFrame.buttons[i] = btn
-        end
-        
-        btn:SetPoint("TOPLEFT", 0, -yOffset)
-        btn.text:SetText(name)
-        btn.dungeonName = name
-        btn.isSelected = (name == activeDungeon)
-        
-        if btn.isSelected then
-            btn.checkmark:Show()
-            btn:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
-        else
-            btn.checkmark:Hide()
-            btn:SetBackdropColor(0, 0, 0, 0)
-        end
-        
-        btn:SetScript("OnClick", function(self)
-            if RDT:LoadDungeon(self.dungeonName) then
-                dropdownFrame.text:SetText(self.dungeonName)
-                menuFrame:Hide()
-            end
-        end)
-        
-        btn:Show()
-        yOffset = yOffset + 22
+    local items = {}
+    for _, name in ipairs(dungeonNames) do
+        table.insert(items, {
+            value = name,
+            text = name,
+            isSelected = (name == activeDungeon)
+        })
     end
     
-    scrollChild:SetHeight(math.max(yOffset, 1))
+    dungeonDropdown:SetItems(items)
 end
 
 --- Update the dungeon dropdown text
 -- @param dungeonName string Name to display
 function UI:UpdateDropdownText(dungeonName)
-    if dropdownFrame and dropdownFrame.text and dungeonName then
-        dropdownFrame.text:SetText(dungeonName)
+    if dungeonDropdown and dungeonName then
+        dungeonDropdown:SetText(dungeonName)
     end
 end
 
@@ -463,68 +562,52 @@ end
 -- Route Dropdown
 --------------------------------------------------------------------------------
 
-local routeDropdownFrame
-local routeScrollFrame, routeScrollChild
-
 --- Create route selection dropdown and buttons
 --- @param parent Frame Parent frame
 function UI:CreateRouteDropdown(parent)
-    -- Route dropdown button (positioned to the right of dungeon dropdown)
-    routeDropdownFrame = CreateFrame("Button", "RDT_RouteDropdown", parent)
-    routeDropdownFrame:SetPoint("TOPLEFT", 230, -8)
-    routeDropdownFrame:SetSize(180, 24)
-    StyleSquareButton(routeDropdownFrame)
-    
-    -- Dropdown text
-    routeDropdownFrame.text = routeDropdownFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    routeDropdownFrame.text:SetPoint("LEFT", 6, 0)
-    routeDropdownFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "")
-    routeDropdownFrame.text:SetText("Route 1")
-    routeDropdownFrame.text:SetTextColor(1, 1, 1)
-    
-    -- Dropdown arrow
-    local arrow = routeDropdownFrame:CreateTexture(nil, "ARTWORK")
-    arrow:SetPoint("RIGHT", -6, 0)
-    arrow:SetSize(12, 12)
-    arrow:SetTexture("Interface\\ChatFrame\\ChatFrameExpandArrow")
-    
-    -- Create scroll frame for route list (initially hidden)
-    routeScrollFrame = CreateFrame("ScrollFrame", "RDT_RouteScroll", parent, "UIPanelScrollFrameTemplate")
-    routeScrollFrame:SetPoint("TOPLEFT", routeDropdownFrame, "BOTTOMLEFT", 0, -2)
-    routeScrollFrame:SetSize(180, 150)
-    routeScrollFrame:SetFrameLevel(parent:GetFrameLevel() + 10)
-    routeScrollFrame:Hide()
-    
-    -- Backdrop for scroll frame
-    routeScrollFrame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 12,
-        insets = { left = 2, right = 2, top = 2, bottom = 2 }
-    })
-    routeScrollFrame:SetBackdropColor(0, 0, 0, 0.95)
-    routeScrollFrame:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
-    
-    routeScrollChild = CreateFrame("Frame", "RDT_RouteScrollChild", routeScrollFrame)
-    routeScrollChild:SetSize(160, 1)
-    routeScrollFrame:SetScrollChild(routeScrollChild)
-    
-    -- Click handler for dropdown
-    routeDropdownFrame:SetScript("OnClick", function(self, button)
-        if button == "LeftButton" then
-            if routeScrollFrame:IsShown() then
-                routeScrollFrame:Hide()
-            else
-                UI:PopulateRouteDropdown()
-                routeScrollFrame:Show()
+    -- Create dropdown using the generic component
+    routeDropdown = UI:CreateModernDropdown({
+        parent = parent,
+        name = "RDT_RouteDropdown",
+        point = "TOPLEFT",
+        x = 230,
+        y = -8,
+        width = 180,
+        height = 24,
+        menuHeight = 150,
+        defaultText = "Route 1",
+        onItemClick = function(item)
+            -- Switch to selected route
+            local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+            if dungeonName and item.value and RDT.RouteManager then
+                if RDT.RouteManager:SwitchRoute(dungeonName, item.value) then
+                    UI:UpdateRouteDropdown()
+                    UI:RefreshUI()
+                end
             end
+        end
+    })
+    
+    -- Override the button's OnClick to populate items before showing
+    local originalButton = routeDropdown.button
+    local originalMenuFrame = routeDropdown.menuFrame
+    originalButton:SetScript("OnClick", function(self)
+        if originalMenuFrame:IsShown() then
+            originalMenuFrame:Hide()
+        else
+            -- Position menu below button
+            originalMenuFrame:ClearAllPoints()
+            originalMenuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+            
+            -- Populate with routes
+            UI:PopulateRouteDropdown()
+            originalMenuFrame:Show()
         end
     end)
     
     -- New Route button (small button next to route dropdown)
     local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", parent)
-    newRouteBtn:SetPoint("LEFT", routeDropdownFrame, "RIGHT", 3, 0)
+    newRouteBtn:SetPoint("LEFT", routeDropdown.button, "RIGHT", 3, 0)
     newRouteBtn:SetSize(50, 24)
     StyleSquareButton(newRouteBtn)
     newRouteBtn.text = newRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -586,81 +669,36 @@ end
 
 --- Populate the route dropdown with current routes
 function UI:PopulateRouteDropdown()
-    if not routeScrollChild then return end
-    
-    -- Clear existing buttons
-    for _, child in ipairs({routeScrollChild:GetChildren()}) do
-        child:Hide()
-        child:SetParent(nil)
-    end
+    if not routeDropdown or not RDT.RouteManager then return end
     
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
-    if not dungeonName or not RDT.RouteManager then return end
+    if not dungeonName then return end
     
     local routes = RDT.RouteManager:GetRouteNames(dungeonName)
     local currentRouteName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
     
-    local yOffset = 0
+    local items = {}
     for _, routeName in ipairs(routes) do
-        local btn = CreateFrame("Button", nil, routeScrollChild)
-        btn:SetSize(160, 22)
-        btn:SetPoint("TOPLEFT", 0, yOffset)
-        
-        -- Button background
-        local bg = btn:CreateTexture(nil, "BACKGROUND")
-        bg:SetAllPoints()
-        if routeName == currentRouteName then
-            bg:SetColorTexture(0.2, 0.4, 0.6, 0.8)  -- Highlight current
-        else
-            bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
-        end
-        btn.bg = bg
-        
-        -- Text
-        local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        text:SetPoint("LEFT", 4, 0)
-        text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-        text:SetText(routeName)
-        text:SetTextColor(1, 1, 1)
-        
-        -- Hover effect
-        btn:SetScript("OnEnter", function(self)
-            if routeName ~= currentRouteName then
-                self.bg:SetColorTexture(0.3, 0.3, 0.3, 0.8)
-            end
-        end)
-        btn:SetScript("OnLeave", function(self)
-            if routeName ~= currentRouteName then
-                self.bg:SetColorTexture(0.1, 0.1, 0.1, 0.5)
-            end
-        end)
-        
-        -- Click to switch route
-        btn:SetScript("OnClick", function()
-            if RDT.RouteManager:SwitchRoute(dungeonName, routeName) then
-                UI:UpdateRouteDropdown()
-                UI:RefreshUI()
-            end
-            routeScrollFrame:Hide()
-        end)
-        
-        btn:Show()
-        yOffset = yOffset - 22
+        table.insert(items, {
+            value = routeName,
+            text = routeName,
+            isSelected = (routeName == currentRouteName)
+        })
     end
     
-    routeScrollChild:SetHeight(math.max(math.abs(yOffset), 1))
+    routeDropdown:SetItems(items)
 end
 
 --- Update the route dropdown text to show current route
 function UI:UpdateRouteDropdown()
-    if not routeDropdownFrame or not routeDropdownFrame.text then return end
+    if not routeDropdown or not RDT.RouteManager then return end
     
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
-    if not dungeonName or not RDT.RouteManager then return end
+    if not dungeonName then return end
     
     local currentRouteName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
     if currentRouteName then
-        routeDropdownFrame.text:SetText(currentRouteName)
+        routeDropdown:SetText(currentRouteName)
     end
 end
 
@@ -1007,7 +1045,7 @@ function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     
     -- Title is always just the addon name (dungeon shown in dropdown)
-    titleText:SetText(L["TITLE"])
+        titleText:SetText(L["TITLE"])
 end
 
 --------------------------------------------------------------------------------
