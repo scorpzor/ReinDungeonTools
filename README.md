@@ -48,6 +48,16 @@ For devs adding new dungeons/making changes:
 /rdt mobs               - List registered mobs
 ```
 
+#### Tiled maps
+
+Default layout is 3x2 - 512px tiles. 1536x1024 source image.
+
+Tiles are arranged left-to-right, top-to-bottom in the grid.
+```
+For a 3x2 grid: [1][2][3]
+                [4][5][6]
+```
+
 ## Roadmap
 
 - [x] Import/Export routes via encoded strings
