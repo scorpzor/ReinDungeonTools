@@ -242,5 +242,216 @@ function UIHelpers:ApplyModernBackdrop(frame, options)
     frame:SetBackdropBorderColor(borderR, borderG, borderB, 1)
 end
 
+--------------------------------------------------------------------------------
+-- Dropdown Component
+--------------------------------------------------------------------------------
+
+--- Create a modern dropdown menu component
+-- @param config table Configuration with:
+--   - parent: Frame - Parent frame
+--   - name: string - Unique name for the dropdown
+--   - point: string - Anchor point (e.g., "TOPLEFT")
+--   - x: number - X offset
+--   - y: number - Y offset
+--   - width: number - Button width
+--   - height: number - Button height (default 24)
+--   - menuHeight: number - Menu height (default 200)
+--   - defaultText: string - Initial text
+--   - onItemClick: function(itemData) - Called when item is selected
+-- @return table Dropdown object with methods:
+--   - SetItems(items): Update dropdown items
+--   - SetText(text): Update button text
+--   - GetButton(): Get the main button frame
+--   - Show/Hide(): Control visibility
+function UIHelpers:CreateModernDropdown(config)
+    local dropdown = {}
+    
+    -- Create main button
+    local button = CreateFrame("Button", config.name, config.parent)
+    button:SetPoint(config.point or "TOPLEFT", config.x or 0, config.y or 0)
+    button:SetSize(config.width or 200, config.height or 24)
+    self:StyleSquareButton(button)
+    
+    -- Dropdown text
+    local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("LEFT", 8, 0)
+    text:SetPoint("RIGHT", -20, 0)
+    text:SetJustifyH("LEFT")
+    text:SetText(config.defaultText or "Select...")
+    button.text = text
+    
+    -- Dropdown arrow
+    local arrow = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    arrow:SetPoint("RIGHT", -5, 0)
+    arrow:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    arrow:SetText("v")
+    arrow:SetTextColor(0.7, 0.7, 0.7)
+    
+    -- Create dropdown menu frame
+    local menuFrame = CreateFrame("Frame", config.name.."Menu", UIParent)
+    menuFrame:SetSize(config.width or 200, config.menuHeight or 200)
+    menuFrame:SetFrameStrata("DIALOG")
+    menuFrame:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    menuFrame:SetBackdropColor(0.1, 0.1, 0.1, 0.98)
+    menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    menuFrame:Hide()
+    
+    -- Scroll frame for menu items
+    local scrollFrame = CreateFrame("ScrollFrame", config.name.."Scroll", menuFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", 4, -4)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
+    
+    local scrollChild = CreateFrame("Frame", nil, scrollFrame)
+    scrollChild:SetSize((config.width or 200) - 30, 1)
+    scrollFrame:SetScrollChild(scrollChild)
+    
+    -- Style the scrollbar
+    self:StyleScrollBar(scrollFrame)
+    
+    menuFrame.scrollFrame = scrollFrame
+    menuFrame.scrollChild = scrollChild
+    menuFrame.buttons = {}
+    
+    -- Frame level management
+    menuFrame:SetScript("OnShow", function(self)
+        self:SetFrameLevel(button:GetFrameLevel() + 10)
+        self:EnableMouse(true)
+    end)
+    
+    menuFrame:SetScript("OnHide", function(self)
+        self:EnableMouse(false)
+    end)
+    
+    -- Click handler to toggle menu
+    button:SetScript("OnClick", function(self)
+        if menuFrame:IsShown() then
+            menuFrame:Hide()
+        else
+            -- Position menu below button
+            menuFrame:ClearAllPoints()
+            menuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
+            
+            -- Show menu
+            menuFrame:Show()
+        end
+    end)
+    
+    button.menuFrame = menuFrame
+    
+    -- Public API
+    dropdown.button = button
+    dropdown.menuFrame = menuFrame
+    
+    --- Update dropdown items
+    -- @param items table Array of items, each with: { value = any, text = string, isSelected = boolean }
+    function dropdown:SetItems(items)
+        local scrollChild = menuFrame.scrollChild
+        
+        -- Clear existing buttons
+        for _, btn in ipairs(menuFrame.buttons) do
+            btn:Hide()
+        end
+        
+        local yOffset = 0
+        local itemWidth = (config.width or 200) - 30
+        
+        for i, item in ipairs(items) do
+            local btn = menuFrame.buttons[i]
+            if not btn then
+                btn = CreateFrame("Button", nil, scrollChild)
+                btn:SetSize(itemWidth, 22)
+                
+                btn:SetBackdrop({
+                    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+                    edgeFile = nil,
+                    tile = false,
+                    insets = { left = 0, right = 0, top = 0, bottom = 0 }
+                })
+                btn:SetBackdropColor(0, 0, 0, 0)
+                
+                local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                btnText:SetPoint("LEFT", 8, 0)
+                btnText:SetJustifyH("LEFT")
+                btn.text = btnText
+                
+                local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+                checkmark:SetPoint("RIGHT", -5, 0)
+                checkmark:SetText("<")
+                checkmark:SetTextColor(0, 1, 0)
+                btn.checkmark = checkmark
+                
+                btn:SetScript("OnEnter", function(self)
+                    self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
+                end)
+                
+                btn:SetScript("OnLeave", function(self)
+                    if self.isSelected then
+                        self:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+                    else
+                        self:SetBackdropColor(0, 0, 0, 0)
+                    end
+                end)
+                
+                menuFrame.buttons[i] = btn
+            end
+            
+            btn:SetPoint("TOPLEFT", 0, yOffset)
+            btn.text:SetText(item.text or tostring(item.value))
+            btn.itemData = item
+            
+            -- Update selection state
+            btn.isSelected = item.isSelected
+            btn.checkmark:SetShown(item.isSelected)
+            if item.isSelected then
+                btn:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+            else
+                btn:SetBackdropColor(0, 0, 0, 0)
+            end
+            
+            -- Click handler
+            btn:SetScript("OnClick", function(self)
+                if config.onItemClick then
+                    config.onItemClick(self.itemData)
+                end
+                menuFrame:Hide()
+            end)
+            
+            btn:Show()
+            yOffset = yOffset - 22
+        end
+        
+        scrollChild:SetHeight(math.max(math.abs(yOffset), 1))
+    end
+    
+    --- Update button text
+    function dropdown:SetText(newText)
+        text:SetText(newText)
+    end
+    
+    --- Get the main button
+    function dropdown:GetButton()
+        return button
+    end
+    
+    --- Show the dropdown
+    function dropdown:Show()
+        button:Show()
+    end
+    
+    --- Hide the dropdown
+    function dropdown:Hide()
+        button:Hide()
+        menuFrame:Hide()
+    end
+    
+    return dropdown
+end
+
 RDT:DebugPrint("UIHelpers module loaded")
 
