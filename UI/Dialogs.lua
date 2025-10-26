@@ -446,6 +446,48 @@ function Dialogs:ShowRenameRoute()
     StaticPopup_Show("RDT_RENAME_ROUTE")
 end
 
+--- Show dialog to delete current route
+function Dialogs:ShowDeleteRoute()
+    local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+    if not dungeonName or not RDT.RouteManager then
+        RDT:PrintError("No dungeon selected")
+        return
+    end
+    
+    local routeName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
+    if not routeName then
+        RDT:PrintError("No route selected")
+        return
+    end
+    
+    -- Count total routes
+    local routes = RDT.RouteManager:GetRouteNames(dungeonName)
+    local routeCount = #routes
+    
+    -- Prevent deleting the last route
+    if routeCount <= 1 then
+        RDT:PrintError("Cannot delete the last route")
+        return
+    end
+    
+    StaticPopupDialogs["RDT_DELETE_ROUTE"] = {
+        text = "Delete route '" .. routeName .. "'?\n\n|cFFFF0000This cannot be undone!|r",
+        button1 = "Delete",
+        button2 = "Cancel",
+        OnAccept = function()
+            if RDT.RouteManager:DeleteRoute(dungeonName, routeName) and RDT.UI then
+                RDT.UI:UpdateRouteDropdown()
+                RDT.UI:RefreshUI()
+            end
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("RDT_DELETE_ROUTE")
+end
+
 --------------------------------------------------------------------------------
 -- Cleanup
 --------------------------------------------------------------------------------

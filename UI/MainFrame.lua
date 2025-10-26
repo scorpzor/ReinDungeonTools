@@ -565,6 +565,23 @@ function UI:CreateRouteDropdown(parent)
             RDT.Dialogs:ShowRenameRoute()
         end
     end)
+    
+    -- Delete Route button (small button next to Rename)
+    local deleteRouteBtn = CreateFrame("Button", "RDT_DeleteRouteButton", parent)
+    deleteRouteBtn:SetPoint("LEFT", renameRouteBtn, "RIGHT", 3, 0)
+    deleteRouteBtn:SetSize(50, 24)
+    StyleSquareButton(deleteRouteBtn)
+    deleteRouteBtn.text = deleteRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    deleteRouteBtn.text:SetAllPoints()
+    deleteRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    deleteRouteBtn.text:SetText("Delete")
+    deleteRouteBtn.text:SetTextColor(1, 0.3, 0.3)  -- Red color for danger
+    
+    deleteRouteBtn:SetScript("OnClick", function()
+        if RDT.Dialogs and RDT.Dialogs.ShowDeleteRoute then
+            RDT.Dialogs:ShowDeleteRoute()
+        end
+    end)
 end
 
 --- Populate the route dropdown with current routes
