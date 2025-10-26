@@ -21,7 +21,7 @@ local BUTTON_PANEL_HEIGHT = 140
 local mainFrame
 local mapContainer
 local mapTexture  -- Legacy single texture (kept for compatibility)
-local mapTiles = {}  -- New: tile system for high-res maps
+local mapTiles = {}
 local titleText
 local versionText
 local dungeonDropdown  -- Dungeon dropdown object
@@ -42,7 +42,6 @@ end
 function UI:CreateMainFrame()
     if mainFrame then
         RDT:DebugPrint("MainFrame already exists")
-        -- Make sure textures are visible after reload
         mainFrame:Show()
         return mainFrame
     end
@@ -71,22 +70,19 @@ function UI:CreateMainFrame()
     mainFrame:SetBackdropBorderColor(0.15, 0.15, 0.15, 1)
     mainFrame:Hide()
 
-    -- Title bar background (matches main window)
     local titleBg = mainFrame:CreateTexture(nil, "ARTWORK")
     titleBg:SetPoint("TOPLEFT", 2, -2)
     titleBg:SetPoint("TOPRIGHT", -2, -2)
     titleBg:SetHeight(36)
     titleBg:SetColorTexture(0.05, 0.05, 0.05, 0.95)
-    mainFrame.titleBg = titleBg  -- Store reference
+    mainFrame.titleBg = titleBg
 
-    -- Title text (centered)
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("TOP", 0, -18)
     titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
     titleText:SetText(L["TITLE"])
     titleText:SetJustifyH("CENTER")
 
-    -- Close button (in title bar)
     local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
@@ -156,18 +152,15 @@ function UI:CreateDungeonDropdown(parent)
         end
     })
     
-    -- Override the button's OnClick to populate items before showing
     local originalButton = dungeonDropdown.button
     local originalMenuFrame = dungeonDropdown.menuFrame
     originalButton:SetScript("OnClick", function(self)
         if originalMenuFrame:IsShown() then
             originalMenuFrame:Hide()
         else
-            -- Position menu below button
             originalMenuFrame:ClearAllPoints()
             originalMenuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
             
-            -- Populate with dungeons
             UI:PopulateDungeonDropdown()
             originalMenuFrame:Show()
         end
@@ -245,28 +238,21 @@ function UI:CreateRouteDropdown(container)
         if originalMenuFrame:IsShown() then
             originalMenuFrame:Hide()
         else
-            -- Update menu width to match button
             originalMenuFrame:SetWidth(self:GetWidth())
-            
-            -- Position menu below button
             originalMenuFrame:ClearAllPoints()
             originalMenuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
             
-            -- Populate with routes
             UI:PopulateRouteDropdown()
             originalMenuFrame:Show()
         end
     end)
     
-    -- Row 1: Route action buttons (New, Rename, Delete)
     local spacing = 3
-    local totalSpacing = spacing * 2  -- Two gaps between three buttons
+    local totalSpacing = spacing * 2
     
-    -- Calculate initial button width (will be recalculated on resize)
     local containerWidth = container:GetWidth() or 290
     local buttonWidth = (containerWidth - totalSpacing) / 3
     
-    -- New Route button (left side, 1/3 width)
     local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", container)
     newRouteBtn:SetPoint("TOPLEFT", routeDropdown.button, "BOTTOMLEFT", 0, -5)
     newRouteBtn:SetSize(buttonWidth, 24)
@@ -281,7 +267,6 @@ function UI:CreateRouteDropdown(container)
         if RDT.Dialogs and RDT.Dialogs.ShowNewRoute then
             RDT.Dialogs:ShowNewRoute()
         else
-            -- Fallback: create route with default name
             local dungeonName = RDT.db.profile.currentDungeon
             if dungeonName and RDT.RouteManager then
                 local newRouteName = RDT.RouteManager:CreateRoute(dungeonName)
@@ -293,7 +278,6 @@ function UI:CreateRouteDropdown(container)
         end
     end)
     
-    -- Rename Route button (middle, 1/3 width)
     local renameRouteBtn = CreateFrame("Button", "RDT_RenameRouteButton", container)
     renameRouteBtn:SetPoint("LEFT", newRouteBtn, "RIGHT", spacing, 0)
     renameRouteBtn:SetSize(buttonWidth, 24)
@@ -310,7 +294,6 @@ function UI:CreateRouteDropdown(container)
         end
     end)
     
-    -- Delete Route button (right side, 1/3 width)
     local deleteRouteBtn = CreateFrame("Button", "RDT_DeleteRouteButton", container)
     deleteRouteBtn:SetPoint("LEFT", renameRouteBtn, "RIGHT", spacing, 0)
     deleteRouteBtn:SetSize(buttonWidth, 24)
@@ -319,7 +302,7 @@ function UI:CreateRouteDropdown(container)
     deleteRouteBtn.text:SetAllPoints()
     deleteRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     deleteRouteBtn.text:SetText("Delete")
-    deleteRouteBtn.text:SetTextColor(1, 0.3, 0.3)  -- Red color for danger
+    deleteRouteBtn.text:SetTextColor(1, 0.3, 0.3)
     
     deleteRouteBtn:SetScript("OnClick", function()
         if RDT.Dialogs and RDT.Dialogs.ShowDeleteRoute then
@@ -327,7 +310,6 @@ function UI:CreateRouteDropdown(container)
         end
     end)
     
-    -- Update button widths when container resizes
     local function UpdateRouteButtonWidths()
         local width = container:GetWidth()
         local btnWidth = (width - totalSpacing) / 3
@@ -338,7 +320,7 @@ function UI:CreateRouteDropdown(container)
     
     container:HookScript("OnSizeChanged", UpdateRouteButtonWidths)
     
-    return newRouteBtn  -- Return first button for anchoring next row
+    return newRouteBtn
 end
 
 --- Populate the route dropdown with current routes
@@ -378,7 +360,6 @@ end
 
 --- Refresh all UI elements after route change
 function UI:RefreshUI()
-    -- Reload current dungeon to refresh all packs/pulls
     if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.LoadDungeon then
         RDT:LoadDungeon(RDT.db.profile.currentDungeon)
     end
@@ -422,7 +403,6 @@ end
 -- Tile-based Map Rendering (for high-res and multi-floor maps)
 --------------------------------------------------------------------------------
 
---- Clear all map tiles
 function UI:ClearMapTiles()
     for _, tile in pairs(mapTiles) do
         tile:Hide()
@@ -435,12 +415,10 @@ end
 function UI:LoadTiledMap(tileData)
     if not mapContainer then return end
     
-    -- Hide legacy single texture
     if mapTexture then
         mapTexture:Hide()
     end
     
-    -- Clear existing tiles
     self:ClearMapTiles()
     
     local tiles = tileData.tiles
@@ -455,11 +433,9 @@ function UI:LoadTiledMap(tileData)
     local cols = tileData.cols or 2
     local rows = tileData.rows or 2
     
-    -- Calculate display size for each tile
     local displayTileWidth = MAP_WIDTH / cols
     local displayTileHeight = MAP_HEIGHT / rows
     
-    -- Create and position tiles
     for i, tileInfo in ipairs(tiles) do
         local tile = mapTiles[i]
         if not tile then
@@ -467,11 +443,9 @@ function UI:LoadTiledMap(tileData)
             mapTiles[i] = tile
         end
         
-        -- Calculate grid position (0-indexed)
         local col = (i - 1) % cols
         local row = math.floor((i - 1) / cols)
         
-        -- Position tile
         local x = col * displayTileWidth + 1
         local y = -(row * displayTileHeight) - 1
         
@@ -479,12 +453,10 @@ function UI:LoadTiledMap(tileData)
         tile:ClearAllPoints()
         tile:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", x, y)
         
-        -- Set texture
         local texturePath = tileInfo.texture or tileInfo
         tile:SetTexture(texturePath)
         tile:SetVertexColor(0.9, 0.9, 0.9)
         
-        -- Apply texture coordinates if specified
         if tileInfo.texCoord then
             tile:SetTexCoord(unpack(tileInfo.texCoord))
         else
@@ -512,16 +484,13 @@ function UI:LoadSingleTextureMap(texturePath)
     
     RDT:Print("Loading single texture map: " .. tostring(texturePath))
     
-    -- Hide all tiles
     self:ClearMapTiles()
     
-    -- Clear all points and reanchor (in case it got disconnected)
     mapTexture:ClearAllPoints()
     mapTexture:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", 1, -1)
     mapTexture:SetPoint("TOPRIGHT", mapContainer, "TOPRIGHT", -1, -1)
     mapTexture:SetHeight(MAP_HEIGHT - 2)
     
-    -- Show and set legacy texture
     mapTexture:Show()
     mapTexture:SetTexture(texturePath or "Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
@@ -548,7 +517,6 @@ function UI:UpdateMapForDungeon(dungeonName)
     
     RDT:Print("UpdateMapForDungeon: " .. dungeonName)
     
-    -- Check if this dungeon uses tiles
     if dungeonData.tiles then
         RDT:Print("Using tiled map")
         -- Load tiled map
@@ -602,10 +570,8 @@ function UI:CreatePullsPanel(parent)
     pullsPanel:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
     pullsPanel:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
-    -- Store reference for PullsList module
     UI.pullsPanel = pullsPanel
     
-    -- PullsList.lua will populate this panel
     if UI.InitializePullsList then
         UI:InitializePullsList(pullsPanel)
     end
@@ -622,22 +588,17 @@ function UI:CreateButtonContainer(parent)
     buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 4, 0)
     buttonContainer:SetPoint("TOPRIGHT", -5, -42)
     buttonContainer:SetHeight(BUTTON_PANEL_HEIGHT)
-    -- No backdrop - buttons will be visible directly
 
-    -- Create route dropdown and buttons at the top (returns first route button for anchoring)
     local firstRouteBtn = UI:CreateRouteDropdown(buttonContainer)
     
-    -- Row 2: New Pull and Reset All (on same line, split 50/50)
     local spacing = 3
     
-    -- New Pull button (left side)
     local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer)
     newPullButton:SetPoint("TOPLEFT", firstRouteBtn, "BOTTOMLEFT", 0, -5)
     newPullButton:SetHeight(26)
     newPullButton:SetText("New Pull")
     newPullButton:RegisterForClicks("LeftButtonUp")
     StyleSquareButton(newPullButton)
-    -- Hook click after styling
     local origOnClick = newPullButton:GetScript("OnClick")
     newPullButton:SetScript("OnClick", function(self, button, ...)
         if origOnClick then origOnClick(self, button, ...) end
@@ -647,7 +608,6 @@ function UI:CreateButtonContainer(parent)
     end)
     UI.newPullButton = newPullButton
 
-    -- Reset All button (right side)
     local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer)
     resetButton:SetPoint("LEFT", newPullButton, "RIGHT", spacing, 0)
     resetButton:SetHeight(26)
@@ -662,8 +622,6 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Row 3: Export and Import (on same line, split 50/50)
-    -- Export button (left side)
     local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer)
     exportButton:SetPoint("TOPLEFT", newPullButton, "BOTTOMLEFT", 0, -5)
     exportButton:SetHeight(24)
@@ -684,7 +642,6 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
-    -- Import button (right side)
     local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer)
     importButton:SetPoint("LEFT", exportButton, "RIGHT", spacing, 0)
     importButton:SetHeight(24)
@@ -701,26 +658,21 @@ function UI:CreateButtonContainer(parent)
         end
     end)
     
-    -- Calculate initial widths
     local containerWidth = buttonContainer:GetWidth() or 290
     local halfWidth = (containerWidth - spacing) / 2
     
-    -- Set initial widths for all buttons
     newPullButton:SetWidth(halfWidth)
     resetButton:SetWidth(halfWidth)
     exportButton:SetWidth(halfWidth)
     importButton:SetWidth(halfWidth)
     
-    -- Update widths dynamically when container resizes
     local function UpdatePullExportButtonWidths()
         local width = buttonContainer:GetWidth()
         local btnHalfWidth = (width - spacing) / 2
         
-        -- Row 2: New Pull and Reset All
         newPullButton:SetWidth(btnHalfWidth)
         resetButton:SetWidth(btnHalfWidth)
         
-        -- Row 3: Export and Import
         exportButton:SetWidth(btnHalfWidth)
         importButton:SetWidth(btnHalfWidth)
     end
@@ -731,20 +683,17 @@ end
 --- Update pull display (removed - no longer needed)
 function UI:UpdatePullIndicator()
     -- Placeholder for backward compatibility
-    -- Pull number is now shown in the pulls list with ">" prefix
 end
 
 --------------------------------------------------------------------------------
 -- Title and Display Updates
 --------------------------------------------------------------------------------
 
---- Update the title text
 -- @param dungeonName string Optional dungeon name to display
 function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     
-    -- Title is always just the addon name (dungeon shown in dropdown)
-        titleText:SetText(L["TITLE"])
+    titleText:SetText(L["TITLE"])
 end
 
 --------------------------------------------------------------------------------
@@ -836,19 +785,15 @@ end
 -- Cleanup
 --------------------------------------------------------------------------------
 
---- Clear all UI elements (for reload/disable)
 function UI:Cleanup()
-    -- PackButtons.lua handles pack cleanup
     if self.ClearPacks then
         self:ClearPacks()
     end
     
-    -- PullsList.lua handles pull list cleanup
     if self.CleanupPullsList then
         self:CleanupPullsList()
     end
     
-    -- Hide main frame
     if mainFrame then
         mainFrame:Hide()
     end

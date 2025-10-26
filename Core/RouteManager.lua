@@ -151,9 +151,7 @@ function RM:AddPackToPull(packId)
     end
 end
 
---- Create a new pull (always creates max pull + 1)
 function RM:NewPull()
-    -- Always calculate next pull as max + 1
     local maxPull = self:GetMaxPull(RDT.State.currentRoute.pulls)
     local nextPull = maxPull + 1
     RDT.State.currentPull = nextPull
@@ -222,7 +220,6 @@ function RM:UnassignPull(pullNum)
     end
 end
 
---- Reset all pulls for current dungeon
 function RM:ResetPulls()
     if not RDT.State.currentRoute then return end
     
@@ -248,7 +245,6 @@ end
 -- Route Validation
 --------------------------------------------------------------------------------
 
---- Validate that a route is valid for a dungeon
 -- @param route table Route data with pulls table
 -- @param dungeonName string Dungeon name to validate against
 -- @return boolean isValid, string errorMessage
@@ -267,13 +263,11 @@ function RM:ValidateRoute(route, dungeonName)
         return false, "Unknown dungeon: " .. tostring(dungeonName)
     end
     
-    -- Build valid pack ID set
     local validPacks = {}
     for _, pack in ipairs(dungeonData.packData or {}) do
         validPacks[pack.id] = true
     end
     
-    -- Validate all pack IDs in route
     for packId, pullNum in pairs(route.pulls) do
         if type(packId) ~= "number" then
             return false, "Invalid pack ID type: " .. type(packId)
@@ -314,14 +308,12 @@ function RM:GetRouteStats()
     local pullCount = #pulls
     local packCount = 0
     
-    -- Count assigned packs
     for packId, pullNum in pairs(RDT.State.currentRoute.pulls) do
         if pullNum > 0 then
             packCount = packCount + 1
         end
     end
     
-    -- Calculate min/max/avg per pull
     local maxPullForces = 0
     local minPullForces = 999999
     
@@ -349,12 +341,10 @@ end
 -- Route Storage Management (Multiple Routes per Dungeon)
 --------------------------------------------------------------------------------
 
---- Ensure a dungeon has at least one route initialized
 -- @param dungeonName string Name of the dungeon
 function RM:EnsureRouteExists(dungeonName)
     if not RDT.db or not RDT.db.profile then return end
     
-    -- Initialize dungeon entry if it doesn't exist
     if not RDT.db.profile.routes[dungeonName] then
         RDT.db.profile.routes[dungeonName] = {
             currentRoute = "Route 1",
@@ -365,12 +355,10 @@ function RM:EnsureRouteExists(dungeonName)
         RDT:DebugPrint("Created default route for: " .. dungeonName)
     end
     
-    -- Ensure routeList exists
     if not RDT.db.profile.routes[dungeonName].routeList then
         RDT.db.profile.routes[dungeonName].routeList = {}
     end
     
-    -- If no routes exist, create default
     local hasRoutes = false
     for _ in pairs(RDT.db.profile.routes[dungeonName].routeList) do
         hasRoutes = true
@@ -382,9 +370,7 @@ function RM:EnsureRouteExists(dungeonName)
         RDT.db.profile.routes[dungeonName].currentRoute = "Route 1"
     end
     
-    -- Ensure currentRoute is set and valid
     if not RDT.db.profile.routes[dungeonName].currentRoute then
-        -- Set to first available route
         for routeName in pairs(RDT.db.profile.routes[dungeonName].routeList) do
             RDT.db.profile.routes[dungeonName].currentRoute = routeName
             break
@@ -473,7 +459,6 @@ function RM:CreateRoute(dungeonName, routeName)
     
     local dungeonData = RDT.db.profile.routes[dungeonName]
     
-    -- Auto-generate name if not provided
     if not routeName or routeName == "" then
         local counter = 1
         repeat
@@ -494,7 +479,6 @@ function RM:CreateRoute(dungeonName, routeName)
         end
     end
     
-    -- Create new route
     dungeonData.routeList[routeName] = { pulls = {} }
     dungeonData.currentRoute = routeName
     RDT.State.currentRoute = dungeonData.routeList[routeName]
@@ -552,13 +536,11 @@ function RM:DeleteRoute(dungeonName, routeName)
     
     local dungeonData = RDT.db.profile.routes[dungeonName]
     
-    -- Count routes
     local routeCount = 0
     for _ in pairs(dungeonData.routeList) do
         routeCount = routeCount + 1
     end
     
-    -- Don't allow deleting the last route
     if routeCount <= 1 then
         RDT:PrintError("Cannot delete the last route")
         return false
@@ -569,10 +551,8 @@ function RM:DeleteRoute(dungeonName, routeName)
         return false
     end
     
-    -- Delete route
     dungeonData.routeList[routeName] = nil
     
-    -- If we deleted the current route, switch to first available
     if dungeonData.currentRoute == routeName then
         for name in pairs(dungeonData.routeList) do
             self:SwitchRoute(dungeonName, name)

@@ -1,6 +1,5 @@
 -- Core/Init.lua
 -- Addon initialization with Ace3 framework
--- Updated to support new mob dictionary system
 
 local ADDON_NAME = "ReinDungeonTools"
 local RDT = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
@@ -53,16 +52,13 @@ function RDT:GetPullColor(pullNum)
         return unassignedColor
     end
     
-    -- Check cache first
     if colorCache[pullNum] then
         return colorCache[pullNum]
     end
     
-    -- Calculate color based on repeating pattern
     local colorIndex = ((pullNum - 1) % #basePullColors) + 1
     local color = basePullColors[colorIndex]
     
-    -- Cache for future use
     colorCache[pullNum] = color
     
     return color
@@ -153,13 +149,11 @@ end
 function RDT:LoadDungeon(dungeonName)
     self:DebugPrint("Loading dungeon: " .. tostring(dungeonName))
     
-    -- Check if Data module exists
     if not self.Data then
         self:PrintError("Data module not loaded yet")
         return false
     end
     
-    -- Validate dungeon exists
     if not self.Data:DungeonExists(dungeonName) then
         self:PrintError(string.format("Unknown dungeon: %s", tostring(dungeonName)))
         local available = self.Data:GetDungeonNames()
@@ -169,10 +163,8 @@ function RDT:LoadDungeon(dungeonName)
         return false
     end
     
-    -- Ensure dungeon has at least one route
     self.RouteManager:EnsureRouteExists(dungeonName)
     
-    -- Get current route for this dungeon
     self.State.currentRoute = self.RouteManager:GetCurrentRoute(dungeonName)
     
     if not self.State.currentRoute then
@@ -261,7 +253,6 @@ function RDT:Print(msg, r, g, b)
     end
 end
 
---- Print debug message (only when debug mode enabled)
 -- @param msg string Debug message to print
 function RDT:DebugPrint(msg)
     if self.db and self.db.profile.debug then
@@ -269,13 +260,11 @@ function RDT:DebugPrint(msg)
     end
 end
 
---- Print error message
 -- @param msg string Error message to print
 function RDT:PrintError(msg)
     self:Print("|cFFFF0000[ERROR]|r " .. tostring(msg), 1, 0.3, 0.3)
 end
 
---- Safe execution wrapper with error handling
 -- @param func function Function to execute
 -- @param ... any Arguments to pass to function
 -- @return boolean success, any result or error
