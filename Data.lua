@@ -211,25 +211,25 @@ end
 local genericMobs = {
     ["generic_trash_mob"] = {
         name = "Generic Trash",
-        count = 1.0,
+        count = 0.5,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["generic_big_mob"] = {
         name = "Generic Big Mob",
-        count = 2.0,
+        count = 1.0,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 1.0,
+        scale = 0.9,
     },
     ["generic_elite_mob"] = {
         name = "Generic Elite",
-        count = 3.0,
+        count = 2.0,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
-        scale = 1.0,
+        scale = 0.9,
     },
     ["generic_boss"] = {
         name = "Generic Boss",
-        count = 5.0,
+        count = 2.0,
         displayIcon = "Interface\\Icons\\Achievement_Character_Human_Male",
         scale = 1.0,
     },
