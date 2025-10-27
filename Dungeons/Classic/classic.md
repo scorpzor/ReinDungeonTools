@@ -1,0 +1,67 @@
+I assume mythic dungeons are going to have the same size as heroic, some wings might be combined, but I never played Ascension before so idk
+
+Import maps:
+- [] Blackfathom Deeps
+- [] Blackrock Caverns
+- [] Blackrock Depths - Manufactory
+- [] Blackrock Depths - Prison
+- [] Blackrock Depths - Upper City
+- [] Deadmines
+- [] Dire Maul - East
+- [] Dire Maul - North
+- [] Dire Maul - West
+- [] Gnomeregan
+- [] Lower Blackrock Spire
+- [] Lower Scholomance
+- [] Maraudon - Orange Crystals
+- [] Maraudon - Pristine Waters
+- [] Maraudon - Purple Crystals
+- [] Ragefire Chasm
+- [] Razorfen Downs
+- [] Razorfen Kraul
+- [] Scarlet Monastery - Armory
+- [] Scarlet Monastery - Cathedral
+- [] Scarlet Monastery - Graveyard
+- [] Scarlet Monastery - Library
+- [] Shadowfang Keep
+- [] Stormwind Stockade
+- [x] Stratholme - Main Gate
+- [x] Stratholme - Service Entrance
+- [] Sunken Temple
+- [] Uldaman
+- [] Upper Scholomance
+- [] Wailing Caverns
+- [] Zul'Farrak
+
+Populate maps:
+- [] Blackfathom Deeps
+- [] Blackrock Caverns
+- [] Blackrock Depths - Manufactory
+- [] Blackrock Depths - Prison
+- [] Blackrock Depths - Upper City
+- [] Deadmines
+- [] Dire Maul - East
+- [] Dire Maul - North
+- [] Dire Maul - West
+- [] Gnomeregan
+- [] Lower Blackrock Spire
+- [] Lower Scholomance
+- [] Maraudon - Orange Crystals
+- [] Maraudon - Pristine Waters
+- [] Maraudon - Purple Crystals
+- [] Ragefire Chasm
+- [] Razorfen Downs
+- [] Razorfen Kraul
+- [] Scarlet Monastery - Armory
+- [] Scarlet Monastery - Cathedral
+- [] Scarlet Monastery - Graveyard
+- [] Scarlet Monastery - Library
+- [] Shadowfang Keep
+- [] Stormwind Stockade
+- [] Stratholme - Main Gate
+- [] Stratholme - Service Entrance
+- [] Sunken Temple
+- [] Uldaman
+- [] Upper Scholomance
+- [] Wailing Caverns
+- [] Zul'Farrak

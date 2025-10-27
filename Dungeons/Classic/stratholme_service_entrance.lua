@@ -39,7 +39,20 @@ end
 --------------------------------------------------------------------------------
 
 local serviceEntrance = {
-    texture = "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\map",
+    tiles = {
+        tileWidth = 512,
+        tileHeight = 512,
+        cols = 3,
+        rows = 2,
+        tiles = {
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_0",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_1",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_2",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_3",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_4",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\stratholme_service_entrance\\tile_5",
+        }
+    },
     totalCount = 120,
     packData = {
         {
