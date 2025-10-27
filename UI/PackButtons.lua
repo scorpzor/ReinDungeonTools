@@ -431,6 +431,21 @@ local function ExpandHull(hull, padding)
     return expanded
 end
 
+-- pixelsPerDot:
+--   - Smaller value (2) = More dots = Thicker/smoother border
+--   - Larger value (4-5) = Fewer dots = Thinner/faster border
+--   - Default: 4
+--
+-- dotSize:
+--   - Smaller value (2) = Thinner line
+--   - Larger value (4) = Thicker line
+--   - Default: 3
+--
+-- padding:
+--   - Distance from pack edges to border
+--   - Smaller value (10) = Tight border
+--   - Larger value (20) = Loose border
+--   - Default: 15
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if #packIds == 0 then
         if pullBorders[pullNum] then
@@ -439,12 +454,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         return
     end
     
-    -- Collect all mob button positions using GetPoint relative to mapTexture
     local points = {}
-    local mapWidth, mapHeight = UI:GetMapDimensions()
-    
-    RDT:DebugPrint(string.format("=== Pull %d Border Calculation ===", pullNum))
-    RDT:DebugPrint(string.format("Map dimensions: %.1f x %.1f", mapWidth, mapHeight))
     
     for _, packId in ipairs(packIds) do
         local packGroup = RDT.State.packButtons["pack" .. packId]
@@ -453,9 +463,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
             local packPt, packRelTo, packRelPt, packX, packY = packGroup:GetPoint(1)
             
             if packX and packY then
-                RDT:DebugPrint(string.format("Pack %d at (%.1f, %.1f) relative to %s", 
-                    packId, packX, packY, packRelPt or "?"))
-                
                 for mobIdx, mobBtn in ipairs(packGroup.mobButtons) do
                     -- Get mob offset from pack center
                     local mobPt, mobRelTo, mobRelPt, mobX, mobY = mobBtn:GetPoint(1)
@@ -464,11 +471,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                         -- Combine pack position + mob offset
                         local absX = packX + mobX
                         local absY = packY + mobY
-                        
                         tinsert(points, {x = absX, y = absY})
-                        
-                        RDT:DebugPrint(string.format("  Mob %d: offset (%.1f, %.1f) -> absolute (%.1f, %.1f)", 
-                            mobIdx, mobX, mobY, absX, absY))
                     end
                 end
             end
@@ -479,21 +482,15 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         if pullBorders[pullNum] then
             pullBorders[pullNum]:Hide()
         end
-        RDT:DebugPrint(string.format("Only %d points, need 3+ for hull", #points))
         return
     end
     
-    RDT:DebugPrint(string.format("Collected %d points for hull", #points))
-    
-    -- Calculate convex hull
     local hull = CalculateConvexHull(points)
-    RDT:DebugPrint(string.format("Hull has %d vertices", #hull))
     
-    -- Expand hull
     local padding = 15
     hull = ExpandHull(hull, padding)
     
-    -- Create border frame
+    -- Create or reuse border frame
     local border = pullBorders[pullNum]
     if not border then
         border = CreateFrame("Frame", "RDT_PullBorder" .. pullNum, UI.mapContainer)
@@ -507,8 +504,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         seg:Hide()
     end
     
-    -- Draw hull using multiple small segments (dots) - works without rotation
-    local dotsPerLine = 30
+    local pixelsPerDot = 4
     local dotSize = 3
     
     local segmentIdx = 1
@@ -516,12 +512,15 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         local p1 = hull[i]
         local p2 = hull[(i % #hull) + 1]
         
-        RDT:DebugPrint(string.format("Line %d: (%.1f, %.1f) -> (%.1f, %.1f)", 
-            i, p1.x, p1.y, p2.x, p2.y))
+        local dx = p2.x - p1.x
+        local dy = p2.y - p1.y
+        local lineLength = math.sqrt(dx * dx + dy * dy)
+        
+        local dotsForThisLine = math.max(2, math.floor(lineLength / pixelsPerDot))
         
         -- Draw dots along the line
-        for j = 0, dotsPerLine do
-            local t = j / dotsPerLine
+        for j = 0, dotsForThisLine do
+            local t = j / dotsForThisLine
             local x = p1.x + (p2.x - p1.x) * t
             local y = p1.y + (p2.y - p1.y) * t
             
@@ -550,7 +549,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     end
     
     border:Show()
-    RDT:DebugPrint(string.format("Border drawn with %d segments", segmentIdx - 1))
 end
 
 --- Clear all pull borders
