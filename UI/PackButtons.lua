@@ -1,6 +1,6 @@
 -- UI/PackButtons.lua
 -- Pack button creation, interaction, and visual updates
--- Now displays individual mob portraits for each pack
+-- Now displays individual mob portraits for each pack with convex hull borders
 
 local RDT = _G.RDT
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
@@ -331,88 +331,226 @@ function UI:OnMobIconEnter(button)
 end
 
 --------------------------------------------------------------------------------
--- Pull Border Management
+-- Pull Border Management (Convex Hull Algorithm)
 --------------------------------------------------------------------------------
 
---- Create or update a border that encompasses all packs in a pull
+--- Calculate convex hull using Graham scan algorithm
+-- @param points table Array of {x, y} points
+-- @return table Array of hull points in counter-clockwise order
+local function CalculateConvexHull(points)
+    if #points < 3 then return points end
+    
+    -- Make a copy of points to avoid modifying original
+    local pointsCopy = {}
+    for i, p in ipairs(points) do
+        pointsCopy[i] = {x = p.x, y = p.y}
+    end
+    
+    -- Find bottom-most point (or left-most if tie)
+    local start = 1
+    for i = 2, #pointsCopy do
+        if pointsCopy[i].y > pointsCopy[start].y or 
+           (pointsCopy[i].y == pointsCopy[start].y and pointsCopy[i].x < pointsCopy[start].x) then
+            start = i
+        end
+    end
+    
+    local startPoint = pointsCopy[start]
+    
+    -- Sort points by polar angle with respect to start point
+    local sorted = {}
+    for i, p in ipairs(pointsCopy) do
+        if i ~= start then
+            local dx = p.x - startPoint.x
+            local dy = p.y - startPoint.y
+            local angle = math.atan2(dy, dx)
+            local dist = math.sqrt(dx * dx + dy * dy)
+            tinsert(sorted, {x = p.x, y = p.y, angle = angle, dist = dist})
+        end
+    end
+    
+    table.sort(sorted, function(a, b)
+        if math.abs(a.angle - b.angle) < 0.001 then
+            return a.dist < b.dist
+        end
+        return a.angle < b.angle
+    end)
+    
+    -- Graham scan to find convex hull
+    local hull = {startPoint}
+    
+    -- Cross product to determine turn direction
+    local function ccw(p1, p2, p3)
+        return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
+    end
+    
+    for _, point in ipairs(sorted) do
+        -- Remove points that make clockwise turn
+        while #hull >= 2 and ccw(hull[#hull - 1], hull[#hull], point) <= 0 do
+            tremove(hull)
+        end
+        tinsert(hull, point)
+    end
+    
+    return hull
+end
+
+--- Expand hull points outward from centroid by padding amount
+-- @param hull table Array of hull points
+-- @param padding number Distance to expand outward
+-- @return table Expanded hull points
+local function ExpandHull(hull, padding)
+    if #hull < 3 then return hull end
+    
+    -- Calculate centroid
+    local cx, cy = 0, 0
+    for _, p in ipairs(hull) do
+        cx = cx + p.x
+        cy = cy + p.y
+    end
+    cx = cx / #hull
+    cy = cy / #hull
+    
+    -- Expand each point outward from centroid
+    local expanded = {}
+    for _, p in ipairs(hull) do
+        local dx = p.x - cx
+        local dy = p.y - cy
+        local len = math.sqrt(dx * dx + dy * dy)
+        
+        if len > 0 then
+            tinsert(expanded, {
+                x = p.x + (dx / len) * padding,
+                y = p.y + (dy / len) * padding
+            })
+        else
+            tinsert(expanded, {x = p.x, y = p.y})
+        end
+    end
+    
+    return expanded
+end
+
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if #packIds == 0 then
-        -- No packs, hide border
         if pullBorders[pullNum] then
             pullBorders[pullNum]:Hide()
         end
         return
     end
     
-    -- Calculate bounding box of all packs in this pull (using map-relative coordinates)
-    local minX, minY, maxX, maxY = nil, nil, nil, nil
-    local validPacks = 0
-    
+    -- Collect all mob button positions using GetPoint relative to mapTexture
+    local points = {}
     local mapWidth, mapHeight = UI:GetMapDimensions()
+    
+    RDT:DebugPrint(string.format("=== Pull %d Border Calculation ===", pullNum))
+    RDT:DebugPrint(string.format("Map dimensions: %.1f x %.1f", mapWidth, mapHeight))
     
     for _, packId in ipairs(packIds) do
         local packGroup = RDT.State.packButtons["pack" .. packId]
-        if packGroup then
-            -- Get pack size
-            local packWidth = packGroup:GetWidth() or 0
-            local packHeight = packGroup:GetHeight() or 0
+        if packGroup and packGroup.mobButtons then
+            -- Get pack group position (this is positioned relative to TOPLEFT)
+            local packPt, packRelTo, packRelPt, packX, packY = packGroup:GetPoint(1)
             
-            -- Get pack center position relative to map
-            local points = {packGroup:GetPoint()}
-            if points[1] and points[3] then
-                local x = points[4] or 0
-                local y = points[5] or 0
+            if packX and packY then
+                RDT:DebugPrint(string.format("Pack %d at (%.1f, %.1f) relative to %s", 
+                    packId, packX, packY, packRelPt or "?"))
                 
-                -- Calculate bounds (center +/- half size)
-                local left = x - packWidth / 2
-                local right = x + packWidth / 2
-                local bottom = y - packHeight / 2
-                local top = y + packHeight / 2
-                
-                minX = minX and math.min(minX, left) or left
-                maxX = maxX and math.max(maxX, right) or right
-                minY = minY and math.min(minY, bottom) or bottom
-                maxY = maxY and math.max(maxY, top) or top
-                validPacks = validPacks + 1
+                for mobIdx, mobBtn in ipairs(packGroup.mobButtons) do
+                    -- Get mob offset from pack center
+                    local mobPt, mobRelTo, mobRelPt, mobX, mobY = mobBtn:GetPoint(1)
+                    
+                    if mobX and mobY then
+                        -- Combine pack position + mob offset
+                        local absX = packX + mobX
+                        local absY = packY + mobY
+                        
+                        tinsert(points, {x = absX, y = absY})
+                        
+                        RDT:DebugPrint(string.format("  Mob %d: offset (%.1f, %.1f) -> absolute (%.1f, %.1f)", 
+                            mobIdx, mobX, mobY, absX, absY))
+                    end
+                end
             end
         end
     end
     
-    if validPacks == 0 or not minX then return end
+    if #points < 3 then
+        if pullBorders[pullNum] then
+            pullBorders[pullNum]:Hide()
+        end
+        RDT:DebugPrint(string.format("Only %d points, need 3+ for hull", #points))
+        return
+    end
     
-    -- Add padding around the bounding box
-    local padding = 0
-    minX = minX - padding
-    maxX = maxX + padding
-    minY = minY - padding
-    maxY = maxY + padding
+    RDT:DebugPrint(string.format("Collected %d points for hull", #points))
     
-    local width = maxX - minX
-    local height = maxY - minY
-    local centerX = (minX + maxX) / 2
-    local centerY = (minY + maxY) / 2
+    -- Calculate convex hull
+    local hull = CalculateConvexHull(points)
+    RDT:DebugPrint(string.format("Hull has %d vertices", #hull))
     
-    -- Create or reuse border frame
+    -- Expand hull
+    local padding = 15
+    hull = ExpandHull(hull, padding)
+    
+    -- Create border frame
     local border = pullBorders[pullNum]
     if not border then
         border = CreateFrame("Frame", "RDT_PullBorder" .. pullNum, UI.mapContainer)
         border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
-        border:SetBackdrop({
-            bgFile = nil,
-            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-            tile = false,
-            edgeSize = 12,
-            insets = { left = 3, right = 3, top = 3, bottom = 3 }
-        })
+        border.segments = {}
         pullBorders[pullNum] = border
     end
     
-    -- Position and size the border (relative to map)
-    border:SetSize(width, height)
-    border:ClearAllPoints()
-    border:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", centerX, centerY)
-    border:SetBackdropBorderColor(r, g, b, alpha)
+    -- Clear old segments
+    for _, seg in ipairs(border.segments) do
+        seg:Hide()
+    end
+    
+    -- Draw hull using multiple small segments (dots) - works without rotation
+    local dotsPerLine = 30
+    local dotSize = 3
+    
+    local segmentIdx = 1
+    for i = 1, #hull do
+        local p1 = hull[i]
+        local p2 = hull[(i % #hull) + 1]
+        
+        RDT:DebugPrint(string.format("Line %d: (%.1f, %.1f) -> (%.1f, %.1f)", 
+            i, p1.x, p1.y, p2.x, p2.y))
+        
+        -- Draw dots along the line
+        for j = 0, dotsPerLine do
+            local t = j / dotsPerLine
+            local x = p1.x + (p2.x - p1.x) * t
+            local y = p1.y + (p2.y - p1.y) * t
+            
+            -- Create or reuse segment
+            local seg = border.segments[segmentIdx]
+            if not seg then
+                seg = CreateFrame("Frame", nil, border)
+                seg:SetSize(dotSize, dotSize)
+                seg:SetFrameLevel(border:GetFrameLevel() + 1)
+                
+                local tex = seg:CreateTexture(nil, "OVERLAY")
+                tex:SetAllPoints()
+                tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
+                seg.texture = tex
+                
+                border.segments[segmentIdx] = seg
+            end
+            
+            seg:ClearAllPoints()
+            seg:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", x, y)
+            seg.texture:SetVertexColor(r, g, b, alpha)
+            seg:Show()
+            
+            segmentIdx = segmentIdx + 1
+        end
+    end
+    
     border:Show()
+    RDT:DebugPrint(string.format("Border drawn with %d segments", segmentIdx - 1))
 end
 
 --- Clear all pull borders
@@ -449,7 +587,7 @@ function UI:UpdateLabels()
         end
     end
     
-    -- Create borders for each pull
+    -- Create borders for each pull using convex hull
     if RDT.RouteManager then
         local pulls = RDT.RouteManager:GetUsedPulls(RDT.State.currentRoute.pulls)
         for _, pullNum in ipairs(pulls) do
@@ -499,11 +637,16 @@ function UI:HighlightPull(pullNum, enable)
     local border = pullBorders[pullNum]
     if border and border:IsShown() then
         if enable then
-            border:SetBackdropBorderColor(1, 1, 0, 1) -- Bright yellow
+            -- Brighten border lines on hover
+            for _, line in ipairs(border.lines or {}) do
+                line:SetVertexColor(1, 1, 0, 1) -- Bright yellow
+            end
         else
             -- Restore original pull color
             local r, g, b = unpack(RDT:GetPullColor(pullNum))
-            border:SetBackdropBorderColor(r, g, b, 0.8)
+            for _, line in ipairs(border.lines or {}) do
+                line:SetVertexColor(r, g, b, 0.8)
+            end
         end
     end
 end
@@ -518,6 +661,11 @@ function UI:ClearPacks()
     
     -- Clear all pull borders
     for _, border in pairs(pullBorders) do
+        if border.lines then
+            for _, line in ipairs(border.lines) do
+                line:Hide()
+            end
+        end
         border:Hide()
         border:SetParent(nil)
     end
@@ -610,4 +758,4 @@ function UI:ResetPackFilter()
     self:ShowAllPacks()
 end
 
-RDT:DebugPrint("PackButtons.lua loaded with mob portraits and dynamic pull borders")
+RDT:DebugPrint("PackButtons.lua loaded with convex hull borders")
