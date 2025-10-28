@@ -164,14 +164,12 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local iconSet = false
     
     if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
-        -- Try to use 3D portrait (may not work with creature IDs in 3.3.5a)
+        -- Use portrait (may not work with creature IDs in 3.3.5a)
         -- SetPortraitTexture only works with unit tokens, not creature IDs
-        -- So we'll skip this and fall through to fallback
+        -- TODO: Implement portrait support
         iconSet = false
     elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" and mobInfo.displayIcon ~= "" then
-        -- Use explicit texture path
         icon:SetTexture(mobInfo.displayIcon)
-        -- Check if texture was actually set
         if icon:GetTexture() then
             iconSet = true
         end
@@ -197,7 +195,7 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     -- Pull number label (overlay on icon, scaled font)
     local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     label:SetPoint("CENTER", 0, 0)
-    local scaledFontSize = math.max(9, 12 * scale) -- Min font size of 9
+    local scaledFontSize = math.max(9, 12 * scale)
     label:SetFont("Fonts\\FRIZQT__.TTF", scaledFontSize, "OUTLINE")
     label:SetTextColor(1, 1, 1)
     button.label = label

@@ -1,37 +1,41 @@
-I assume mythic dungeons are going to have the same size as heroic, some wings might be combined, but I never played Ascension before so idk
+It appears there is the same number of mythic dungeons as heroic, they share the similar layout, Blackrock Caverns is cata backport and is not in m+ list, yet?
+
+- /script print(GetCurrentMapAreaID()) - 1
+- /script WorldMapButtonFilters:Hide() smile
 
 Import maps:
-- [] Blackfathom Deeps
-- [] Blackrock Caverns
-- [] Blackrock Depths - Manufactory
-- [] Blackrock Depths - Prison
-- [] Blackrock Depths - Upper City
-- [] Deadmines
-- [] Dire Maul - East
-- [] Dire Maul - North
-- [] Dire Maul - West
-- [] Gnomeregan
-- [] Lower Blackrock Spire
-- [] Lower Scholomance
-- [] Maraudon - Orange Crystals
-- [] Maraudon - Pristine Waters
-- [] Maraudon - Purple Crystals
-- [] Ragefire Chasm
-- [] Razorfen Downs
-- [] Razorfen Kraul
-- [] Scarlet Monastery - Armory
-- [] Scarlet Monastery - Cathedral
-- [] Scarlet Monastery - Graveyard
-- [] Scarlet Monastery - Library
-- [] Shadowfang Keep
-- [] Stormwind Stockade
-- [x] Stratholme - Main Gate
-- [x] Stratholme - Service Entrance
-- [] Sunken Temple
-- [] Uldaman
-- [] Upper Scholomance
-- [] Wailing Caverns
-- [] Zul'Farrak
+- [x] /script SetMapByID(688) - Blackfathom Deeps
+- [] /script SetMapByID(753) - Blackrock Caverns
+- [] /script SetMapByID(704) - Blackrock Depths - Manufactory
+- [] /script SetMapByID(704) - Blackrock Depths - Prison
+- [] /script SetMapByID(704) - Blackrock Depths - Upper City
+- [] /script SetMapByID(756) - Deadmines
+- [] /script SetMapByID(699) - Dire Maul - East
+- [] /script SetMapByID(699) - Dire Maul - North
+- [] /script SetMapByID(699) - Dire Maul - West
+- [] /script SetMapByID(691) - Gnomeregan
+- [] /script SetMapByID(721) - Lower Blackrock Spire
+- [] /script SetMapByID(763) - Lower Scholomance
+- [] /script SetMapByID(750) - Maraudon - Orange Crystals
+- [] /script SetMapByID(750) - Maraudon - Pristine Waters
+- [] /script SetMapByID(750) - Maraudon - Purple Crystals
+- [] /script SetMapByID(680) - Ragefire Chasm
+- [] /script SetMapByID(760) - Razorfen Downs
+- [] /script SetMapByID(761) - Razorfen Kraul
+- [] /script SetMapByID(763) - Scarlet Monastery - Armory
+- [] /script SetMapByID(763) - Scarlet Monastery - Cathedral
+- [] /script SetMapByID(763) - Scarlet Monastery - Graveyard
+- [] /script SetMapByID(763) - Scarlet Monastery - Library
+- [] /script SetMapByID(764) - Shadowfang Keep
+- [] /script SetMapByID(690) - Stormwind Stockade
+- [x] /script SetMapByID(765) - Stratholme - Main Gate
+- [x] /script SetMapByID(765) - Stratholme - Service Entrance
+- [] /script SetMapByID(687) - Sunken Temple
+- [] /script SetMapByID(692) - Uldaman
+- [] /script SetMapByID(721) - Upper Blackrock Spire
+- [] /script SetMapByID(763) - Upper Scholomance
+- [] /script SetMapByID(749) - Wailing Caverns
+- [] /script SetMapByID(686) - Zul'Farrak
 
 Populate maps:
 - [] Blackfathom Deeps
