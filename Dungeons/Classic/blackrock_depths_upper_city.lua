@@ -53,6 +53,6 @@ local mapDefinition = {
     },
 }
 
-RDT.Data:RegisterDungeon("", mapDefinition)
+RDT.Data:RegisterDungeon("Blackrock Depths Upper City", mapDefinition)
 
 RDT:DebugPrint("Loaded dungeon module: Blackrock Depths Upper City")
