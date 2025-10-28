@@ -3,10 +3,6 @@ if not RDT or not RDT.Data then
     error("RDT.Data not initialized! Dungeon modules must load after Data.lua")
 end
 
---------------------------------------------------------------------------------
--- Mob Definitions
---------------------------------------------------------------------------------
-
 local mobs = {
     ["bfd_skittering_crustacean"] = {
         name = "Skittering Crustacean",
@@ -49,11 +45,7 @@ local mobs = {
 
 RDT.Data:RegisterMobs(mobs)
 
---------------------------------------------------------------------------------
--- Map Definitions
---------------------------------------------------------------------------------
-
-local mainGate = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
@@ -221,6 +213,6 @@ local mainGate = {
     },
 }
 
-RDT.Data:RegisterDungeon("Blackfathom Deeps", mainGate)
+RDT.Data:RegisterDungeon("Blackfathom Deeps", mapDefinition)
 
 RDT:DebugPrint("Loaded dungeon module: Blackfathom Deeps")

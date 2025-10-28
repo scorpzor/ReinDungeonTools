@@ -24,6 +24,10 @@ Data.lua
 
 # Dungeon Modules (after Data.lua provides registry)
 Dungeons\Classic\blackfathom_deeps.lua
+Dungeons\Classic\blackrock_caverns.lua
+Dungeons\Classic\blackrock_depths_manufactory.lua
+Dungeons\Classic\blackrock_depths_prison.lua
+Dungeons\Classic\blackrock_depths_upper_city.lua
 Dungeons\Classic\stratholme_main_gate.lua
 Dungeons\Classic\stratholme_service_entrance.lua
 
