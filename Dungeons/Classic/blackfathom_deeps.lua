@@ -26,6 +26,25 @@ local mobs = {
         displayIcon = "Interface\\Icons\\inv_pet_babymurlocs_white",
         scale = 0.7,
     },
+    ["bfd_blackfathom_sea_witch"] = {
+        name = "Blackfathom Sea Witch",
+        count = 1,
+        displayIcon = "Interface\\Icons\\inv_misc_nagafemale",
+        scale = 0.8,
+    },
+    ["bfd_blackfathom_myrmidon"] = {
+        name = "Blackfathom Myrmidon",
+        count = 1,
+        displayIcon = "Interface\\Icons\\inv_misc_nagamale",
+        scale = 0.9,
+    },
+
+    ["bfd_boss_lady_sarevess"] = {
+        name = "Lady Sarevess",
+        count = 1,
+        displayIcon = "Interface\\Icons\\achievement_boss_elitenagamale",
+        scale = 2.0,
+    },
 }
 
 RDT.Data:RegisterMobs(mobs)
@@ -139,6 +158,64 @@ local mainGate = {
             y = 0.339,
             mobs = {
                 ["bfd_blindlight_murloc"] = 1,
+            }
+        },
+        {
+            id = 12,
+            x = 0.589,
+            y = 0.386,
+            mobs = {
+                ["bfd_blindlight_murloc"] = 2,
+                ["bfd_murkshallow_snapclaw"] = 1,
+            }
+        },
+        {
+            id = 13,
+            x = 0.596,
+            y = 0.441,
+            mobs = {
+                ["bfd_murkshallow_snapclaw"] = 1,
+            }
+        },
+        {
+            id = 14,
+            x = 0.441,
+            y = 0.356,
+            mobs = {
+                ["bfd_blindlight_murloc"] = 1,
+            }
+        },
+        {
+            id = 15,
+            x = 0.421,
+            y = 0.409,
+            mobs = {
+                ["bfd_blindlight_murloc"] = 1,
+                ["bfd_murkshallow_snapclaw"] = 1,
+            }
+        },
+        {
+            id = 16,
+            x = 0.475,
+            y = 0.365,
+            mobs = {
+                ["bfd_blindlight_murloc"] = 1,
+            }
+        },
+        {
+            id = 17,
+            x = 0.426,
+            y = 0.443,
+            mobs = {
+                ["bfd_murkshallow_snapclaw"] = 1,
+            }
+        },
+        {
+            id = 18,
+            x = 0.404,
+            y = 0.475,
+            mobs = {
+                ["bfd_skittering_crustacean"] = 1,
             }
         },
     },
