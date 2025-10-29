@@ -10,9 +10,10 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 -- Pack button styling constants
-local MOB_ICON_SIZE = 20  -- Reduced from 32 to 20 for better scaling on larger maps
-local MOB_ICON_SPACING = 1  -- Reduced spacing
-local MOB_HIGHLIGHT_SIZE = 24  -- Adjusted to match new icon size
+local MOB_ICON_SIZE = 20
+local MOB_ICON_SPACING = 1
+local MOB_HIGHLIGHT_SIZE = 24
+local MOB_PACK_HIGHLIGHT_SIZE = 22
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 -- Pull border frames (one per pull, encompasses all packs)
@@ -156,7 +157,8 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     
     -- Portrait/Icon texture (scaled)
     local icon = button:CreateTexture(nil, "ARTWORK")
-    local scaledIconSize = (MOB_ICON_SIZE - 4) * scale
+    --local scaledIconSize = (MOB_ICON_SIZE - 4) * scale
+    local scaledIconSize = MOB_ICON_SIZE * scale
     icon:SetSize(scaledIconSize, scaledIconSize)
     icon:SetPoint("CENTER")
     
@@ -198,7 +200,20 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local scaledFontSize = math.max(9, 12 * scale)
     label:SetFont("Fonts\\FRIZQT__.TTF", scaledFontSize, "OUTLINE")
     label:SetTextColor(1, 1, 1)
+    label:Hide()
     button.label = label
+    
+    -- Glow border for assigned pulls (will be shown when pack is in a pull)
+    local glowBorder = button:CreateTexture(nil, "OVERLAY")
+
+    glowBorder:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    glowBorder:SetBlendMode("ADD")
+
+    local scaledGlowSize = MOB_PACK_HIGHLIGHT_SIZE * scale
+    glowBorder:SetSize(scaledGlowSize, scaledGlowSize)
+    glowBorder:SetPoint("CENTER")
+    glowBorder:Hide()
+    button.glowBorder = glowBorder
     
     -- Set up interaction
     self:SetupMobIconHandlers(button)
@@ -577,8 +592,13 @@ function UI:UpdateLabels()
         -- Update label on each mob icon in the pack
         if packGroup.mobButtons then
             for _, mobBtn in ipairs(packGroup.mobButtons) do
-                mobBtn.label:SetText(pullNum > 0 and tostring(pullNum) or "")
-                mobBtn.label:SetTextColor(unpack(RDT:GetPullColor(pullNum)))
+                if pullNum > 0 then
+                    local r, g, b = unpack(RDT:GetPullColor(pullNum))
+                    mobBtn.glowBorder:SetVertexColor(r, g, b, 0.9)
+                    mobBtn.glowBorder:Show()
+                else
+                    mobBtn.glowBorder:Hide()
+                end
             end
         end
     end

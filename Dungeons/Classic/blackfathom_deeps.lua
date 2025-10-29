@@ -180,7 +180,7 @@ local mapDefinition = {
         {
             id = 15,
             x = 0.421,
-            y = 0.409,
+            y = 0.401,
             mobs = {
                 ["bfd_blindlight_murloc"] = 1,
                 ["bfd_murkshallow_snapclaw"] = 1,
