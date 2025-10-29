@@ -4,12 +4,10 @@ A route planning addon for classic dungeons.
 
 ## Features
 
-- **Interactive Map**: Visual dungeon maps with enemy pack positioning
-- **Pull Planning**: Organize packs into numbered pulls for optimal routing
+- **Pull Planning**: Organize packs into pulls to find optimal route
+- **Full Scale Map**: Custom made maps to fit multi-floor dungeon into a single view
 - **Route Import/Export**: Share routes via encoded strings
 - **Party Sharing**: Send routes to party members in-game (WIP)
-- **Minimap Button**: Quick access to the planner
-- **Multi-Dungeon Support**: Modular dungeon system for easy expansion
 
 ## Installation
 
@@ -32,7 +30,6 @@ A route planning addon for classic dungeons.
 ```
 /rdt                    - Toggle main window
 /rdt help               - Show all commands
-/rdt debug              - Toggle debug mode
 ```
 
 ### Development Tools
@@ -40,8 +37,8 @@ A route planning addon for classic dungeons.
 For devs adding new dungeons/making changes:
 
 ```
+/rdt debug              - Toggle debug mode
 /rdt coords             - Toggle coordinate picker (click map to get coordinates)
-/rdt mapinfo            - Show current map dimensions
 /rdt packcoords         - List all pack coordinates
 /rdt validate           - Validate all dungeon data
 /rdt list               - List registered dungeons
@@ -61,8 +58,8 @@ For a 3x2 grid: [1][2][3]
 ## Roadmap
 
 - [x] Import/Export routes via encoded strings
-- [x] Minimap button for quick access
-- [x] Multi-language localization support
+- [x] Minimap button
+- [x] Multi-language support
 - [x] Pull border indication
 - [x] Basic pack information (mob names, forces)
 - [x] In-game coordinate picker for development
@@ -73,6 +70,8 @@ For a 3x2 grid: [1][2][3]
 - [ ] Undo/Redo functionality
 - [ ] Dungeon timer integration
 - [ ] Statistics tracking
+- [ ] Replace static icons with mob portraits
+- [ ] Make icons/portraits round
 
 ## Contributing
 
