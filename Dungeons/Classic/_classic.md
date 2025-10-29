@@ -5,12 +5,12 @@ It appears there is the same number of mythic dungeons as heroic, they share the
 
 Import maps:
 - [x] /script SetMapByID(688) - Blackfathom Deeps
-- [] /script SetMapByID(753) - Blackrock Caverns
-- [] /script SetMapByID(704) - Blackrock Depths - Manufactory
-- [] /script SetMapByID(704) - Blackrock Depths - Prison
-- [] /script SetMapByID(704) - Blackrock Depths - Upper City
-- [] /script SetMapByID(756) - Deadmines
-- [] /script SetMapByID(699) - Dire Maul - East
+- [x] /script SetMapByID(753) - Blackrock Caverns
+- [x] /script SetMapByID(704) - Blackrock Depths - Manufactory
+- [x] /script SetMapByID(704) - Blackrock Depths - Prison
+- [x] /script SetMapByID(704) - Blackrock Depths - Upper City
+- [x] /script SetMapByID(756) - Deadmines
+- [x] /script SetMapByID(699) - Dire Maul - East
 - [] /script SetMapByID(699) - Dire Maul - North
 - [] /script SetMapByID(699) - Dire Maul - West
 - [] /script SetMapByID(691) - Gnomeregan

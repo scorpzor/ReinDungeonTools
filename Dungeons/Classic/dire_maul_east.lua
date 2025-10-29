@@ -3,10 +3,6 @@ if not RDT or not RDT.Data then
     error("RDT.Data not initialized! Dungeon modules must load after Data.lua")
 end
 
---------------------------------------------------------------------------------
--- Mob Definitions
---------------------------------------------------------------------------------
-
 --local mobs = {
 --    ["trash"] = {
 --        name = "Trash",
@@ -18,49 +14,34 @@ end
 --
 --RDT.Data:RegisterMobs(mobs)
 
---------------------------------------------------------------------------------
--- Map Definitions
---------------------------------------------------------------------------------
-
-local mainGate = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
         cols = 3,
         rows = 2,
         tiles = {
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_0",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_1",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_2",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_3",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_4",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_5",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_0",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_1",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_2",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_3",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_4",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\dire_maul_east\\tile_5",
         }
     },
     totalCount = 110,
     packData = {
         {
             id = 1,
-            x = 0.5,
-            y = 0.15,
+            x = 0.1,
+            y = 0.1,
             mobs = {
-                ["generic_trash_mob"] = 2,
                 ["generic_elite_mob"] = 1,
             }
-        },
-        {
-            id = 2,
-            x = 0.45,
-            y = 0.25,
-            mobs = {
-                ["generic_trash_mob"] = 3,
-                ["generic_elite_mob"] = 1,
-                ["generic_big_mob"] = 1,
-            }
-        },
+        }
     },
 }
 
-RDT.Data:RegisterDungeon("", mainGate)
+RDT.Data:RegisterDungeon("Dire Maul East", mapDefinition)
 
-RDT:DebugPrint("Loaded dungeon module: ")
+RDT:DebugPrint("Loaded dungeon module: Dire Maul East")
