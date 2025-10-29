@@ -11,8 +11,8 @@ Import maps:
 - [x] /script SetMapByID(704) - Blackrock Depths - Upper City
 - [x] /script SetMapByID(756) - Deadmines
 - [x] /script SetMapByID(699) - Dire Maul - East
-- [] /script SetMapByID(699) - Dire Maul - North
-- [] /script SetMapByID(699) - Dire Maul - West
+- [x] /script SetMapByID(699) - Dire Maul - North
+- [x] /script SetMapByID(699) - Dire Maul - West
 - [] /script SetMapByID(691) - Gnomeregan
 - [] /script SetMapByID(721) - Lower Blackrock Spire
 - [] /script SetMapByID(763) - Lower Scholomance
