@@ -22,15 +22,15 @@ Import maps:
 - [] /script SetMapByID(680) - Ragefire Chasm
 - [] /script SetMapByID(760) - Razorfen Downs
 - [] /script SetMapByID(761) - Razorfen Kraul
-- [] /script SetMapByID(763) - Scarlet Monastery - Armory
-- [] /script SetMapByID(763) - Scarlet Monastery - Cathedral
-- [] /script SetMapByID(763) - Scarlet Monastery - Graveyard
-- [] /script SetMapByID(763) - Scarlet Monastery - Library
+- [] /script SetMapByID(762) - Scarlet Monastery - Armory
+- [] /script SetMapByID(762) - Scarlet Monastery - Cathedral
+- [] /script SetMapByID(762) - Scarlet Monastery - Graveyard
+- [] /script SetMapByID(762) - Scarlet Monastery - Library
 - [] /script SetMapByID(764) - Shadowfang Keep
 - [] /script SetMapByID(690) - Stormwind Stockade
 - [x] /script SetMapByID(765) - Stratholme - Main Gate
 - [x] /script SetMapByID(765) - Stratholme - Service Entrance
-- [] /script SetMapByID(687) - Sunken Temple
+- [] /script SetMapByID(2021) - Sunken Temple - id is different from classic, why is it so highres lmao was this place rebuild from scratch
 - [] /script SetMapByID(692) - Uldaman
 - [] /script SetMapByID(721) - Upper Blackrock Spire
 - [] /script SetMapByID(763) - Upper Scholomance
