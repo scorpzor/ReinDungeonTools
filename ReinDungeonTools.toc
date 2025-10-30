@@ -32,8 +32,8 @@ Dungeons\Classic\deadmines.lua
 Dungeons\Classic\dire_maul_east.lua
 Dungeons\Classic\dire_maul_north.lua
 Dungeons\Classic\dire_maul_west.lua
-# Dungeons\Classic\gnomeregan.lua
-# Dungeons\Classic\lower_blackrock_spire.lua
+Dungeons\Classic\gnomeregan.lua
+Dungeons\Classic\lower_blackrock_spire.lua
 # Dungeons\Classic\lower_scholomance.lua
 # Dungeons\Classic\maraudon_orange_crystals.lua
 # Dungeons\Classic\maraudon_pristine_waters.lua

@@ -13,8 +13,8 @@ Import maps:
 - [x] /script SetMapByID(699) - Dire Maul - East
 - [x] /script SetMapByID(699) - Dire Maul - North
 - [x] /script SetMapByID(699) - Dire Maul - West
-- [] /script SetMapByID(691) - Gnomeregan
-- [] /script SetMapByID(721) - Lower Blackrock Spire
+- [x] /script SetMapByID(691) - Gnomeregan
+- [x] /script SetMapByID(721) - Lower Blackrock Spire
 - [] /script SetMapByID(763) - Lower Scholomance
 - [] /script SetMapByID(750) - Maraudon - Orange Crystals
 - [] /script SetMapByID(750) - Maraudon - Pristine Waters
