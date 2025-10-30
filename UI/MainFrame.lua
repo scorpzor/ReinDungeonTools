@@ -149,6 +149,7 @@ function UI:CreateDungeonDropdown(parent)
             -- Switch to selected dungeon
             if item.value and RDT.LoadDungeon then
                 RDT:LoadDungeon(item.value)
+                UI:UpdateDungeonDropdown()
             end
         end
     })
@@ -188,11 +189,12 @@ function UI:PopulateDungeonDropdown()
     dungeonDropdown:SetItems(items)
 end
 
---- Update the dungeon dropdown text
--- @param dungeonName string Name to display
-function UI:UpdateDropdownText(dungeonName)
-    if dungeonDropdown and dungeonName then
-        dungeonDropdown:SetText(dungeonName)
+--- Update the dungeon dropdown
+function UI:UpdateDungeonDropdown()
+    if not dungeonDropdown or not RDT.db or not RDT.db.profile then return end
+    local activeDungeon = RDT.db.profile.currentDungeon
+    if activeDungeon then
+        dungeonDropdown:SetText(activeDungeon)
     end
 end
 

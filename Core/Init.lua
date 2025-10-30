@@ -232,6 +232,10 @@ function RDT:LoadDungeon(dungeonName)
         if self.UI.UpdateRouteDropdown then
             self.UI:UpdateRouteDropdown()
         end
+        -- Update dungeon dropdown to show current dungeon
+        if self.UI.UpdateDungeonDropdown then
+            self.UI:UpdateDungeonDropdown()
+        end
     end
     
     self:DebugPrint("Dungeon loaded successfully")
