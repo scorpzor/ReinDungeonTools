@@ -72,6 +72,7 @@ For a 3x2 grid: [1][2][3]
 - [ ] Statistics tracking
 - [ ] Replace static icons with mob portraits
 - [ ] Make icons/portraits round
+- [ ] Add Entrance/Floor/Buffs indicators
 
 ## Contributing
 
