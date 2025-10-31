@@ -33,10 +33,8 @@ Dungeons\Classic\dire_maul_west.lua
 Dungeons\Classic\gnomeregan.lua
 Dungeons\Classic\lower_blackrock_spire.lua
 # Dungeons\Classic\lower_scholomance.lua
-# Dungeons\Classic\maraudon_orange_crystals.lua
-# Dungeons\Classic\maraudon_pristine_waters.lua
-# Dungeons\Classic\maraudon_purple_crystals.lua
-# Dungeons\Classic\ragefire_chasm.lua
+Dungeons\Classic\maraudon.lua
+Dungeons\Classic\ragefire_chasm.lua
 # Dungeons\Classic\razorfen_downs.lua
 # Dungeons\Classic\razorfen_kraul.lua
 # Dungeons\Classic\scarlet_monastery_armory.lua

@@ -16,10 +16,10 @@ Import maps:
 - [x] /script SetMapByID(691) - Gnomeregan
 - [x] /script SetMapByID(721) - Lower Blackrock Spire
 - [] /script SetMapByID(763) - Lower Scholomance
-- [] /script SetMapByID(750) - Maraudon - Orange Crystals
-- [] /script SetMapByID(750) - Maraudon - Pristine Waters
-- [] /script SetMapByID(750) - Maraudon - Purple Crystals
-- [] /script SetMapByID(680) - Ragefire Chasm
+- [x] /script SetMapByID(750) - Maraudon - Orange Crystals
+- [x] /script SetMapByID(750) - Maraudon - Pristine Waters
+- [x] /script SetMapByID(750) - Maraudon - Purple Crystals
+- [x] /script SetMapByID(680) - Ragefire Chasm
 - [] /script SetMapByID(760) - Razorfen Downs
 - [] /script SetMapByID(761) - Razorfen Kraul
 - [] /script SetMapByID(762) - Scarlet Monastery - Armory
