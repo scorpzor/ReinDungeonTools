@@ -64,15 +64,6 @@ function RDT:GetPullColor(pullNum)
     return color
 end
 
--- Backward compatibility: Keep PullColors table with metatable
-RDT.PullColors = setmetatable({
-    [0] = unassignedColor,  -- Explicit for pull 0
-}, {
-    __index = function(t, key)
-        return RDT:GetPullColor(key)
-    end
-})
-
 --------------------------------------------------------------------------------
 -- Ace3 Lifecycle Callbacks
 --------------------------------------------------------------------------------

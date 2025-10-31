@@ -295,9 +295,6 @@ function UI:RenderPullEntry(pullNum, yOffset)
         pullButton:SetScript("OnClick", function(self, button)
             if button == "LeftButton" then
                 RDT.State.currentPull = self.pullNum
-                if RDT.UI and RDT.UI.UpdatePullIndicator then
-                    RDT.UI:UpdatePullIndicator()
-                end
                 if RDT.UI and RDT.UI.UpdatePullList then
                     RDT.UI:UpdatePullList()
                 end

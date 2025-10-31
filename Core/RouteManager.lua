@@ -160,9 +160,6 @@ function RM:NewPull()
     
     -- Update UI
     if RDT.UI then
-        if RDT.UI.UpdatePullIndicator then
-            RDT.UI:UpdatePullIndicator()
-        end
         if RDT.UI.UpdatePullList then
             RDT.UI:UpdatePullList()
         end

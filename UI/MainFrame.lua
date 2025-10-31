@@ -683,11 +683,6 @@ function UI:CreateButtonContainer(parent)
     buttonContainer:HookScript("OnSizeChanged", UpdatePullExportButtonWidths)
 end
 
---- Update pull display (removed - no longer needed)
-function UI:UpdatePullIndicator()
-    -- Placeholder for backward compatibility
-end
-
 --------------------------------------------------------------------------------
 -- Title and Display Updates
 --------------------------------------------------------------------------------
