@@ -22,19 +22,19 @@ end
 -- Map Definitions
 --------------------------------------------------------------------------------
 
-local mainGate = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
         cols = 3,
         rows = 2,
         tiles = {
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_0",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_1",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_2",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_3",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_4",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_5",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_0",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_1",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_2",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_3",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_4",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\upper_blackrock_spire\\tile_5",
         }
     },
     totalCount = 110,
@@ -61,6 +61,6 @@ local mainGate = {
     },
 }
 
-RDT.Data:RegisterDungeon("", mainGate)
+RDT.Data:RegisterDungeon("Upper Blackrock Spire", mapDefinition)
 
-RDT:DebugPrint("Loaded dungeon module: ")
+RDT:DebugPrint("Loaded dungeon module: Upper Blackrock Spire")

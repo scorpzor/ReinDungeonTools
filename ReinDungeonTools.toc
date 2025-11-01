@@ -35,22 +35,22 @@ Dungeons\Classic\lower_blackrock_spire.lua
 # Dungeons\Classic\lower_scholomance.lua
 Dungeons\Classic\maraudon.lua
 Dungeons\Classic\ragefire_chasm.lua
-# Dungeons\Classic\razorfen_downs.lua
-# Dungeons\Classic\razorfen_kraul.lua
-# Dungeons\Classic\scarlet_monastery_armory.lua
-# Dungeons\Classic\scarlet_monastery_cathedral.lua
-# Dungeons\Classic\scarlet_monastery_graveyard.lua
-# Dungeons\Classic\scarlet_monastery_library.lua
-# Dungeons\Classic\shadowfang_keep.lua
-# Dungeons\Classic\stormwind_stockade.lua
+Dungeons\Classic\razorfen_downs.lua
+Dungeons\Classic\razorfen_kraul.lua
+Dungeons\Classic\scarlet_monastery_armory.lua
+Dungeons\Classic\scarlet_monastery_cathedral.lua
+Dungeons\Classic\scarlet_monastery_graveyard.lua
+Dungeons\Classic\scarlet_monastery_library.lua
+Dungeons\Classic\shadowfang_keep.lua
+Dungeons\Classic\stormwind_stockade.lua
 Dungeons\Classic\stratholme_main_gate.lua
 Dungeons\Classic\stratholme_service_entrance.lua
-# Dungeons\Classic\sunken_temple.lua
-# Dungeons\Classic\uldaman.lua
-# Dungeons\Classic\upper_blackrock_spire.lua
+Dungeons\Classic\sunken_temple.lua
+Dungeons\Classic\uldaman.lua
+Dungeons\Classic\upper_blackrock_spire.lua
 # Dungeons\Classic\upper_scholomance.lua
-# Dungeons\Classic\wailing_caverns.lua
-# Dungeons\Classic\zulfarrak.lua
+Dungeons\Classic\wailing_caverns.lua
+Dungeons\Classic\zulfarrak.lua
 
 # Core continued
 Core\Database.lua

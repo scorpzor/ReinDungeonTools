@@ -22,19 +22,19 @@ end
 -- Map Definitions
 --------------------------------------------------------------------------------
 
-local mainGate = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
         cols = 3,
         rows = 2,
         tiles = {
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_0",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_1",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_2",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_3",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_4",
-            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\_\\tile_5",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_0",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_1",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_2",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_3",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_4",
+            "Interface\\AddOns\\ReinDungeonTools\\Dungeons\\Classic\\Textures\\razorfen_kraul\\tile_5",
         }
     },
     totalCount = 110,
@@ -61,6 +61,6 @@ local mainGate = {
     },
 }
 
-RDT.Data:RegisterDungeon("", mainGate)
+RDT.Data:RegisterDungeon("Razorfen Kraul", mapDefinition)
 
-RDT:DebugPrint("Loaded dungeon module: ")
+RDT:DebugPrint("Loaded dungeon module: Razorfen Kraul")

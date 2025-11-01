@@ -15,27 +15,27 @@ Import maps:
 - [x] /script SetMapByID(699) - Dire Maul - West
 - [x] /script SetMapByID(691) - Gnomeregan
 - [x] /script SetMapByID(721) - Lower Blackrock Spire
-- [] /script SetMapByID(763) - Lower Scholomance
+- [ ] /script SetMapByID(763) - Lower Scholomance
 - [x] /script SetMapByID(750) - Maraudon - Orange Crystals
 - [x] /script SetMapByID(750) - Maraudon - Pristine Waters
 - [x] /script SetMapByID(750) - Maraudon - Purple Crystals
 - [x] /script SetMapByID(680) - Ragefire Chasm
-- [] /script SetMapByID(760) - Razorfen Downs
-- [] /script SetMapByID(761) - Razorfen Kraul
-- [] /script SetMapByID(762) - Scarlet Monastery - Armory
-- [] /script SetMapByID(762) - Scarlet Monastery - Cathedral
-- [] /script SetMapByID(762) - Scarlet Monastery - Graveyard
-- [] /script SetMapByID(762) - Scarlet Monastery - Library
-- [] /script SetMapByID(764) - Shadowfang Keep
-- [] /script SetMapByID(690) - Stormwind Stockade
+- [x] /script SetMapByID(760) - Razorfen Downs
+- [x] /script SetMapByID(761) - Razorfen Kraul
+- [x] /script SetMapByID(762) - Scarlet Monastery - Armory
+- [x] /script SetMapByID(762) - Scarlet Monastery - Cathedral
+- [x] /script SetMapByID(762) - Scarlet Monastery - Graveyard
+- [x] /script SetMapByID(762) - Scarlet Monastery - Library
+- [x] /script SetMapByID(764) - Shadowfang Keep
+- [x] /script SetMapByID(690) - Stormwind Stockade
 - [x] /script SetMapByID(765) - Stratholme - Main Gate
 - [x] /script SetMapByID(765) - Stratholme - Service Entrance
-- [] /script SetMapByID(2021) - Sunken Temple - id is different from classic, why is it so highres lmao was this place rebuild from scratch
-- [] /script SetMapByID(692) - Uldaman
-- [] /script SetMapByID(721) - Upper Blackrock Spire
-- [] /script SetMapByID(763) - Upper Scholomance
-- [] /script SetMapByID(749) - Wailing Caverns
-- [] /script SetMapByID(686) - Zul'Farrak
+- [x] /script SetMapByID(2021) - Sunken Temple - id is different from classic, why is it so highres lmao was this place rebuild from scratch
+- [x] /script SetMapByID(692) - Uldaman
+- [x] /script SetMapByID(721) - Upper Blackrock Spire
+- [ ] /script SetMapByID(763) - Upper Scholomance
+- [x] /script SetMapByID(749) - Wailing Caverns
+- [x] /script SetMapByID(686) - Zul'Farrak
 
 Populate maps:
 - [] Blackfathom Deeps

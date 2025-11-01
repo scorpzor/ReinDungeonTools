@@ -38,7 +38,7 @@ end
 -- Stratholme - Service Entrance
 --------------------------------------------------------------------------------
 
-local serviceEntrance = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
@@ -77,6 +77,6 @@ local serviceEntrance = {
     },
 }
 
-RDT.Data:RegisterDungeon("Stratholme Service Entrance", serviceEntrance)
+RDT.Data:RegisterDungeon("Stratholme Service Entrance", mapDefinition)
 
 RDT:DebugPrint("Loaded dungeon module: Stratholme Service Entrance")

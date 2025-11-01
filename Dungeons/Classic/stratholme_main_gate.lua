@@ -35,7 +35,7 @@ end
 -- Stratholme - Main Gate
 --------------------------------------------------------------------------------
 
-local mainGate = {
+local mapDefinition = {
     tiles = {
         tileWidth = 512,
         tileHeight = 512,
@@ -74,6 +74,6 @@ local mainGate = {
     },
 }
 
-RDT.Data:RegisterDungeon("Stratholme Main Gate", mainGate)
+RDT.Data:RegisterDungeon("Stratholme Main Gate", mapDefinition)
 
 RDT:DebugPrint("Loaded dungeon module: Stratholme Main Gate")
