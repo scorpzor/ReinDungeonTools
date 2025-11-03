@@ -180,7 +180,7 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local bgSize = scaledSize * 1.20
     bg:SetSize(bgSize, bgSize)
     bg:SetPoint("CENTER")
-    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_silver")
+    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_gradient")
     button.bg = bg
 
     -- Selection highlight (scaled)
