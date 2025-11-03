@@ -93,7 +93,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     
     -- Calculate layout: biggest mob in center, others in clockwise circle
     local totalMobs = #mobList
-    local radius = 12 + (totalMobs * 1.2) -- Dynamic radius based on mob count
+    local radius = 14 + (totalMobs * 1.15) -- Dynamic radius based on mob count
     
     -- Set container size to encompass the circle
     local containerSize = radius * 2 + MOB_ICON_SIZE
@@ -148,21 +148,20 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     button.mobInfo = mobInfo
     button.iconScale = scale
     
-    -- Portrait/Icon texture (scaled)
+    -- Portrait/Icon
     local icon = button:CreateTexture(nil, "ARTWORK")
-    --local scaledIconSize = (MOB_ICON_SIZE - 4) * scale
     local scaledIconSize = MOB_ICON_SIZE * scale
     icon:SetSize(scaledIconSize, scaledIconSize)
     icon:SetPoint("CENTER")
-    
-    -- Set icon based on displayIcon type
+
     local iconSet = false
     
     if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
-        -- TODO: Implement portrait support, idk if it's even possible. SetPortraitTexture only works with unit tokens, not creature IDs
+        -- TODO: Implement portrait support, idk if it's even possible.
+        -- SetPortraitTexture only works with unit tokens, not creature IDs
+        -- SetPortraitTextureFromCreatureDisplayID doesn't exists yet
         iconSet = false
     elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" and mobInfo.displayIcon ~= "" then
-        --icon:SetTexture(mobInfo.displayIcon)
         SetPortraitToTexture(icon, mobInfo.displayIcon)
         if icon:GetTexture() then
             iconSet = true
@@ -171,18 +170,17 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     
     -- Fallback to question mark if icon wasn't set
     if not iconSet then
-        --icon:SetTexture(FALLBACK_ICON)
         SetPortraitToTexture(icon, FALLBACK_ICON)
     end
     
     button.icon = icon
 
     -- Background/border
-    local bg = button:CreateTexture(nil, "OVERLAY")--BACKGROUND
-    bg:SetAllPoints()
-    --bg:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
-    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_dark_steel")
-    bg:SetVertexColor(0.8, 0.8, 0.8)
+    local bg = button:CreateTexture(nil, "BACKGROUND")
+    local bgSize = scaledSize * 1.20
+    bg:SetSize(bgSize, bgSize)
+    bg:SetPoint("CENTER")
+    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_silver")
     button.bg = bg
 
     -- Selection highlight (scaled)
