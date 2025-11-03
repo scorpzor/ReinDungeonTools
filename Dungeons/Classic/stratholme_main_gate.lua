@@ -8,7 +8,6 @@ end
 --------------------------------------------------------------------------------
 
 local mobs = {
-    -- Generic example mobs (replace with actual Stratholme mobs)
     ["strat_skeletal_berserker"] = {
         name = "Skeletal Berserker",
         count = 0.5,
