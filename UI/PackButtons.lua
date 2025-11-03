@@ -13,7 +13,7 @@ local UI = RDT.UI
 local MOB_ICON_SIZE = 20
 local MOB_ICON_SPACING = 1
 local MOB_HIGHLIGHT_SIZE = 24
-local MOB_PACK_HIGHLIGHT_SIZE = 22
+local MOB_PACK_HIGHLIGHT_SIZE = 28
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 -- Pull border frames (one per pull, encompasses all packs)
@@ -148,13 +148,6 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     button.mobInfo = mobInfo
     button.iconScale = scale
     
-    -- Background/border
-    local bg = button:CreateTexture(nil, "BACKGROUND")
-    bg:SetAllPoints()
-    bg:SetTexture("Interface\\Buttons\\UI-Quickslot2")
-    bg:SetVertexColor(0.8, 0.8, 0.8)
-    button.bg = bg
-    
     -- Portrait/Icon texture (scaled)
     local icon = button:CreateTexture(nil, "ARTWORK")
     --local scaledIconSize = (MOB_ICON_SIZE - 4) * scale
@@ -166,12 +159,11 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local iconSet = false
     
     if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
-        -- Use portrait (may not work with creature IDs in 3.3.5a)
-        -- SetPortraitTexture only works with unit tokens, not creature IDs
-        -- TODO: Implement portrait support
+        -- TODO: Implement portrait support, idk if it's even possible. SetPortraitTexture only works with unit tokens, not creature IDs
         iconSet = false
     elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" and mobInfo.displayIcon ~= "" then
-        icon:SetTexture(mobInfo.displayIcon)
+        --icon:SetTexture(mobInfo.displayIcon)
+        SetPortraitToTexture(icon, mobInfo.displayIcon)
         if icon:GetTexture() then
             iconSet = true
         end
@@ -179,14 +171,23 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     
     -- Fallback to question mark if icon wasn't set
     if not iconSet then
-        icon:SetTexture(FALLBACK_ICON)
+        --icon:SetTexture(FALLBACK_ICON)
+        SetPortraitToTexture(icon, FALLBACK_ICON)
     end
     
     button.icon = icon
-    
+
+    -- Background/border
+    local bg = button:CreateTexture(nil, "OVERLAY")--BACKGROUND
+    bg:SetAllPoints()
+    --bg:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_dark_steel")
+    bg:SetVertexColor(0.8, 0.8, 0.8)
+    button.bg = bg
+
     -- Selection highlight (scaled)
     local highlight = button:CreateTexture(nil, "OVERLAY")
-    highlight:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
     highlight:SetBlendMode("ADD")
     local scaledHighlightSize = MOB_HIGHLIGHT_SIZE * scale
     highlight:SetSize(scaledHighlightSize, scaledHighlightSize)
@@ -206,7 +207,7 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     -- Glow border for assigned pulls (will be shown when pack is in a pull)
     local glowBorder = button:CreateTexture(nil, "OVERLAY")
 
-    glowBorder:SetTexture("Interface\\Buttons\\ButtonHilight-Square")
+    glowBorder:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
     glowBorder:SetBlendMode("ADD")
 
     local scaledGlowSize = MOB_PACK_HIGHLIGHT_SIZE * scale

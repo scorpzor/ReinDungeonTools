@@ -7,7 +7,8 @@ local mobs = {
     ["bfd_skittering_crustacean"] = {
         name = "Skittering Crustacean",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\INV_Misc_Birdbeck_02",
+        --displayIcon = "Interface\\Icons\\INV_Misc_Birdbeck_02",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\skeletal_guardian",
         scale = 0.7,
     },
     ["bfd_murkshallow_snapclaw"] = {
