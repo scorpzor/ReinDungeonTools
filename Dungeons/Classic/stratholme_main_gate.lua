@@ -44,6 +44,12 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ghostly_citizen",
         scale = 0.7,
     },
+    ["strat_spectral_citizen"] = {
+        name = "Spectral Citizen",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ghostly_citizen",
+        scale = 0.7,
+    },
     ["strat_undead_postman"] = {
         name = "Undead Postman",
         count = 0.5,
@@ -111,18 +117,24 @@ local mobs = {
         scale = 0.7,
     },
 
-
-    ["strat_boss_ezra_grimm"] = {
-        name = "Ezra Grimm",
+    -------------------------------- Bosses --------------------------------
+    ["strat_boss_stratholme_courier"] = {
+        name = "Stratholme Courier",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\undead_postman",
+        scale = 1.25,
     },
+    --["strat_boss_ezra_grimm"] = {
+    --    name = "Ezra Grimm",
+    --    count = 2,
+    --    displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+    --    scale = 2,
+    --},
     ["strat_boss_skul"] = {
         name = "Skul",
         count = 2,
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        scale = 1.25,
     },
     ["strat_boss_the_unforgiven"] = {
         name = "The Unforgiven",
@@ -208,27 +220,36 @@ local mapDefinition = {
         },
         {
             id = 2,
+            x = 0.679,
+            y = 0.787,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,--patrol
+            }
+        },
+        {
+            id = 3,
             x = 0.685,
             y = 0.753,
             mobs = {
                 ["strat_skeletal_berserker"] = 2,
                 ["strat_skeletal_guardian"] = 3,
-                ["strat_mangled_cadaver"] = 2,
-                ["strat_plague_ghoul"] = 1,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
             }
         },
         {
-            id = 3,
+            id = 4,
             x = 0.643,
             y = 0.738,
             mobs = {
                 ["strat_skeletal_berserker"] = 2,
                 ["strat_skeletal_guardian"] = 2,
-                ["strat_mangled_cadaver"] = 3,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
             }
         },
         {
-            id = 4,
+            id = 5,
             x = 0.642,
             y = 0.701,
             mobs = {
@@ -236,7 +257,7 @@ local mapDefinition = {
             }
         },
         {
-            id = 5,
+            id = 6,
             x = 0.669,
             y = 0.656,
             mobs = {
@@ -246,47 +267,156 @@ local mapDefinition = {
             }
         },
         {
-            id = 6,
-            x = 0.684,
-            y = 0.686,
+            id = 7,
+            x = 0.679,
+            y = 0.699,
             mobs = {
-                ["strat_plague_ghoul"] = 1,
+                ["strat_plague_ghoul"] = 1,--patrol
             }
         },
         {
-            id = 7,
+            id = 8,
             x = 0.675,
             y = 0.552,
             mobs = {
                 ["strat_skeletal_berserker"] = 2,
                 ["strat_skeletal_guardian"] = 2,
-                ["strat_mangled_cadaver"] = 3,
-            }
-        },
-        {
-            id = 8,
-            x = 0.656,
-            y = 0.558,
-            mobs = {
-                ["strat_plague_ghoul"] = 1,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
             }
         },
         {
             id = 9,
-            x = 0.645,
-            y = 0.592,
+            x = 0.649,
+            y = 0.546,
             mobs = {
-                ["strat_patchwork_horror"] = 1,
+                ["strat_plague_ghoul"] = 1,--patrol
             }
         },
         {
             id = 10,
+            x = 0.652,
+            y = 0.588,
+            mobs = {
+                ["strat_patchwork_horror"] = 1,--patrol
+            }
+        },
+        {
+            id = 11,
             x = 0.726,
             y = 0.565,
             mobs = {
                 ["strat_skeletal_berserker"] = 2,
                 ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 12,
+            x = 0.632,
+            y = 0.605,
+            mobs = {
+                ["strat_spectral_citizen"] = 2,
+            }
+        },
+        {
+            id = 13,
+            x = 0.621,
+            y = 0.575,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 14,
+            x = 0.621,
+            y = 0.507,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
                 ["strat_mangled_cadaver"] = 3,
+            }
+        },
+        {
+            id = 15,
+            x = 0.595,
+            y = 0.502,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,--patrol
+            }
+        },
+        {
+            id = 16,
+            x = 0.569,
+            y = 0.523,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 2,
+            }
+        },
+        {
+            id = 17,
+            x = 0.591,
+            y = 0.608,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 3,
+            }
+        },
+        {
+            id = 18,
+            x = 0.571,
+            y = 0.675,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_ravaged_cadaver"] = 3,
+                ["strat_plague_ghoul"] = 1,
+                ["strat_spectral_citizen"] = 1,
+            }
+        },
+        {
+            id = 19,
+            x = 0.776,
+            y = 0.494,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 20,
+            x = 0.786,
+            y = 0.458,
+            mobs = {
+                ["strat_patchwork_horror"] = 1,--patrol
+            }
+        },
+        -------------------------------- Bosses --------------------------------
+        {
+            id = 1000,
+            x = 0.535,
+            y = 0.673,
+            mobs = {
+                ["strat_boss_stratholme_courier"] = 1,
+            }
+        },
+        {
+            id = 1001,
+            x = 0.810,
+            y = 0.479,
+            mobs = {
+                ["strat_boss_skul"] = 1,
             }
         },
     },
