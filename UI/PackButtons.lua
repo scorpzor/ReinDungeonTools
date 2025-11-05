@@ -14,6 +14,12 @@ local MOB_HIGHLIGHT_SIZE = 24
 local MOB_PACK_HIGHLIGHT_SIZE = 28
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
+-- Object pools for reusing frames/textures
+local packGroupPool = {}
+local mobButtonPool = {}
+local borderFramePool = {}
+local borderLinePool = {}
+
 local pullBorders = {}
 
 --------------------------------------------------------------------------------
@@ -52,7 +58,17 @@ function UI:CreatePacks(packData)
 end
 
 function UI:CreatePackGroup(data, mapWidth, mapHeight)
-    local packGroup = CreateFrame("Frame", "RDT_Pack" .. data.id, UI.mapContainer)
+    -- Try to reuse a pack group frame from the pool, or create a new one
+    local packGroup = table.remove(packGroupPool)
+    if not packGroup then
+        -- No pooled frame available, create a new one
+        packGroup = CreateFrame("Frame", nil, UI.mapContainer)
+    end
+
+    -- Reset/set pack group properties
+    packGroup:SetParent(UI.mapContainer)
+    packGroup:ClearAllPoints()
+    packGroup:Show()
     packGroup.packId = data.id
     packGroup.count = data.count or 0
     packGroup.mobs = data.mobs or {}
@@ -111,21 +127,63 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
 end
 
 function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
-    local button = CreateFrame("Button", nil, parent)
+    -- Try to reuse a mob button from the pool, or create a new one
+    local button = table.remove(mobButtonPool)
+    if not button then
+        -- No pooled button available, create a new one
+        button = CreateFrame("Button", nil, parent)
+
+        -- Create textures only once when creating new button
+        local icon = button:CreateTexture(nil, "ARTWORK")
+        icon:SetPoint("CENTER")
+        button.icon = icon
+
+        local bg = button:CreateTexture(nil, "BACKGROUND")
+        bg:SetPoint("CENTER")
+        bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_gradient")
+        button.bg = bg
+
+        local highlight = button:CreateTexture(nil, "OVERLAY")
+        highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+        highlight:SetBlendMode("ADD")
+        highlight:SetPoint("CENTER")
+        highlight:Hide()
+        button.highlight = highlight
+
+        local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        label:SetPoint("CENTER", 0, 0)
+        label:SetTextColor(1, 1, 1)
+        label:Hide()
+        button.label = label
+
+        local glowBorder = button:CreateTexture(nil, "OVERLAY")
+        glowBorder:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+        glowBorder:SetBlendMode("ADD")
+        glowBorder:SetPoint("CENTER")
+        glowBorder:Hide()
+        button.glowBorder = glowBorder
+
+        -- Setup handlers once
+        self:SetupMobIconHandlers(button)
+    end
+
+    -- Reset parent and position
+    button:SetParent(parent)
+    button:ClearAllPoints()
 
     local scale = mobInfo.scale or 1.0
     local scaledSize = MOB_ICON_SIZE * scale
-    
+
     button:SetSize(scaledSize, scaledSize)
     button:SetPoint("CENTER", parent, "CENTER", xOffset, yOffset)
     button.packId = parent.packId
     button.mobInfo = mobInfo
     button.iconScale = scale
 
-    local icon = button:CreateTexture(nil, "ARTWORK")
+    -- Update icon texture and size
+    local icon = button.icon
     local scaledIconSize = MOB_ICON_SIZE * scale
     icon:SetSize(scaledIconSize, scaledIconSize)
-    icon:SetPoint("CENTER")
 
     local iconSet = false
     
@@ -142,46 +200,30 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     if not iconSet then
         SetPortraitToTexture(icon, FALLBACK_ICON)
     end
-    
-    button.icon = icon
 
-    local bg = button:CreateTexture(nil, "BACKGROUND")
+    -- Update background size
+    local bg = button.bg
     local bgSize = scaledSize * 1.20
     bg:SetSize(bgSize, bgSize)
-    bg:SetPoint("CENTER")
-    bg:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Borders\\icon_border_gradient")
-    button.bg = bg
 
-    local highlight = button:CreateTexture(nil, "OVERLAY")
-    highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
-    highlight:SetBlendMode("ADD")
+    -- Update highlight size
+    local highlight = button.highlight
     local scaledHighlightSize = MOB_HIGHLIGHT_SIZE * scale
     highlight:SetSize(scaledHighlightSize, scaledHighlightSize)
-    highlight:SetPoint("CENTER")
-    highlight:Hide()
-    button.highlight = highlight
 
-    local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    label:SetPoint("CENTER", 0, 0)
+    -- Update label font size
+    local label = button.label
     local scaledFontSize = math.max(9, 12 * scale)
     label:SetFont("Fonts\\FRIZQT__.TTF", scaledFontSize, "OUTLINE")
-    label:SetTextColor(1, 1, 1)
-    label:Hide()
-    button.label = label
 
-    local glowBorder = button:CreateTexture(nil, "OVERLAY")
-
-    glowBorder:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
-    glowBorder:SetBlendMode("ADD")
-
+    -- Update glow border size
+    local glowBorder = button.glowBorder
     local scaledGlowSize = MOB_PACK_HIGHLIGHT_SIZE * scale
     glowBorder:SetSize(scaledGlowSize, scaledGlowSize)
-    glowBorder:SetPoint("CENTER")
-    glowBorder:Hide()
-    button.glowBorder = glowBorder
 
-    self:SetupMobIconHandlers(button)
-    
+    -- Show the button
+    button:Show()
+
     return button
 end
 
@@ -415,9 +457,24 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
 
     local border = pullBorders[pullNum]
     if not border then
-        border = CreateFrame("Frame", "RDT_PullBorder" .. pullNum, UI.mapContainer)
-        border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
-        border.segments = {}
+        -- Try to reuse a border frame from the pool, or create a new one
+        border = table.remove(borderFramePool)
+        if not border then
+            -- No pooled border available, create a new one
+            border = CreateFrame("Frame", nil, UI.mapContainer)
+            border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
+            border.segments = {}
+        else
+            -- Reset pooled border properties
+            border:SetParent(UI.mapContainer)
+            border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
+            -- Ensure segments are reparented to the border
+            if border.segments then
+                for _, seg in ipairs(border.segments) do
+                    seg:SetParent(border)
+                end
+            end
+        end
         pullBorders[pullNum] = border
     end
 
@@ -564,30 +621,47 @@ end
 function UI:ClearPacks()
     RDT:DebugPrint("Clearing pack groups")
 
+    -- Return pull border frames to pool
     for _, border in pairs(pullBorders) do
-        if border.lines then
-            for _, line in ipairs(border.lines) do
-                line:Hide()
+        -- Hide all segments but keep them attached to the border for reuse
+        if border.segments then
+            for _, seg in ipairs(border.segments) do
+                seg:Hide()
             end
         end
         border:Hide()
-        border:SetParent(nil)
+        border:ClearAllPoints()
+        table.insert(borderFramePool, border)
     end
     wipe(pullBorders)
-    
+
+    -- Return pack groups and mob buttons to pool
     for name, packGroup in pairs(RDT.State.packButtons) do
         if packGroup then
             if packGroup.mobButtons then
                 for _, mobBtn in ipairs(packGroup.mobButtons) do
                     mobBtn:Hide()
-                    mobBtn:SetParent(nil)
+                    mobBtn:ClearAllPoints()
+                    -- Clear mob button references
+                    mobBtn.packId = nil
+                    mobBtn.mobInfo = nil
+                    mobBtn.iconScale = nil
+                    -- Return to pool
+                    table.insert(mobButtonPool, mobBtn)
                 end
             end
             packGroup:Hide()
-            packGroup:SetParent(nil)
+            packGroup:ClearAllPoints()
+            -- Clear pack group references
+            packGroup.packId = nil
+            packGroup.count = nil
+            packGroup.mobs = nil
+            packGroup.mobButtons = nil
+            -- Return to pool
+            table.insert(packGroupPool, packGroup)
         end
     end
-    
+
     wipe(RDT.State.packButtons)
 end
 
