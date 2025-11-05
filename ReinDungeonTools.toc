@@ -18,9 +18,7 @@ Locales\enUS.lua
 
 # Core Systems
 Core\Init.lua
-
-# Data Registry (loads first, provides registration functions)
-Data.lua
+Core\Data.lua
 
 # Dungeon Modules (after Data.lua provides registry)
 Dungeons\Classic\blackfathom_deeps.lua

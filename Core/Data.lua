@@ -1,4 +1,4 @@
--- Data.lua
+-- Core/Data.lua
 -- Dungeon registry and data management module
 -- NOTE: This file loads AFTER Core/Init.lua, so RDT object already exists
 --
@@ -30,7 +30,7 @@
 
 local RDT = _G.RDT
 if not RDT then
-    error("RDT object not found! Data.lua must load after Core/Init.lua")
+    error("RDT object not found! Core/Data.lua must load after Core/Init.lua")
 end
 
 -- Data namespace
