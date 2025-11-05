@@ -337,7 +337,7 @@ function UIHelpers:CreateSimpleDialog(config)
 
     local button1 = CreateFrame("Button", nil, frame)
     button1:SetSize(120, 30)
-    button1:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
+    button1:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
     button1:SetText(config.button1Text or "OK")
     self:StyleSquareButton(button1)
     if config.onButton1Click then
@@ -347,7 +347,7 @@ function UIHelpers:CreateSimpleDialog(config)
 
     local button2 = CreateFrame("Button", nil, frame)
     button2:SetSize(120, 30)
-    button2:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
+    button2:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
     button2:SetText(config.button2Text or "Cancel")
     self:StyleSquareButton(button2)
     if config.onButton2Click then
