@@ -64,15 +64,15 @@ For a 3x2 grid: [1][2][3]
 - [x] Basic pack information (mob names, forces)
 - [x] In-game coordinate picker for development
 - [x] Multiple routes per dungeon
+- [x] Replace sample icons with mob portraits
+- [x] Make icons/portraits round
+- [x] Add Entrance/Floor/Buffs indicators
 - [ ] Complete dungeon layouts
 - [ ] Detailed pack information (abilities, patrol paths)
 - [ ] Route sharing in chat
 - [ ] Undo/Redo functionality
 - [ ] Dungeon timer integration
 - [ ] Statistics tracking
-- [ ] Replace static icons with mob portraits
-- [ ] Make icons/portraits round
-- [ ] Add Entrance/Floor/Buffs indicators
 
 ## Contributing
 
