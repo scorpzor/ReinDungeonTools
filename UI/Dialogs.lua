@@ -29,7 +29,6 @@ local SIMPLE_DIALOG_HEIGHT = 150
 -- Styling Helper Functions (Use UIHelpers)
 --------------------------------------------------------------------------------
 
--- Local convenience wrappers
 local function StyleModernButton(button)
     UIHelpers:StyleSquareButton(button)
 end
@@ -440,15 +439,9 @@ function Dialogs:IsAnyShown()
 end
 
 --------------------------------------------------------------------------------
--- Cleanup
---------------------------------------------------------------------------------
-
---- Cleanup dialog resources
---------------------------------------------------------------------------------
 -- Route Management Dialogs
 --------------------------------------------------------------------------------
 
---- Create the new route dialog
 function Dialogs:CreateNewRouteDialog()
     if newRouteFrame then
         return newRouteFrame
@@ -481,7 +474,6 @@ function Dialogs:CreateNewRouteDialog()
     return newRouteFrame
 end
 
---- Show dialog to create a new route
 function Dialogs:ShowNewRoute()
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
     if not dungeonName then
@@ -498,7 +490,6 @@ function Dialogs:ShowNewRoute()
     newRouteFrame:Show()
 end
 
---- Create the rename route dialog
 function Dialogs:CreateRenameRouteDialog()
     if renameRouteFrame then
         return renameRouteFrame
@@ -530,7 +521,6 @@ function Dialogs:CreateRenameRouteDialog()
     return renameRouteFrame
 end
 
---- Show dialog to rename current route
 function Dialogs:ShowRenameRoute()
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
     if not dungeonName or not RDT.RouteManager then
@@ -556,7 +546,6 @@ function Dialogs:ShowRenameRoute()
     renameRouteFrame:Show()
 end
 
---- Create the delete route dialog
 function Dialogs:CreateDeleteRouteDialog()
     if deleteRouteFrame then
         return deleteRouteFrame
@@ -590,7 +579,6 @@ function Dialogs:CreateDeleteRouteDialog()
     return deleteRouteFrame
 end
 
---- Show dialog to delete current route
 function Dialogs:ShowDeleteRoute()
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
     if not dungeonName or not RDT.RouteManager then
