@@ -43,6 +43,9 @@ local dungeons = {}
 -- Mob database (shared across all dungeons)
 local mobDatabase = {}
 
+-- Identifier icon type database (doors, stairs, portals, etc.)
+local identifierTypes = {}
+
 --------------------------------------------------------------------------------
 -- Core Registry Functions
 --------------------------------------------------------------------------------
@@ -101,6 +104,42 @@ function Data:RegisterMob(key, mobData)
     RDT:DebugPrint("Registered mob: " .. key)
 end
 
+--- Register identifier icon types (called by dungeon modules or core)
+-- @param types table Dictionary of identifier type definitions {[key] = {name, description, icon, scale}}
+function Data:RegisterIdentifierTypes(types)
+    if not types then
+        RDT:PrintError("RegisterIdentifierTypes: Invalid parameters")
+        return
+    end
+
+    for key, typeData in pairs(types) do
+        if identifierTypes[key] then
+            RDT:PrintError("RegisterIdentifierTypes: Type already registered: " .. key)
+        else
+            identifierTypes[key] = typeData
+            RDT:DebugPrint("Registered identifier type: " .. key)
+        end
+    end
+end
+
+--- Register a single identifier type
+-- @param key string Identifier type key (e.g., "door", "stairs", "portal")
+-- @param typeData table Type definition {name, description, icon, scale}
+function Data:RegisterIdentifierType(key, typeData)
+    if not key or not typeData then
+        RDT:PrintError("RegisterIdentifierType: Invalid parameters")
+        return
+    end
+
+    if identifierTypes[key] then
+        RDT:PrintError("RegisterIdentifierType: Type already registered: " .. key)
+        return
+    end
+
+    identifierTypes[key] = typeData
+    RDT:DebugPrint("Registered identifier type: " .. key)
+end
+
 --------------------------------------------------------------------------------
 -- Access Functions
 --------------------------------------------------------------------------------
@@ -147,6 +186,19 @@ end
 -- @return table Mob database
 function Data:GetAllMobs()
     return mobDatabase
+end
+
+--- Get identifier type definition by key
+-- @param typeKey string Identifier type key (e.g., "door", "stairs")
+-- @return table Type data {name, description, icon, scale} or nil
+function Data:GetIdentifierType(typeKey)
+    return identifierTypes[typeKey]
+end
+
+--- Get all identifier types
+-- @return table Identifier type database
+function Data:GetAllIdentifierTypes()
+    return identifierTypes
 end
 
 --- Get the required enemy forces count for a dungeon
@@ -236,6 +288,39 @@ local genericMobs = {
 }
 
 Data:RegisterMobs(genericMobs)
+
+--------------------------------------------------------------------------------
+-- Default Identifier Types (Doors, Stairs, Portals, etc.)
+--------------------------------------------------------------------------------
+
+local defaultIdentifierTypes = {
+    door = {
+        name = "Door",
+        description = "A door or gate",
+        icon = "Interface\\Icons\\INV_Misc_Key_03",  -- Placeholder: Key icon
+        scale = 1.0,
+    },
+    stairs = {
+        name = "Stairs",
+        description = "Stairs or ramp",
+        icon = "Interface\\Icons\\Ability_Rogue_Sprint",  -- Placeholder: Sprint icon
+        scale = 1.0,
+    },
+    portal = {
+        name = "Portal",
+        description = "Teleport portal",
+        icon = "Interface\\Icons\\Spell_Arcane_PortalDalaran",  -- Placeholder: Portal icon
+        scale = 1.2,
+    },
+    action = {
+        name = "Action",
+        description = "Special action point",
+        icon = "Interface\\Icons\\INV_Misc_QuestionMark",  -- Placeholder: Question mark
+        scale = 1.0,
+    },
+}
+
+Data:RegisterIdentifierTypes(defaultIdentifierTypes)
 
 --------------------------------------------------------------------------------
 -- Validation

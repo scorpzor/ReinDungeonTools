@@ -51,6 +51,51 @@ local mapDefinition = {
             }
         },
     },
+    identifiers = {
+        {
+            id = 1,
+            type = "door",
+            x = 0.3,
+            y = 0.2,
+            name = "Entrance Door",
+            description = "Main entrance to the mines",
+        },
+        {
+            id = 2,
+            type = "stairs",
+            x = 0.6,
+            y = 0.3,
+            name = "Stairs Down",
+            description = "Leads to the lower level",
+        },
+        {
+            id = 3,
+            type = "portal",
+            x = 0.25,
+            y = 0.5,
+            name = "Portal A",
+            description = "Teleports to Portal B",
+            linkedTo = 4,
+        },
+        {
+            id = 4,
+            type = "portal",
+            x = 0.75,
+            y = 0.6,
+            name = "Portal B",
+            description = "Teleports to Portal A",
+            linkedTo = 3,
+        },
+        {
+            id = 5,
+            type = "action",
+            x = 0.5,
+            y = 0.7,
+            name = "Lever",
+            description = "Activates the mining cart",
+            scale = 0.8,
+        },
+    },
 }
 
 RDT.Data:RegisterDungeon("Deadmines", mapDefinition)

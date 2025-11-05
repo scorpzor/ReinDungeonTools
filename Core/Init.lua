@@ -24,6 +24,8 @@ RDT.State = {
     currentPull = 1,         -- Current pull number for adding packs
     currentRoute = nil,      -- Reference to current route table from DB
     packButtons = {},        -- Map of packID -> button frame
+    identifierButtons = {},  -- Map of identifierID -> button frame
+    portalLines = {},        -- Array of portal connection line textures
     isInitialized = false,   -- Whether addon has finished loading
 }
 
@@ -187,7 +189,11 @@ function RDT:LoadDungeon(dungeonName)
         if self.UI.CreatePacks then
             self.UI:CreatePacks(dungeonData.packData)
         end
-        
+
+        if self.UI.CreateIdentifierIcons then
+            self.UI:CreateIdentifierIcons()
+        end
+
         if self.UI.UpdateTitle then
             self.UI:UpdateTitle(dungeonName)
         end

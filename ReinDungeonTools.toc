@@ -64,5 +64,6 @@ Modules\ImportExport.lua
 UI\UIHelpers.lua
 UI\MainFrame.lua
 UI\PackButtons.lua
+UI\IdentifierIcons.lua
 UI\PullsList.lua
 UI\Dialogs.lua
