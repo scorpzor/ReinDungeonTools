@@ -114,6 +114,7 @@ function UI:CreateIdentifierIcon(data)
 
     -- Reset button parent in case it was pooled
     button:SetParent(self.mapContainer)
+    button:ClearAllPoints()
 
     -- Apply scale from type definition or data override
     local scale = data.scale or identifierType.scale or 1.0
@@ -277,6 +278,7 @@ function UI:DrawPortalLine(portal1, portal2)
         end
 
         -- Update properties
+        dot:ClearAllPoints()
         dot:SetVertexColor(0.5, 0.8, 1.0, 0.6)  -- Light blue, semi-transparent
         dot:SetPoint("CENTER", self.mapTexture, "TOPLEFT", x, -y)
         dot:Show()
