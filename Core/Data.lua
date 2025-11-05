@@ -418,4 +418,4 @@ end
 -- Module Initialization
 --------------------------------------------------------------------------------
 
-RDT:Print("Data registry initialized (dungeons will be loaded from modules)")
+RDT:DebugPrint("Data registry initialized (dungeons will be loaded from modules)")

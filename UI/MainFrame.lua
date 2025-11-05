@@ -451,13 +451,13 @@ function UI:LoadSingleTextureMap(texturePath)
         RDT:PrintError("LoadSingleTextureMap: mapTexture is nil!")
         return
     end
-    
+
     if not mapContainer then
         RDT:PrintError("LoadSingleTextureMap: mapContainer is nil!")
         return
     end
-    
-    RDT:Print("Loading single texture map: " .. tostring(texturePath))
+
+    RDT:DebugPrint("Loading single texture map: " .. tostring(texturePath))
     
     self:ClearMapTiles()
     
@@ -470,8 +470,8 @@ function UI:LoadSingleTextureMap(texturePath)
     mapTexture:SetTexture(texturePath or "Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
     mapTexture:SetTexCoord(0, 1, 0, 0.67)
-    
-    RDT:Print("Map texture loaded, shown, size: " .. mapTexture:GetWidth() .. "x" .. mapTexture:GetHeight())
+
+    RDT:DebugPrint("Map texture loaded, shown, size: " .. mapTexture:GetWidth() .. "x" .. mapTexture:GetHeight())
 end
 
 
@@ -486,14 +486,14 @@ function UI:UpdateMapForDungeon(dungeonName)
         RDT:PrintError("Dungeon data not found: " .. dungeonName)
         return
     end
-    
-    RDT:Print("UpdateMapForDungeon: " .. dungeonName)
-    
+
+    RDT:DebugPrint("UpdateMapForDungeon: " .. dungeonName)
+
     if dungeonData.tiles then
-        RDT:Print("Using tiled map")
+        RDT:DebugPrint("Using tiled map")
         self:LoadTiledMap(dungeonData.tiles)
     elseif dungeonData.texture then
-        RDT:Print("Using single texture: " .. dungeonData.texture)
+        RDT:DebugPrint("Using single texture: " .. dungeonData.texture)
         self:LoadSingleTextureMap(dungeonData.texture)
     else
         RDT:PrintError("No map data found for: " .. dungeonName)
