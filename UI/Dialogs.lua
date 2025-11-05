@@ -14,11 +14,16 @@ local UIHelpers = RDT.UIHelpers
 -- Local references
 local exportFrame
 local importFrame
+local newRouteFrame
+local renameRouteFrame
+local deleteRouteFrame
 
 -- Dialog constants
 local DIALOG_WIDTH = 600
 local DIALOG_HEIGHT = 300
 local IMPORT_DIALOG_HEIGHT = 350
+local SIMPLE_DIALOG_WIDTH = 400
+local SIMPLE_DIALOG_HEIGHT = 150
 
 --------------------------------------------------------------------------------
 -- Styling Helper Functions (Use UIHelpers)
@@ -33,8 +38,8 @@ local function CreateModernCloseButton(parent)
     return UIHelpers:CreateModernCloseButton(parent)
 end
 
-local function StyleStaticPopup(dialog)
-    UIHelpers:StyleStaticPopup(dialog)
+local function CreateSimpleDialog(config)
+    return UIHelpers:CreateSimpleDialog(config)
 end
 
 --------------------------------------------------------------------------------
@@ -408,7 +413,16 @@ function Dialogs:HideAll()
         importFrame:Hide()
         importFrame.editBox:SetText("")
     end
-    
+    if newRouteFrame then
+        newRouteFrame:Hide()
+    end
+    if renameRouteFrame then
+        renameRouteFrame:Hide()
+    end
+    if deleteRouteFrame then
+        deleteRouteFrame:Hide()
+    end
+
     StaticPopup_Hide("RDT_CONFIRM")
     StaticPopup_Hide("RDT_INFO")
 end
@@ -416,8 +430,11 @@ end
 --- Check if any dialog is shown
 -- @return boolean True if any dialog is visible
 function Dialogs:IsAnyShown()
-    return (exportFrame and exportFrame:IsShown()) 
+    return (exportFrame and exportFrame:IsShown())
         or (importFrame and importFrame:IsShown())
+        or (newRouteFrame and newRouteFrame:IsShown())
+        or (renameRouteFrame and renameRouteFrame:IsShown())
+        or (deleteRouteFrame and deleteRouteFrame:IsShown())
         or StaticPopup_Visible("RDT_CONFIRM")
         or StaticPopup_Visible("RDT_INFO")
 end
@@ -431,6 +448,39 @@ end
 -- Route Management Dialogs
 --------------------------------------------------------------------------------
 
+--- Create the new route dialog
+function Dialogs:CreateNewRouteDialog()
+    if newRouteFrame then
+        return newRouteFrame
+    end
+
+    newRouteFrame = CreateSimpleDialog({
+        name = "RDT_NewRouteDialog",
+        title = "New Route",
+        width = SIMPLE_DIALOG_WIDTH,
+        height = SIMPLE_DIALOG_HEIGHT,
+        hasEditBox = true,
+        message = "Enter name for new route:",
+        button1Text = "Create",
+        onButton1Click = function(frame)
+            local routeName = frame.editBox:GetText()
+            if routeName and routeName ~= "" then
+                local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+                if dungeonName then
+                    local newRouteName = RDT.RouteManager:CreateRoute(dungeonName, routeName)
+                    if newRouteName and RDT.UI then
+                        RDT.UI:UpdateRouteDropdown()
+                        RDT.UI:RefreshUI()
+                        frame:Hide()
+                    end
+                end
+            end
+        end
+    })
+
+    return newRouteFrame
+end
+
 --- Show dialog to create a new route
 function Dialogs:ShowNewRoute()
     local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
@@ -438,33 +488,46 @@ function Dialogs:ShowNewRoute()
         RDT:PrintError("No dungeon selected")
         return
     end
-    
-    StaticPopupDialogs["RDT_NEW_ROUTE"] = {
-        text = "Enter name for new route:",
-        button1 = "Create",
-        button2 = "Cancel",
+
+    if not newRouteFrame then
+        self:CreateNewRouteDialog()
+    end
+
+    newRouteFrame.editBox:SetText("")
+    newRouteFrame.editBox:SetFocus()
+    newRouteFrame:Show()
+end
+
+--- Create the rename route dialog
+function Dialogs:CreateRenameRouteDialog()
+    if renameRouteFrame then
+        return renameRouteFrame
+    end
+
+    renameRouteFrame = CreateSimpleDialog({
+        name = "RDT_RenameRouteDialog",
+        title = "Rename Route",
+        width = SIMPLE_DIALOG_WIDTH,
+        height = SIMPLE_DIALOG_HEIGHT,
         hasEditBox = true,
-        OnShow = function(self)
-            self.editBox:SetFocus()
-            self.editBox:SetText("")
-            StyleStaticPopup(self)
-        end,
-        OnAccept = function(self)
-            local routeName = self.editBox:GetText()
-            if routeName and routeName ~= "" then
-                local newRouteName = RDT.RouteManager:CreateRoute(dungeonName, routeName)
-                if newRouteName and RDT.UI then
-                    RDT.UI:UpdateRouteDropdown()
-                    RDT.UI:RefreshUI()
+        message = "Enter new route name:",
+        button1Text = "Rename",
+        onButton1Click = function(frame)
+            local newName = frame.editBox:GetText()
+            local oldName = frame.oldName
+            if newName and newName ~= "" and newName ~= oldName then
+                local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
+                if dungeonName and oldName then
+                    if RDT.RouteManager:RenameRoute(dungeonName, oldName, newName) and RDT.UI then
+                        RDT.UI:UpdateRouteDropdown()
+                        frame:Hide()
+                    end
                 end
             end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-    StaticPopup_Show("RDT_NEW_ROUTE")
+        end
+    })
+
+    return renameRouteFrame
 end
 
 --- Show dialog to rename current route
@@ -474,38 +537,57 @@ function Dialogs:ShowRenameRoute()
         RDT:PrintError("No dungeon selected")
         return
     end
-    
+
     local oldName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
     if not oldName then
         RDT:PrintError("No route selected")
         return
     end
-    
-    StaticPopupDialogs["RDT_RENAME_ROUTE"] = {
-        text = "Rename '" .. oldName .. "' to:",
-        button1 = "Rename",
-        button2 = "Cancel",
-        hasEditBox = true,
-        OnShow = function(self)
-            self.editBox:SetFocus()
-            self.editBox:SetText(oldName)
-            self.editBox:HighlightText()
-            StyleStaticPopup(self)
-        end,
-        OnAccept = function(self)
-            local newName = self.editBox:GetText()
-            if newName and newName ~= "" and newName ~= oldName then
-                if RDT.RouteManager:RenameRoute(dungeonName, oldName, newName) and RDT.UI then
+
+    if not renameRouteFrame then
+        self:CreateRenameRouteDialog()
+    end
+
+    renameRouteFrame.oldName = oldName
+    renameRouteFrame.messageText:SetText("Rename '" .. oldName .. "' to:")
+    renameRouteFrame.editBox:SetText(oldName)
+    renameRouteFrame.editBox:HighlightText()
+    renameRouteFrame.editBox:SetFocus()
+    renameRouteFrame:Show()
+end
+
+--- Create the delete route dialog
+function Dialogs:CreateDeleteRouteDialog()
+    if deleteRouteFrame then
+        return deleteRouteFrame
+    end
+
+    deleteRouteFrame = CreateSimpleDialog({
+        name = "RDT_DeleteRouteDialog",
+        title = "Delete Route",
+        width = SIMPLE_DIALOG_WIDTH,
+        height = 180,
+        message = "Delete this route?",
+        button1Text = "Delete",
+        onButton1Click = function(frame)
+            local dungeonName = frame.dungeonName
+            local routeName = frame.routeName
+            if dungeonName and routeName then
+                if RDT.RouteManager:DeleteRoute(dungeonName, routeName) and RDT.UI then
                     RDT.UI:UpdateRouteDropdown()
+                    RDT.UI:RefreshUI()
+                    frame:Hide()
                 end
             end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-    StaticPopup_Show("RDT_RENAME_ROUTE")
+        end
+    })
+
+    local warningText = deleteRouteFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    warningText:SetPoint("TOP", 0, -80)
+    warningText:SetText("|cFFFF0000This cannot be undone!|r")
+    deleteRouteFrame.warningText = warningText
+
+    return deleteRouteFrame
 end
 
 --- Show dialog to delete current route
@@ -515,42 +597,29 @@ function Dialogs:ShowDeleteRoute()
         RDT:PrintError("No dungeon selected")
         return
     end
-    
+
     local routeName = RDT.RouteManager:GetCurrentRouteName(dungeonName)
     if not routeName then
         RDT:PrintError("No route selected")
         return
     end
-    
-    -- Count total routes
+
     local routes = RDT.RouteManager:GetRouteNames(dungeonName)
     local routeCount = #routes
-    
-    -- Prevent deleting the last route
+
     if routeCount <= 1 then
         RDT:PrintError("Cannot delete the last route")
         return
     end
-    
-    StaticPopupDialogs["RDT_DELETE_ROUTE"] = {
-        text = "Delete route '" .. routeName .. "'?\n\n|cFFFF0000This cannot be undone!|r",
-        button1 = "Delete",
-        button2 = "Cancel",
-        OnShow = function(self)
-            StyleStaticPopup(self)
-        end,
-        OnAccept = function()
-            if RDT.RouteManager:DeleteRoute(dungeonName, routeName) and RDT.UI then
-                RDT.UI:UpdateRouteDropdown()
-                RDT.UI:RefreshUI()
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-    StaticPopup_Show("RDT_DELETE_ROUTE")
+
+    if not deleteRouteFrame then
+        self:CreateDeleteRouteDialog()
+    end
+
+    deleteRouteFrame.dungeonName = dungeonName
+    deleteRouteFrame.routeName = routeName
+    deleteRouteFrame.messageText:SetText("Delete route '" .. routeName .. "'?")
+    deleteRouteFrame:Show()
 end
 
 --------------------------------------------------------------------------------
@@ -559,17 +628,32 @@ end
 
 function Dialogs:Cleanup()
     self:HideAll()
-    
+
     if exportFrame then
         exportFrame:SetParent(nil)
         exportFrame = nil
     end
-    
+
     if importFrame then
         importFrame:SetParent(nil)
         importFrame = nil
     end
-    
+
+    if newRouteFrame then
+        newRouteFrame:SetParent(nil)
+        newRouteFrame = nil
+    end
+
+    if renameRouteFrame then
+        renameRouteFrame:SetParent(nil)
+        renameRouteFrame = nil
+    end
+
+    if deleteRouteFrame then
+        deleteRouteFrame:SetParent(nil)
+        deleteRouteFrame = nil
+    end
+
     RDT:DebugPrint("Dialogs cleaned up")
 end
 

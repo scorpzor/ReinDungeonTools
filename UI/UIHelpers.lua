@@ -251,11 +251,11 @@ function UIHelpers:ApplyModernBackdrop(frame, options)
     options = options or {}
     local bgAlpha = options.bgAlpha or 0.98
     local borderR, borderG, borderB = 0.5, 0.5, 0.5
-    
+
     if options.borderColor then
         borderR, borderG, borderB = unpack(options.borderColor)
     end
-    
+
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -265,6 +265,103 @@ function UIHelpers:ApplyModernBackdrop(frame, options)
     })
     frame:SetBackdropColor(0.05, 0.05, 0.05, bgAlpha)
     frame:SetBackdropBorderColor(borderR, borderG, borderB, 1)
+end
+
+--- Create a simple dialog frame with modern styling
+-- @param config table Configuration with:
+--   - name: string - Unique frame name
+--   - title: string - Dialog title
+--   - width: number - Dialog width (default 400)
+--   - height: number - Dialog height (default 150)
+--   - hasEditBox: boolean - Whether to include an edit box (default false)
+--   - message: string - Message text to display (optional)
+--   - button1Text: string - Text for button 1 (left)
+--   - button2Text: string - Text for button 2 (right, default "Cancel")
+--   - onButton1Click: function(frame) - Callback for button 1
+--   - onButton2Click: function(frame) - Callback for button 2 (optional, defaults to hide)
+-- @return Frame The dialog frame with properties:
+--   - editBox: EditBox (if hasEditBox is true)
+--   - messageText: FontString (if message is provided)
+--   - button1: Button
+--   - button2: Button
+function UIHelpers:CreateSimpleDialog(config)
+    local frame = CreateFrame("Frame", config.name, UIParent)
+    frame:SetSize(config.width or 400, config.height or 150)
+    frame:SetPoint("CENTER")
+    frame:SetFrameStrata("DIALOG")
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", frame.StartMoving)
+    frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+    frame:SetClampedToScreen(true)
+    frame:Hide()
+
+    self:ApplyModernBackdrop(frame)
+
+    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOP", 0, -15)
+    title:SetText(config.title or "Dialog")
+    frame.titleText = title
+
+    local closeBtn = self:CreateModernCloseButton(frame)
+    closeBtn:SetScript("OnClick", function() frame:Hide() end)
+
+    if config.message then
+        local messageText = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+        messageText:SetPoint("TOP", 0, -45)
+        messageText:SetText(config.message)
+        frame.messageText = messageText
+    end
+
+    if config.hasEditBox then
+        local editBox = CreateFrame("EditBox", nil, frame)
+        editBox:SetSize(360, 30)
+        editBox:SetPoint("TOP", 0, -70)
+        editBox:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+        editBox:SetAutoFocus(true)
+        editBox:SetTextColor(1, 1, 1)
+        editBox:SetMaxLetters(50)
+        editBox:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = false,
+            edgeSize = 1,
+            insets = { left = 2, right = 2, top = 2, bottom = 2 }
+        })
+        editBox:SetBackdropColor(0, 0, 0, 0.8)
+        editBox:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+        editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
+        frame.editBox = editBox
+    end
+
+    local button1 = CreateFrame("Button", nil, frame)
+    button1:SetSize(120, 30)
+    button1:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
+    button1:SetText(config.button1Text or "OK")
+    self:StyleSquareButton(button1)
+    if config.onButton1Click then
+        button1:SetScript("OnClick", function() config.onButton1Click(frame) end)
+    end
+    frame.button1 = button1
+
+    local button2 = CreateFrame("Button", nil, frame)
+    button2:SetSize(120, 30)
+    button2:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
+    button2:SetText(config.button2Text or "Cancel")
+    self:StyleSquareButton(button2)
+    if config.onButton2Click then
+        button2:SetScript("OnClick", function() config.onButton2Click(frame) end)
+    else
+        button2:SetScript("OnClick", function() frame:Hide() end)
+    end
+    frame.button2 = button2
+
+    if config.hasEditBox and frame.editBox then
+        frame.editBox:SetScript("OnEnterPressed", function() button1:Click() end)
+    end
+
+    return frame
 end
 
 --------------------------------------------------------------------------------
