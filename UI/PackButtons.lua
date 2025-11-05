@@ -93,7 +93,9 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     
     -- Calculate layout: biggest mob in center, others in clockwise circle
     local totalMobs = #mobList
-    local radius = 14 + (totalMobs * 1.15) -- Dynamic radius based on mob count
+    local minRadius = 16
+    local dynamicRadius = 14 + (totalMobs * 0.6)
+    local radius = math.max(minRadius, dynamicRadius)
     
     -- Set container size to encompass the circle
     local containerSize = radius * 2 + MOB_ICON_SIZE
