@@ -20,7 +20,7 @@ local BUTTON_PANEL_HEIGHT = 140
 -- Local frame references
 local mainFrame
 local mapContainer
-local mapTexture  -- Legacy single texture (kept for compatibility)
+local mapTexture
 local mapTiles = {}
 local titleText
 local versionText
@@ -87,16 +87,9 @@ function UI:CreateMainFrame()
     local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
-    -- Create dungeon dropdown
     self:CreateDungeonDropdown(mainFrame)
-    
-    -- Create map container
     self:CreateMapContainer(mainFrame)
-    
-    -- Create button container (top right)
     self:CreateButtonContainer(mainFrame)
-    
-    -- Create pulls panel (below button container, right side)
     self:CreatePullsPanel(mainFrame)
     
     -- Bottom bar background (matches main window)
@@ -105,16 +98,14 @@ function UI:CreateMainFrame()
     bottomBg:SetPoint("BOTTOMRIGHT", -2, 2)
     bottomBg:SetHeight(16)
     bottomBg:SetColorTexture(0.05, 0.05, 0.05, 0.95)
-    mainFrame.bottomBg = bottomBg  -- Store reference
+    mainFrame.bottomBg = bottomBg
 
-    -- Help text at bottom (left side)
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     helpText:SetPoint("BOTTOMLEFT", 7, 6)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
     helpText:SetText("Left-Click Pack: Add to Pull | Click Pull Sidebar: Switch Pull | Right-Click: Remove")
     helpText:SetTextColor(0.6, 0.6, 0.6)
-    
-    -- Version text (bottom right)
+
     versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     versionText:SetPoint("BOTTOMRIGHT", -7, 6)
     versionText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
@@ -129,12 +120,9 @@ end
 -- Dungeon Dropdown
 --------------------------------------------------------------------------------
 
---- Create dungeon selection dropdown (custom modern design)
--- @param parent Frame Parent frame
 function UI:CreateDungeonDropdown(parent)
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
-    
-    -- Create dropdown using the generic component
+
     dungeonDropdown = UIHelpers:CreateModernDropdown({
         parent = parent,
         name = "RDT_DungeonDropdown",
@@ -146,7 +134,6 @@ function UI:CreateDungeonDropdown(parent)
         menuHeight = 200,
         defaultText = currentDungeon,
         onItemClick = function(item)
-            -- Switch to selected dungeon
             if item.value and RDT.LoadDungeon then
                 RDT:LoadDungeon(item.value)
                 UI:UpdateDungeonDropdown()
@@ -202,22 +189,18 @@ end
 -- Route Dropdown
 --------------------------------------------------------------------------------
 
---- Create route selection dropdown and buttons in button container
---- @param container Frame Button container frame
 function UI:CreateRouteDropdown(container)
-    -- Create dropdown using the generic component
     routeDropdown = UIHelpers:CreateModernDropdown({
         parent = container,
         name = "RDT_RouteDropdown",
         point = "TOPLEFT",
         x = 0,
         y = -8,
-        width = 290,  -- Default width, will be adjusted
+        width = 290,
         height = 26,
         menuHeight = 150,
         defaultText = "Route 1",
         onItemClick = function(item)
-            -- Switch to selected route
             local dungeonName = RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon
             if dungeonName and item.value and RDT.RouteManager then
                 if RDT.RouteManager:SwitchRoute(dungeonName, item.value) then
@@ -227,14 +210,12 @@ function UI:CreateRouteDropdown(container)
             end
         end
     })
-    
-    -- Override positioning to use full width
+
     routeDropdown.button:ClearAllPoints()
     routeDropdown.button:SetPoint("TOPLEFT", container, "TOPLEFT", 0, -8)
     routeDropdown.button:SetPoint("TOPRIGHT", container, "TOPRIGHT", 0, -8)
     routeDropdown.button:SetHeight(26)
-    
-    -- Update menu width when dropdown is shown
+
     local originalButton = routeDropdown.button
     local originalMenuFrame = routeDropdown.menuFrame
     originalButton:SetScript("OnClick", function(self)
@@ -372,8 +353,6 @@ end
 -- Map Container
 --------------------------------------------------------------------------------
 
---- Create map display container
--- @param parent Frame Parent frame
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
     mapContainer:SetPoint("TOPLEFT", 5, -42)
@@ -388,7 +367,6 @@ function UI:CreateMapContainer(parent)
     mapContainer:SetBackdropColor(0, 0, 0, 1)
     mapContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
-    -- Map texture (legacy single texture - will be hidden when tiles are active)
     mapTexture = mapContainer:CreateTexture(nil, "ARTWORK")
     mapTexture:SetPoint("TOPLEFT", 1, -1)
     mapTexture:SetPoint("TOPRIGHT", -1, -1)
@@ -396,8 +374,7 @@ function UI:CreateMapContainer(parent)
     mapTexture:SetTexture("Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
     mapTexture:SetTexCoord(0, 1, 0, 0.67)
-    
-    -- Store reference for pack buttons to anchor to
+
     UI.mapContainer = mapContainer
     UI.mapTexture = mapTexture
 end
@@ -413,8 +390,6 @@ function UI:ClearMapTiles()
     end
 end
 
---- Load and display a tiled map
--- @param tileData table Table with tile information (tileWidth, tileHeight, cols, rows, tiles)
 function UI:LoadTiledMap(tileData)
     if not mapContainer then return end
     
@@ -429,8 +404,7 @@ function UI:LoadTiledMap(tileData)
         RDT:PrintError("No tiles found in tile data")
         return
     end
-    
-    -- Get tile configuration
+
     local tileWidth = tileData.tileWidth or 1024
     local tileHeight = tileData.tileHeight or 1024
     local cols = tileData.cols or 2
@@ -472,8 +446,6 @@ function UI:LoadTiledMap(tileData)
     RDT:DebugPrint(string.format("Loaded %d tiles", #tiles))
 end
 
---- Load a single texture map (legacy mode)
--- @param texturePath string Path to texture
 function UI:LoadSingleTextureMap(texturePath)
     if not mapTexture then
         RDT:PrintError("LoadSingleTextureMap: mapTexture is nil!")
@@ -503,15 +475,12 @@ function UI:LoadSingleTextureMap(texturePath)
 end
 
 
---- Update the map for a dungeon (handles both tiled and single-texture maps)
--- @param dungeonName string Name of the dungeon
 function UI:UpdateMapForDungeon(dungeonName)
     if not RDT.Data or not dungeonName then
         RDT:PrintError("UpdateMapForDungeon: Invalid parameters")
         return
     end
-    
-    -- Use the proper Data module method to get dungeon data
+
     local dungeonData = RDT.Data:GetDungeon(dungeonName)
     if not dungeonData then
         RDT:PrintError("Dungeon data not found: " .. dungeonName)
@@ -522,19 +491,15 @@ function UI:UpdateMapForDungeon(dungeonName)
     
     if dungeonData.tiles then
         RDT:Print("Using tiled map")
-        -- Load tiled map
         self:LoadTiledMap(dungeonData.tiles)
     elseif dungeonData.texture then
         RDT:Print("Using single texture: " .. dungeonData.texture)
-        -- Load single texture (legacy mode)
         self:LoadSingleTextureMap(dungeonData.texture)
     else
         RDT:PrintError("No map data found for: " .. dungeonName)
     end
 end
 
---- Update the map texture (legacy method, kept for compatibility)
--- @param texturePath string Path to texture file
 function UI:UpdateMapTexture(texturePath)
     self:LoadSingleTextureMap(texturePath)
 end
@@ -555,8 +520,6 @@ end
 -- Pulls Panel (created by PullsList.lua)
 --------------------------------------------------------------------------------
 
---- Create pulls panel container (panel content handled by PullsList.lua)
--- @param parent Frame Parent frame
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
     pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -4)
@@ -584,8 +547,6 @@ end
 -- Button Container
 --------------------------------------------------------------------------------
 
---- Create button container (top right)
--- @param parent Frame Parent frame
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
     buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 4, 0)
@@ -687,7 +648,6 @@ end
 -- Title and Display Updates
 --------------------------------------------------------------------------------
 
--- @param dungeonName string Optional dungeon name to display
 function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     

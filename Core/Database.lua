@@ -10,16 +10,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
 local defaults = {
     profile = {
-        -- Current dungeon selection (will be set to first available dungeon on load)
         currentDungeon = nil,
-        
-        -- Routes storage: [dungeonName] = { currentRoute = "Route 1", routeList = { ["Route 1"] = { pulls = {...} } } }
         routes = {},
-        
-        -- Debug mode toggle
         debug = false,
-        
-        -- UI preferences
         showMinimapButton = true,
         
         -- Main window position
@@ -29,11 +22,6 @@ local defaults = {
             xOfs = 0,
             yOfs = 0,
         },
-        
-        -- Future settings
-        -- pullListExpanded = true,
-        -- autoSaveRoutes = true,
-        -- highlightColor = {1, 1, 1},
     },
 }
 
@@ -41,17 +29,13 @@ local defaults = {
 -- Database Initialization (called from Init.lua OnInitialize)
 --------------------------------------------------------------------------------
 
---- Initialize the database with AceDB-3.0
 function RDT:OnInitialize()
-    -- Create database with defaults
     self.db = LibStub("AceDB-3.0"):New("ReinDungeonToolsDB", defaults, true)
-    
-    -- Register profile callbacks
+
     self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
     self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
     self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
-    
-    -- Register slash commands (Commands.lua will define these)
+
     self:RegisterChatCommand("rdt", "SlashCommand")
     self:RegisterChatCommand("reindungeontools", "SlashCommand")
     
@@ -63,7 +47,6 @@ end
 -- Profile Management
 --------------------------------------------------------------------------------
 
---- Profile changed callback - reload current dungeon
 function RDT:RefreshConfig()
     self:Print("Profile changed, reloading...")
     if self.State.isInitialized then
@@ -111,7 +94,6 @@ function RDT:CreateProfile(profileName)
         return false
     end
     
-    -- Check if profile already exists
     local profiles = self:GetProfiles()
     for _, name in ipairs(profiles) do
         if name == profileName then
@@ -135,7 +117,6 @@ function RDT:DeleteProfile(profileName)
         return false
     end
     
-    -- Can't delete current profile
     if profileName == self:GetCurrentProfile() then
         self:PrintError("Cannot delete the active profile")
         return false
@@ -155,7 +136,6 @@ function RDT:CopyProfile(sourceProfile)
         return false
     end
     
-    -- Can't copy to same profile
     if sourceProfile == self:GetCurrentProfile() then
         self:PrintError("Cannot copy profile to itself")
         return false
@@ -163,8 +143,7 @@ function RDT:CopyProfile(sourceProfile)
     
     self.db:CopyProfile(sourceProfile)
     self:Print(string.format(L["PROFILE_COPIED"], sourceProfile, self:GetCurrentProfile()))
-    
-    -- Reload current dungeon to reflect copied settings
+
     self:RefreshConfig()
     return true
 end
@@ -174,8 +153,7 @@ end
 function RDT:ResetProfile()
     self.db:ResetProfile()
     self:Print("Profile reset to defaults")
-    
-    -- Reload current dungeon
+
     self:RefreshConfig()
     return true
 end
@@ -185,8 +163,7 @@ end
 function RDT:ResetDatabase()
     self.db:ResetDB()
     self:Print("Database reset to defaults")
-    
-    -- Reload current dungeon
+
     self:RefreshConfig()
     return true
 end

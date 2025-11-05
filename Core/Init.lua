@@ -68,19 +68,13 @@ end
 -- Ace3 Lifecycle Callbacks
 --------------------------------------------------------------------------------
 
---- Called when addon is first loaded (before ADDON_LOADED)
 function RDT:OnInitialize()
     self:DebugPrint("OnInitialize called")
-    
-    -- Database module will set up saved variables here
-    -- (Database.lua must be loaded after Init.lua in TOC)
 end
 
---- Called during PLAYER_LOGIN (when game data is available)
 function RDT:OnEnable()
     self:DebugPrint("OnEnable called")
-    
-    -- Validate Data module loaded
+
     if not self.Data then
         self:PrintError("Data module not loaded - check TOC file load order")
         return
@@ -88,8 +82,7 @@ function RDT:OnEnable()
     
     -- Validate dungeon data
     self.Data:ValidateAll()
-    
-    -- Create main UI
+
     if self.UI and self.UI.CreateMainFrame then
         self.UI:CreateMainFrame()
     end
@@ -111,8 +104,7 @@ function RDT:OnEnable()
     
     self:LoadDungeon(currentDungeon)
     self.State.isInitialized = true
-    
-    -- Initialize minimap button
+
     if self.MinimapButton then
         self.MinimapButton:Initialize()
     end
@@ -120,11 +112,9 @@ function RDT:OnEnable()
     self:Print("ReinDungeonTools v" .. self.Version .. " loaded! Type /rdt to open")
 end
 
---- Called when addon is disabled
 function RDT:OnDisable()
     self:DebugPrint("OnDisable called")
-    
-    -- Hide main frame
+
     if self.UI and self.UI.Hide then
         self.UI:Hide()
     end
@@ -155,23 +145,20 @@ function RDT:LoadDungeon(dungeonName)
     end
     
     self.RouteManager:EnsureRouteExists(dungeonName)
-    
+
     self.State.currentRoute = self.RouteManager:GetCurrentRoute(dungeonName)
-    
+
     if not self.State.currentRoute then
         self:PrintError("Failed to get route for dungeon")
         return false
     end
     
-    -- Clear old UI state
     if self.UI and self.UI.ClearPacks then
         self.UI:ClearPacks()
     end
-    
-    -- Calculate next pull number
+
     self.State.currentPull = self.RouteManager:GetNextPull(self.State.currentRoute.pulls)
     
-    -- CHANGED: Use GetProcessedDungeon to get pack data with calculated counts
     local dungeonData = self.Data:GetProcessedDungeon(dungeonName)
     
     if not dungeonData then
@@ -184,24 +171,19 @@ function RDT:LoadDungeon(dungeonName)
         return false
     end
     
-    -- Save current dungeon to DB BEFORE updating UI (so UI can read the correct dungeon)
     self.db.profile.currentDungeon = dungeonName
-    
-    -- Update UI (load map FIRST, then create packs)
+
     if self.UI then
-        -- Load map first
         if self.UI.UpdateMapForDungeon then
             self.UI:UpdateMapForDungeon(dungeonName)
         elseif self.UI.UpdateMapTexture then
-            self.UI:UpdateMapTexture(dungeonData.texture)  -- Fallback to legacy method
+            self.UI:UpdateMapTexture(dungeonData.texture)
         end
-        
-        -- Force layout update before creating packs (don't show the main window!)
+
         if self.UI.mapContainer then
             self.UI.mapContainer:Show()
         end
-        
-        -- Then create packs (they anchor to the map texture)
+
         if self.UI.CreatePacks then
             self.UI:CreatePacks(dungeonData.packData)
         end
@@ -215,15 +197,12 @@ function RDT:LoadDungeon(dungeonName)
         if self.UI.UpdatePullList then
             self.UI:UpdatePullList()
         end
-        -- Explicitly update total forces after everything is loaded
         if self.UI.UpdateTotalForces then
             self.UI:UpdateTotalForces()
         end
-        -- Update route dropdown to show current route
         if self.UI.UpdateRouteDropdown then
             self.UI:UpdateRouteDropdown()
         end
-        -- Update dungeon dropdown to show current dungeon
         if self.UI.UpdateDungeonDropdown then
             self.UI:UpdateDungeonDropdown()
         end

@@ -136,11 +136,9 @@ function RM:AddPackToPull(packId)
     if not RDT.State.currentRoute or not packId then return end
     
     RDT:DebugPrint("Adding pack " .. packId .. " to pull " .. RDT.State.currentPull)
-    
-    -- Assign pack to current pull
+
     RDT.State.currentRoute.pulls[packId] = RDT.State.currentPull
-    
-    -- Update UI
+
     if RDT.UI then
         if RDT.UI.UpdateLabels then
             RDT.UI:UpdateLabels()
@@ -157,8 +155,7 @@ function RM:NewPull()
     RDT.State.currentPull = nextPull
     
     RDT:Print(string.format("Started new pull #%d", nextPull))
-    
-    -- Update UI
+
     if RDT.UI then
         if RDT.UI.UpdatePullList then
             RDT.UI:UpdatePullList()
@@ -174,8 +171,7 @@ function RM:UnassignPack(packId)
     if RDT.State.currentRoute.pulls[packId] then
         local oldPull = RDT.State.currentRoute.pulls[packId]
         RDT.State.currentRoute.pulls[packId] = nil
-        
-        -- Update UI
+
         if RDT.UI then
             if RDT.UI.UpdateLabels then
                 RDT.UI:UpdateLabels()
@@ -203,7 +199,6 @@ function RM:UnassignPull(pullNum)
     end
     
     if count > 0 then
-        -- Update UI
         if RDT.UI then
             if RDT.UI.UpdateLabels then
                 RDT.UI:UpdateLabels()
@@ -224,8 +219,7 @@ function RM:ResetPulls()
     
     wipe(RDT.State.currentRoute.pulls)
     RDT.State.currentPull = 1
-    
-    -- Update UI
+
     if RDT.UI then
         if RDT.UI.UpdateLabels then
             RDT.UI:UpdateLabels()
@@ -254,7 +248,6 @@ function RM:ValidateRoute(route, dungeonName)
         return false, "Route missing pulls table"
     end
     
-    -- Get dungeon data
     local dungeonData = RDT.Data:GetDungeon(dungeonName)
     if not dungeonData then
         return false, "Unknown dungeon: " .. tostring(dungeonName)
@@ -463,7 +456,6 @@ function RM:CreateRoute(dungeonName, routeName)
             counter = counter + 1
         until not dungeonData.routeList[routeName]
     else
-        -- Check if route name already exists and find an available variant
         if dungeonData.routeList[routeName] then
             local baseName = routeName
             local counter = 1
@@ -509,11 +501,9 @@ function RM:RenameRoute(dungeonName, oldName, newName)
         return false
     end
     
-    -- Copy route to new name and delete old
     dungeonData.routeList[newName] = dungeonData.routeList[oldName]
     dungeonData.routeList[oldName] = nil
-    
-    -- Update currentRoute if it was the renamed one
+
     if dungeonData.currentRoute == oldName then
         dungeonData.currentRoute = newName
     end

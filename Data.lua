@@ -367,13 +367,11 @@ function Data:ExportDungeon(dungeonName)
         return nil
     end
     
-    -- Use AceSerializer if available
     local AceSerializer = LibStub:GetLibrary("AceSerializer-3.0", true)
     if AceSerializer then
         return AceSerializer:Serialize(dungeon)
     end
-    
-    -- Fallback: basic string conversion
+
     return "-- Export not available without AceSerializer"
 end
 
