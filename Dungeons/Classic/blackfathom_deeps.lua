@@ -211,6 +211,86 @@ local mapDefinition = {
             }
         },
     },
+    identifiers = {
+        -- Entrance and main doors
+        {
+            id = 1,
+            type = "door",
+            x = 0.49,
+            y = 0.12,
+            name = "Entrance Portal",
+            description = "Main entrance to Blackfathom Deeps",
+        },
+        {
+            id = 2,
+            type = "door",
+            x = 0.52,
+            y = 0.22,
+            name = "Iron Gate",
+            description = "Sealed iron gate to the depths",
+        },
+
+        -- Underwater passages
+        {
+            id = 3,
+            type = "stairs",
+            x = 0.46,
+            y = 0.28,
+            name = "Descent",
+            description = "Spiral ramp leading down",
+        },
+        {
+            id = 4,
+            type = "stairs",
+            x = 0.58,
+            y = 0.36,
+            name = "Cavern Steps",
+            description = "Steps carved into the rock",
+            scale = 0.95,
+        },
+
+        -- Teleportation shrines (Portal pair 1)
+        {
+            id = 5,
+            type = "portal",
+            x = 0.42,
+            y = 0.38,
+            name = "Shrine of Water",
+            description = "Ancient naga teleportation shrine",
+            linkedTo = 6,
+            scale = 1.15,
+        },
+        {
+            id = 6,
+            type = "portal",
+            x = 0.61,
+            y = 0.45,
+            name = "Shrine of Depths",
+            description = "Connected to the Shrine of Water",
+            linkedTo = 5,
+            scale = 1.15,
+        },
+
+        -- Special actions
+        {
+            id = 7,
+            type = "action",
+            x = 0.50,
+            y = 0.40,
+            name = "Altar of the Deeps",
+            description = "Summons the Guardian of the Deeps",
+            scale = 1.2,
+        },
+        {
+            id = 8,
+            type = "action",
+            x = 0.55,
+            y = 0.26,
+            name = "Twilight Flame",
+            description = "Corrupted flame brazier",
+            scale = 0.9,
+        },
+    },
 }
 
 RDT.Data:RegisterDungeon("Blackfathom Deeps", mapDefinition)

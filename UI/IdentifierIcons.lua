@@ -16,6 +16,10 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 -- Constants
 local IDENTIFIER_ICON_SIZE = 24  -- Base size for identifier icons
 
+-- Object pools for reusing frames/textures
+local identifierButtonPool = {}
+local lineTexturePool = {}
+
 --------------------------------------------------------------------------------
 -- Identifier Icon Rendering
 --------------------------------------------------------------------------------
@@ -46,19 +50,29 @@ end
 
 --- Clear all identifier icons from the map
 function UI:ClearIdentifierIcons()
+    -- Return buttons to pool
     if RDT.State.identifierButtons then
         for _, button in pairs(RDT.State.identifierButtons) do
             button:Hide()
-            button:SetParent(nil)
+            button:ClearAllPoints()
+            -- Clear references
+            button.identifierId = nil
+            button.identifierType = nil
+            button.identifierData = nil
+            button.typeDefinition = nil
+            -- Return to pool for reuse
+            table.insert(identifierButtonPool, button)
         end
     end
     RDT.State.identifierButtons = {}
 
-    -- Clear portal connection lines
+    -- Return line textures to pool
     if RDT.State.portalLines then
         for _, line in ipairs(RDT.State.portalLines) do
             line:Hide()
-            line:SetParent(nil)
+            line:ClearAllPoints()
+            -- Return to pool for reuse
+            table.insert(lineTexturePool, line)
         end
     end
     RDT.State.portalLines = {}
@@ -86,8 +100,20 @@ function UI:CreateIdentifierIcon(data)
         return
     end
 
-    -- Create button frame
-    local button = CreateFrame("Button", "RDT_Identifier" .. data.id, self.mapContainer)
+    -- Try to reuse a button from the pool, or create a new one
+    local button = table.remove(identifierButtonPool)
+    if not button then
+        -- No pooled button available, create a new one
+        button = CreateFrame("Button", nil, self.mapContainer)
+
+        -- Create icon texture (only once when creating new button)
+        local icon = button:CreateTexture(nil, "ARTWORK")
+        icon:SetAllPoints(button)
+        button.icon = icon
+    end
+
+    -- Reset button parent in case it was pooled
+    button:SetParent(self.mapContainer)
 
     -- Apply scale from type definition or data override
     local scale = data.scale or identifierType.scale or 1.0
@@ -101,10 +127,8 @@ function UI:CreateIdentifierIcon(data)
         data.x * mapWidth,
         -(data.y * mapHeight))
 
-    -- Create icon texture
-    local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetAllPoints(button)
-    icon:SetTexture(identifierType.icon)
+    -- Update icon texture (reuse existing texture from pooled button)
+    button.icon:SetTexture(identifierType.icon)
 
     -- Store reference data
     button.identifierId = data.id
@@ -243,12 +267,19 @@ function UI:DrawPortalLine(portal1, portal2)
         local x = x1 + dx * t
         local y = y1 + dy * t
 
-        -- Create dot texture
-        local dot = self.mapContainer:CreateTexture(nil, "OVERLAY")
-        dot:SetSize(4, 4)
-        dot:SetTexture("Interface\\Buttons\\WHITE8X8")
+        -- Try to reuse a texture from the pool, or create a new one
+        local dot = table.remove(lineTexturePool)
+        if not dot then
+            -- No pooled texture available, create a new one
+            dot = self.mapContainer:CreateTexture(nil, "OVERLAY")
+            dot:SetSize(4, 4)
+            dot:SetTexture("Interface\\Buttons\\WHITE8X8")
+        end
+
+        -- Update properties
         dot:SetVertexColor(0.5, 0.8, 1.0, 0.6)  -- Light blue, semi-transparent
         dot:SetPoint("CENTER", self.mapTexture, "TOPLEFT", x, -y)
+        dot:Show()
 
         table.insert(RDT.State.portalLines, dot)
     end

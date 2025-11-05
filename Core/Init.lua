@@ -159,6 +159,10 @@ function RDT:LoadDungeon(dungeonName)
         self.UI:ClearPacks()
     end
 
+    if self.UI and self.UI.ClearIdentifierIcons then
+        self.UI:ClearIdentifierIcons()
+    end
+
     self.State.currentPull = self.RouteManager:GetNextPull(self.State.currentRoute.pulls)
     
     local dungeonData = self.Data:GetProcessedDungeon(dungeonName)
