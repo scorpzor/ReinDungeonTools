@@ -131,6 +131,14 @@ function UI:CreateIdentifierIcon(data)
     -- Update icon texture (reuse existing texture from pooled button)
     button.icon:SetTexture(identifierType.icon)
 
+    -- Apply texture coordinates if using an atlas
+    if identifierType.texCoords then
+        button.icon:SetTexCoord(unpack(identifierType.texCoords))
+    else
+        -- Reset to default texture coordinates if not using atlas
+        button.icon:SetTexCoord(0, 1, 0, 1)
+    end
+
     -- Store reference data
     button.identifierId = data.id
     button.identifierType = data.type

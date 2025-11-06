@@ -290,32 +290,116 @@ local genericMobs = {
 Data:RegisterMobs(genericMobs)
 
 --------------------------------------------------------------------------------
--- Default Identifier Types (Doors, Stairs, Portals, etc.)
+-- Identifier Icon Atlas
 --------------------------------------------------------------------------------
 
+-- Centralized atlas configuration for identifier icons
+-- This allows all identifier icons to share a single texture file for better performance
+-- Source: Interface\Minimap\ObjectIconsAtlas (WoW 3.3.5a built-in atlas)
+local identifierAtlas = {
+    texture = "Interface\\Minimap\\ObjectIconsAtlas",
+    icons = {
+        -- Atlas coordinates format: {left, right, top, bottom}
+        -- These are normalized UV coordinates (0-1 range)
+        -- Source format from game data: {width, height, left, right, top, bottom}
+        -- We only use the UV coords (last 4 values)
+
+        ["stairs-up"] = {0.027344, 0.051758, 0.969727, 0.993164},
+        ["stairs-down"] = {0.734375, 0.758789, 0.09668, 0.120117},
+        ["door-in"] = {0.000977, 0.025391, 0.969727, 0.993164},
+        ["door-out"] = {0.760742, 0.785156, 0.09668, 0.120117},
+        ["gate"] = {0.708008, 0.732422, 0.09668, 0.120117},
+        ["portal"] = {0.000977, 0.063477, 0.454102, 0.516602},
+        ["dungeon-entrance"] = {0.198242, 0.24707, 0.313477, 0.362305},
+        ["action"] = {0.766602, 0.797852, 0.46582, 0.49707},
+    }
+}
+
+--------------------------------------------------------------------------------
+-- Default Identifier Types (Doors, Stairs, Portals, etc.)
+--------------------------------------------------------------------------------
+-- All identifier types use the same atlas texture for optimal performance
+
 local defaultIdentifierTypes = {
-    door = {
-        name = "Door",
-        description = "A door or gate",
-        icon = "Interface\\Icons\\INV_Misc_Key_03",  -- Placeholder: Key icon
+    -- Stair variants
+    ["stairs-up"] = {
+        name = "Stairs Up",
+        description = "Stairs leading upward",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["stairs-up"],
         scale = 1.0,
     },
-    stairs = {
-        name = "Stairs",
-        description = "Stairs or ramp",
-        icon = "Interface\\Icons\\Ability_Rogue_Sprint",  -- Placeholder: Sprint icon
+    ["stairs-down"] = {
+        name = "Stairs Down",
+        description = "Stairs leading downward",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["stairs-down"],
         scale = 1.0,
     },
-    portal = {
+
+    -- Door/Gate variants
+    ["door-in"] = {
+        name = "Door In",
+        description = "Entrance door",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["door-in"],
+        scale = 1.0,
+    },
+    ["door-out"] = {
+        name = "Door Out",
+        description = "Exit door",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["door-out"],
+        scale = 1.0,
+    },
+    ["gate"] = {
+        name = "Gate",
+        description = "A gate or barrier",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["gate"],
+        scale = 1.0,
+    },
+
+    -- Portal
+    ["portal"] = {
         name = "Portal",
         description = "Teleport portal",
-        icon = "Interface\\Icons\\Spell_Arcane_PortalDalaran",  -- Placeholder: Portal icon
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["portal"],
         scale = 1.2,
     },
-    action = {
+
+    -- Dungeon entrance
+    ["dungeon-entrance"] = {
+        name = "Dungeon Entrance",
+        description = "Main dungeon entrance",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["dungeon-entrance"],
+        scale = 1.1,
+    },
+
+    -- Action
+    ["action"] = {
         name = "Action",
         description = "Special action point",
-        icon = "Interface\\Icons\\INV_Misc_QuestionMark",  -- Placeholder: Question mark
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["action"],
+        scale = 1.0,
+    },
+
+    -- Legacy aliases for backward compatibility with existing test data
+    ["door"] = {
+        name = "Door",
+        description = "A door or gate",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["gate"],
+        scale = 1.0,
+    },
+    ["stairs"] = {
+        name = "Stairs",
+        description = "Stairs or ramp",
+        icon = identifierAtlas.texture,
+        texCoords = identifierAtlas.icons["stairs-down"],
         scale = 1.0,
     },
 }
