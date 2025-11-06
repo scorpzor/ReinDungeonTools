@@ -2,6 +2,8 @@
 
 A route planning addon for classic dungeons.
 
+<img width="1967" height="1119" alt="image" src="https://github.com/user-attachments/assets/6af3655d-8ab2-4632-be7a-5a19c95542d4" />
+
 ## Features
 
 - **Pull Planning**: Organize packs into pulls to find optimal route
