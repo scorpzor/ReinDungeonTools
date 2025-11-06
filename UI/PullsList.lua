@@ -259,15 +259,34 @@ function UI:RenderPullEntry(pullNum, yOffset)
         bgTexture:SetAllPoints(pullButton)
         bgTexture:SetColorTexture(0, 0, 0, 0)
         pullButton.bgTexture = bgTexture
-        
-        -- Create selection highlight border (left edge indicator)
-        local highlightBorder = pullButton:CreateTexture(nil, "OVERLAY")
-        highlightBorder:SetPoint("TOPLEFT", pullButton, "TOPLEFT", 0, 0)
-        highlightBorder:SetPoint("BOTTOMLEFT", pullButton, "BOTTOMLEFT", 0, 0)
-        highlightBorder:SetWidth(4)
-        highlightBorder:SetColorTexture(1, 1, 1, 0)  -- Start hidden
-        pullButton.highlightBorder = highlightBorder
-        
+
+        -- Create edge gradient overlays (vignette effect)
+        -- Left edge gradient
+        local leftGradient = pullButton:CreateTexture(nil, "BORDER")
+        leftGradient:SetPoint("TOPLEFT", pullButton, "TOPLEFT", 0, 0)
+        leftGradient:SetPoint("BOTTOMLEFT", pullButton, "BOTTOMLEFT", 0, 0)
+        leftGradient:SetWidth(20)
+        leftGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
+        leftGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0.5, 0, 0, 0, 0)
+        pullButton.leftGradient = leftGradient
+
+        -- Right edge gradient
+        local rightGradient = pullButton:CreateTexture(nil, "BORDER")
+        rightGradient:SetPoint("TOPRIGHT", pullButton, "TOPRIGHT", 0, 0)
+        rightGradient:SetPoint("BOTTOMRIGHT", pullButton, "BOTTOMRIGHT", 0, 0)
+        rightGradient:SetWidth(20)
+        rightGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
+        rightGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0, 0, 0, 0, 0.5)
+        pullButton.rightGradient = rightGradient
+
+        -- Selection overlay (for currently selected pull)
+        local selectionOverlay = pullButton:CreateTexture(nil, "OVERLAY")
+        selectionOverlay:SetAllPoints(pullButton)
+        selectionOverlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+        selectionOverlay:SetBlendMode("ADD")  -- Additive blending for glow effect
+        selectionOverlay:SetAlpha(0)  -- Start hidden
+        pullButton.selectionOverlay = selectionOverlay
+
         -- Set up hover handlers with tooltip
         pullButton:SetScript("OnEnter", function(self)
             if UI.HighlightPull then
@@ -311,24 +330,25 @@ function UI:RenderPullEntry(pullNum, yOffset)
     pullButton:SetPoint("TOPLEFT", pullsScrollChild, "TOPLEFT", 0, startYOffset)
     pullButton:SetPoint("TOPRIGHT", pullsScrollChild, "TOPRIGHT", 0, startYOffset)
     
-    -- Update background color (faded pull color)
+    -- Update background color
     if pullButton.bgTexture then
         local bgR, bgG, bgB = unpack(RDT:GetPullColor(pullNum))
-        -- Fade the color significantly for background
-        local fadeAlpha = isCurrentPull and 0.35 or 0.15
+        -- Selected pull: bright full background; Non-selected: medium fade
+        local fadeAlpha = isCurrentPull and 0.55 or 0.25
         pullButton.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
     end
-    
-    -- Update selection highlight border
-    if pullButton.highlightBorder then
+
+    -- Update selection overlay
+    if pullButton.selectionOverlay then
         if isCurrentPull then
-            local highlightR, highlightG, highlightB = unpack(RDT:GetPullColor(pullNum))
-            pullButton.highlightBorder:SetColorTexture(highlightR, highlightG, highlightB, 1.0)
+            local overlayR, overlayG, overlayB = unpack(RDT:GetPullColor(pullNum))
+            pullButton.selectionOverlay:SetVertexColor(overlayR, overlayG, overlayB)
+            pullButton.selectionOverlay:SetAlpha(0.25)  -- Subtle additive glow
         else
-            pullButton.highlightBorder:SetColorTexture(1, 1, 1, 0)  -- Hide
+            pullButton.selectionOverlay:SetAlpha(0)  -- Hidden
         end
     end
-    
+
     pullButton:Show()
     
     -- Now add text elements anchored to the button
