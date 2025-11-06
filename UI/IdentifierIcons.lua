@@ -93,22 +93,22 @@ function UI:CreateIdentifierIcon(data)
         return
     end
 
-    -- Get identifier type definition
     local identifierType = RDT.Data:GetIdentifierType(data.type)
     if not identifierType then
         RDT:PrintError("Unknown identifier type: " .. tostring(data.type))
         return
     end
 
-    -- Try to reuse a button from the pool, or create a new one
+    -- Try to reuse a button from the pool
     local button = table.remove(identifierButtonPool)
     if not button then
         -- No pooled button available, create a new one
         button = CreateFrame("Button", nil, self.mapContainer)
 
-        -- Create icon texture (only once when creating new button)
         local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetAllPoints(button)
+        local atlasTexture = RDT.Data:GetIdentifierAtlasTexture()
+        icon:SetTexture(atlasTexture)
         button.icon = icon
     end
 
@@ -128,14 +128,9 @@ function UI:CreateIdentifierIcon(data)
         data.x * mapWidth,
         -(data.y * mapHeight))
 
-    -- Update icon texture (reuse existing texture from pooled button)
-    button.icon:SetTexture(identifierType.icon)
-
-    -- Apply texture coordinates if using an atlas
     if identifierType.texCoords then
         button.icon:SetTexCoord(unpack(identifierType.texCoords))
     else
-        -- Reset to default texture coordinates if not using atlas
         button.icon:SetTexCoord(0, 1, 0, 1)
     end
 

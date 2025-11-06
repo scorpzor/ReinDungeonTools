@@ -201,6 +201,12 @@ function Data:GetAllIdentifierTypes()
     return identifierTypes
 end
 
+--- Get the atlas texture path for identifier icons
+-- @return string Atlas texture path
+function Data:GetIdentifierAtlasTexture()
+    return identifierAtlas.texture
+end
+
 --- Get the required enemy forces count for a dungeon
 -- @param dungeonName string Name of the dungeon
 -- @return number Required count (e.g., 100) or nil if not found
@@ -293,16 +299,12 @@ Data:RegisterMobs(genericMobs)
 -- Identifier Icon Atlas
 --------------------------------------------------------------------------------
 
--- Centralized atlas configuration for identifier icons
--- This allows all identifier icons to share a single texture file for better performance
--- Source: Interface\Minimap\ObjectIconsAtlas (WoW 3.3.5a built-in atlas)
 local identifierAtlas = {
     texture = "Interface\\Minimap\\ObjectIconsAtlas",
     icons = {
         -- Atlas coordinates format: {left, right, top, bottom}
         -- These are normalized UV coordinates (0-1 range)
         -- Source format from game data: {width, height, left, right, top, bottom}
-        -- We only use the UV coords (last 4 values)
 
         ["stairs-up"] = {0.027344, 0.051758, 0.969727, 0.993164},
         ["stairs-down"] = {0.734375, 0.758789, 0.09668, 0.120117},
@@ -318,7 +320,6 @@ local identifierAtlas = {
 --------------------------------------------------------------------------------
 -- Default Identifier Types (Doors, Stairs, Portals, etc.)
 --------------------------------------------------------------------------------
--- All identifier types use the same atlas texture for optimal performance
 
 local defaultIdentifierTypes = {
     -- Stair variants
@@ -387,7 +388,7 @@ local defaultIdentifierTypes = {
         scale = 1.0,
     },
 
-    -- Legacy aliases for backward compatibility with existing test data
+    -- Legacy aliases
     ["door"] = {
         name = "Door",
         description = "A door or gate",
