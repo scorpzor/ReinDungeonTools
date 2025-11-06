@@ -104,14 +104,26 @@ local mobs = {
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 0.7,
     },
-    ["strat_risen_monk"] = {
-        name = "Risen Monk",
+    ["strat_crimson_defender"] = {
+        name = "Crimson Defender",
         count = 0.5,
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 0.7,
     },
-    ["strat_risen_battle_mage"] = {
-        name = "Risen Battle Mage",
+    ["strat_crimson_priest"] = {
+        name = "Crimson Priest",
+        count = 0.5,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        scale = 0.7,
+    },
+    ["strat_crimson_monk"] = {
+        name = "Crimson Monk",
+        count = 0.5,
+        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        scale = 0.7,
+    },
+    ["strat_crimson_battle_mage"] = {
+        name = "Crimson Battle Mage",
         count = 0.5,
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 0.7,
@@ -160,20 +172,20 @@ local mobs = {
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 2,
     },
-    ["strat_boss_risen_hammersmith"] = {
-        name = "Risen Hammersmith",
+    --["strat_boss_risen_hammersmith"] = {
+    --    name = "Risen Hammersmith",
+    --    count = 2,
+    --    displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+    --    scale = 2,
+    --},
+    ["strat_boss_cannon_master_willey"] = {
+        name = "Cannon Master Willey",
         count = 2,
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 2,
     },
-    ["strat_boss_willey_hopebreaker"] = {
-        name = "Willey Hopebreaker",
-        count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
-    },
-    ["strat_boss_instructor_galford"] = {
-        name = "Instructor Galford",
+    ["strat_boss_archivist_galford"] = {
+        name = "Archivist Galford",
         count = 2,
         displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
         scale = 2,
@@ -402,6 +414,498 @@ local mapDefinition = {
                 ["strat_patchwork_horror"] = 1,--patrol
             }
         },
+        {
+            id = 21,
+            x = 0.853,
+            y = 0.454,
+            mobs = {
+                ["strat_plague_ghoul"] = 2,
+            }
+        },
+        {
+            id = 22,
+            x = 0.818,
+            y = 0.409,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 2,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 23,
+            x = 0.873,
+            y = 0.381,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_ravaged_cadaver"] = 3,
+            }
+        },
+        {
+            id = 24,
+            x = 0.791,
+            y = 0.352,
+            mobs = {
+                ["strat_plague_ghoul"] = 3,
+            }
+        },
+        {
+            id = 25,
+            x = 0.892,
+            y = 0.387,
+            mobs = {
+                ["strat_spectral_citizen"] = 2,
+            }
+        },
+        {
+            id = 26,
+            x = 0.817,
+            y = 0.350,
+            mobs = {
+                ["strat_spectral_citizen"] = 1,
+            }
+        },
+        {
+            id = 27,
+            x = 0.851,
+            y = 0.315,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_ravaged_cadaver"] = 3,
+            }
+        },
+        {
+            id = 28,
+            x = 0.851,
+            y = 0.277,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 29,
+            x = 0.810,
+            y = 0.266,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 2,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 30,
+            x = 0.773,
+            y = 0.143,
+            mobs = {
+                ["strat_plague_ghoul"] = 3,
+            }
+        },
+        {
+            id = 31,
+            x = 0.716,
+            y = 0.204,
+            mobs = {
+                ["strat_patchwork_horror"] = 1,--patrol
+            }
+        },
+        {
+            id = 32,
+            x = 0.722,
+            y = 0.252,
+            mobs = {
+                ["strat_plague_ghoul"] = 2,
+            }
+        },
+        {
+            id = 33,
+            x = 0.684,
+            y = 0.235,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_ravaged_cadaver"] = 3,
+            }
+        },
+        {
+            id = 34,
+            x = 0.685,
+            y = 0.280,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 35,
+            x = 0.637,
+            y = 0.282,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 2,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 36,
+            x = 0.825,
+            y = 0.172,
+            mobs = {
+                ["strat_spectral_citizen"] = 1,
+                ["strat_ghostly_citizen"] = 2
+            }
+        },
+        {
+            id = 37,
+            x = 0.647,
+            y = 0.224,
+            mobs = {
+                ["strat_spectral_citizen"] = 1,
+                ["strat_ghostly_citizen"] = 1
+            }
+        },
+        {
+            id = 38,
+            x = 0.600,
+            y = 0.323,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 3,
+            }
+        },
+        {
+            id = 39,
+            x = 0.631,
+            y = 0.342,
+            mobs = {
+                ["strat_ghostly_citizen"] = 1
+            }
+        },
+        {
+            id = 40,
+            x = 0.621,
+            y = 0.300,
+            mobs = {
+                ["strat_spectral_citizen"] = 1
+            }
+        },
+        {
+            id = 41,
+            x = 0.562,
+            y = 0.285,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 2,
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 42,
+            x = 0.495,
+            y = 0.293,
+            mobs = {
+                ["strat_spectral_citizen"] = 2,
+                ["strat_plague_ghoul"] = 2,
+            }
+        },
+        {
+            id = 43,
+            x = 0.496,
+            y = 0.167,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 2,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 44,
+            x = 0.440,
+            y = 0.271,
+            mobs = {
+                ["strat_crimson_gallant"] = 1,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 45,
+            x = 0.408,
+            y = 0.277,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+            }
+        },
+        {
+            id = 46,
+            x = 0.426,
+            y = 0.346,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+            }
+        },
+        {
+            id = 47,
+            x = 0.404,
+            y = 0.268,
+            mobs = {
+                ["strat_crimson_gallant"] = 1,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 48,
+            x = 0.412,
+            y = 0.307,
+            mobs = {
+                ["strat_crimson_guardsman"] = 2,
+                ["strat_crimson_initiate"] = 1,
+            }
+        },
+        {
+            id = 49,
+            x = 0.379,
+            y = 0.307,
+            mobs = {
+                ["strat_crimson_guardsman"] = 2,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 50,
+            x = 0.374,
+            y = 0.221,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+            }
+        },
+        {
+            id = 51,
+            x = 0.333,
+            y = 0.274,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+                ["strat_skeletal_guardian"] = 1,
+                ["strat_crimson_guardsman"] = 1,
+            }
+        },
+        {
+            id = 52,
+            x = 0.338,
+            y = 0.330,
+            mobs = {
+                ["strat_crimson_guardsman"] = 2,
+                ["strat_crimson_initiate"] = 1,
+            }
+        },
+        {
+            id = 53,
+            x = 0.378,
+            y = 0.434,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+            }
+        },
+        {
+            id = 54,
+            x = 0.362,
+            y = 0.383,
+            mobs = {
+                ["strat_skeletal_berserker"] = 1,
+                ["strat_skeletal_guardian"] = 1,
+                ["strat_crimson_guardsman"] = 1,
+            }
+        },
+        {
+            id = 55,
+            x = 0.257,
+            y = 0.312,
+            mobs = {
+                ["strat_crimson_guardsman"] = 2,
+                ["strat_crimson_initiate"] = 2,
+            }
+        },
+        {
+            id = 56,
+            x = 0.226,
+            y = 0.353,
+            mobs = {
+                ["strat_crimson_guardsman"] = 1,
+                ["strat_crimson_initiate"] = 1,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 57,
+            x = 0.295,
+            y = 0.405,
+            mobs = {
+                ["strat_crimson_guardsman"] = 3,
+                ["strat_crimson_initiate"] = 2,
+                ["strat_crimson_conjuror"] = 2,
+            }
+        },
+        {
+            id = 58,
+            x = 0.225,
+            y = 0.450,
+            mobs = {
+                ["strat_crimson_guardsman"] = 1,
+                ["strat_crimson_initiate"] = 1,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 59,
+            x = 0.249,
+            y = 0.502,
+            mobs = {
+                ["strat_crimson_guardsman"] = 1,
+                ["strat_crimson_initiate"] = 1,
+                ["strat_crimson_conjuror"] = 1,
+            }
+        },
+        {
+            id = 60,
+            x = 0.223,
+            y = 0.489,
+            mobs = {
+                ["strat_crimson_guardsman"] = 1,--patrol
+            }
+        },
+        {
+            id = 61,
+            x = 0.242,
+            y = 0.580,
+            mobs = {
+                ["strat_crimson_gallant"] = 2,
+                ["strat_crimson_inquisitor"] = 2,
+            }
+        },
+        {
+            id = 62,
+            x = 0.143,
+            y = 0.575,
+            mobs = {
+                ["strat_crimson_defender"] = 2,
+                ["strat_crimson_priest"] = 1,
+            }
+        },
+        {
+            id = 63,
+            x = 0.149,
+            y = 0.512,
+            mobs = {
+                ["strat_crimson_gallant"] = 1,--patrol
+            }
+        },
+        {
+            id = 64,
+            x = 0.124,
+            y = 0.497,
+            mobs = {
+                ["strat_crimson_defender"] = 1,
+                ["strat_crimson_priest"] = 1,
+                ["strat_crimson_sorcerer"] = 1,
+            }
+        },
+        {
+            id = 65,
+            x = 0.086,
+            y = 0.509,
+            mobs = {
+                ["strat_crimson_defender"] = 2,
+                ["strat_crimson_priest"] = 1,
+            }
+        },
+        {
+            id = 66,
+            x = 0.107,
+            y = 0.557,
+            mobs = {
+                ["strat_crimson_defender"] = 2,
+                ["strat_crimson_priest"] = 1,
+                ["strat_crimson_gallant"] = 1,
+            }
+        },
+        {
+            id = 67,
+            x = 0.074,
+            y = 0.593,
+            mobs = {
+                ["strat_crimson_defender"] = 2,
+                ["strat_crimson_priest"] = 2,
+            }
+        },
+        {
+            id = 68,
+            x = 0.196,
+            y = 0.580,
+            mobs = {
+                ["strat_crimson_monk"] = 1,--patrol
+                ["strat_crimson_sorcerer"] = 1,--patrol
+            }
+        },
+        {
+            id = 69,
+            x = 0.216,
+            y = 0.624,
+            mobs = {
+                ["strat_crimson_gallant"] = 2,
+                ["strat_crimson_battle_mage"] = 1,
+            }
+        },
+        {
+            id = 70,
+            x = 0.243,
+            y = 0.679,
+            mobs = {
+                ["strat_crimson_gallant"] = 3,
+                ["strat_crimson_battle_mage"] = 1,
+            }
+        },
+        {
+            id = 71,
+            x = 0.208,
+            y = 0.695,
+            mobs = {
+                ["strat_crimson_monk"] = 1,--patrol
+                ["strat_crimson_sorcerer"] = 1,--patrol
+            }
+        },
+        {
+            id = 72,
+            x = 0.229,
+            y = 0.738,
+            mobs = {
+                ["strat_crimson_gallant"] = 2,
+                ["strat_crimson_battle_mage"] = 1,
+            }
+        },
+        {
+            id = 73,
+            x = 0.256,
+            y = 0.796,
+            mobs = {
+                ["strat_crimson_gallant"] = 1,
+                ["strat_crimson_battle_mage"] = 1,
+                ["strat_crimson_defender"] = 1,
+            }
+        },
+        {
+            id = 74,
+            x = 0.256,
+            y = 0.714,
+            mobs = {
+                ["strat_crimson_monk"] = 2,
+            }
+        },
         -------------------------------- Bosses --------------------------------
         {
             id = 1000,
@@ -417,6 +921,62 @@ local mapDefinition = {
             y = 0.479,
             mobs = {
                 ["strat_boss_skul"] = 1,
+            }
+        },
+        {
+            id = 1002,
+            x = 0.728,
+            y = 0.176,
+            mobs = {
+                ["strat_boss_the_unforgiven"] = 1,
+            }
+        },
+        {
+            id = 1003,
+            x = 0.599,
+            y = 0.252,
+            mobs = {
+                ["strat_boss_hearthsinger_forresten"] = 1,
+            }
+        },
+        {
+            id = 1004,
+            x = 0.407,
+            y = 0.455,
+            mobs = {
+                ["strat_boss_timmy_the_cruel"] = 1,
+            }
+        },
+        {
+            id = 1005,
+            x = 0.300,
+            y = 0.411,
+            mobs = {
+                ["strat_boss_commander_malor"] = 1,
+            }
+        },
+        {
+            id = 1006,
+            x = 0.042,
+            y = 0.510,
+            mobs = {
+                ["strat_boss_cannon_master_willey"] = 1,
+            }
+        },
+        {
+            id = 1007,
+            x = 0.273,
+            y = 0.751,
+            mobs = {
+                ["strat_boss_archivist_galford"] = 1,
+            }
+        },
+        {
+            id = 1008,
+            x = 0.205,
+            y = 0.822,
+            mobs = {
+                ["strat_boss_grand_crusader_dathrohan"] = 1,
             }
         },
     },
