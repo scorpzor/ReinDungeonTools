@@ -101,104 +101,100 @@ local mobs = {
     ["strat_crimson_inquisitor"] = {
         name = "Crimson Inquisitor",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_inquisitor",
         scale = 0.7,
     },
     ["strat_crimson_defender"] = {
         name = "Crimson Defender",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_defender",
         scale = 0.7,
     },
     ["strat_crimson_priest"] = {
         name = "Crimson Priest",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_priest",
         scale = 0.7,
     },
     ["strat_crimson_monk"] = {
         name = "Crimson Monk",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_monk",
         scale = 0.7,
     },
     ["strat_crimson_battle_mage"] = {
         name = "Crimson Battle Mage",
         count = 0.5,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_battle_mage",
         scale = 0.7,
     },
+}
 
-    -------------------------------- Bosses --------------------------------
+local bosses = {
     ["strat_boss_stratholme_courier"] = {
         name = "Stratholme Courier",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\undead_postman",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\stratholme_courier",
         scale = 1.25,
     },
-    --["strat_boss_ezra_grimm"] = {
-    --    name = "Ezra Grimm",
-    --    count = 2,
-    --    displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-    --    scale = 2,
-    --},
     ["strat_boss_skul"] = {
         name = "Skul",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\skul",
         scale = 1.25,
     },
     ["strat_boss_the_unforgiven"] = {
         name = "The Unforgiven",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\vengeful_phantom",
+        scale = 1.25,
     },
     ["strat_boss_hearthsinger_forresten"] = {
         name = "Hearthsinger Forresten",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\hearthsinger_forresten",
+        scale = 1.25,
     },
     ["strat_boss_timmy_the_cruel"] = {
         name = "Timmy the Cruel",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\timmy_the_cruel",
+        scale = 1.25,
     },
     ["strat_boss_commander_malor"] = {
         name = "Commander Malor",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\commander_malor",
+        scale = 1.25,
     },
-    --["strat_boss_risen_hammersmith"] = {
-    --    name = "Risen Hammersmith",
+    --["strat_boss_crimson_hammersmith"] = {
+    --    name = "Crimson Hammersmith",
     --    count = 2,
-    --    displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-    --    scale = 2,
+    --    displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crimson_hammersmith",
+    --    scale = 1.25,
     --},
     ["strat_boss_cannon_master_willey"] = {
         name = "Cannon Master Willey",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\cannon_master_willey",
+        scale = 1.25,
     },
     ["strat_boss_archivist_galford"] = {
         name = "Archivist Galford",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\archivist_galford",
+        scale = 1.25,
     },
-    ["strat_boss_grand_crusader_dathrohan"] = {
-        name = "Grand Crusader Dathrohan",
+    ["strat_boss_balnazzar"] = {
+        name = "Balnazzar",
         count = 2,
-        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
-        scale = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\balnazzar",
+        scale = 1.5,
     },
 }
 
 RDT.Data:RegisterMobs(mobs)
+RDT.Data:RegisterMobs(bosses)
 
 --------------------------------------------------------------------------------
 -- Stratholme - Main Gate
@@ -223,8 +219,8 @@ local mapDefinition = {
     packData = {
         {
             id = 1,
-            x = 0.665,
-            y = 0.807,
+            x = 0.658,
+            y = 0.825,
             mobs = {
                 ["strat_skeletal_berserker"] = 3,
                 ["strat_skeletal_guardian"] = 2,
@@ -232,8 +228,8 @@ local mapDefinition = {
         },
         {
             id = 2,
-            x = 0.679,
-            y = 0.787,
+            x = 0.676,
+            y = 0.795,
             mobs = {
                 ["strat_plague_ghoul"] = 1,--patrol
             }
@@ -326,8 +322,8 @@ local mapDefinition = {
         },
         {
             id = 12,
-            x = 0.632,
-            y = 0.605,
+            x = 0.642,
+            y = 0.621,
             mobs = {
                 ["strat_spectral_citizen"] = 2,
             }
@@ -355,8 +351,8 @@ local mapDefinition = {
         },
         {
             id = 15,
-            x = 0.595,
-            y = 0.502,
+            x = 0.593,
+            y = 0.484,
             mobs = {
                 ["strat_plague_ghoul"] = 1,--patrol
             }
@@ -408,8 +404,8 @@ local mapDefinition = {
         },
         {
             id = 20,
-            x = 0.786,
-            y = 0.458,
+            x = 0.796,
+            y = 0.449,
             mobs = {
                 ["strat_patchwork_horror"] = 1,--patrol
             }
@@ -453,8 +449,8 @@ local mapDefinition = {
         },
         {
             id = 25,
-            x = 0.892,
-            y = 0.387,
+            x = 0.905,
+            y = 0.398,
             mobs = {
                 ["strat_spectral_citizen"] = 2,
             }
@@ -479,8 +475,8 @@ local mapDefinition = {
         },
         {
             id = 28,
-            x = 0.851,
-            y = 0.277,
+            x = 0.846,
+            y = 0.269,
             mobs = {
                 ["strat_plague_ghoul"] = 1,
             }
@@ -515,7 +511,7 @@ local mapDefinition = {
         {
             id = 32,
             x = 0.722,
-            y = 0.252,
+            y = 0.245,
             mobs = {
                 ["strat_plague_ghoul"] = 2,
             }
@@ -587,8 +583,8 @@ local mapDefinition = {
         },
         {
             id = 40,
-            x = 0.621,
-            y = 0.300,
+            x = 0.627,
+            y = 0.320,
             mobs = {
                 ["strat_spectral_citizen"] = 1
             }
@@ -636,8 +632,8 @@ local mapDefinition = {
         },
         {
             id = 45,
-            x = 0.408,
-            y = 0.277,
+            x = 0.407,
+            y = 0.233,
             mobs = {
                 ["strat_skeletal_berserker"] = 1,
             }
@@ -652,8 +648,8 @@ local mapDefinition = {
         },
         {
             id = 47,
-            x = 0.404,
-            y = 0.268,
+            x = 0.396,
+            y = 0.263,
             mobs = {
                 ["strat_crimson_gallant"] = 1,
                 ["strat_crimson_conjuror"] = 1,
@@ -687,8 +683,8 @@ local mapDefinition = {
         },
         {
             id = 51,
-            x = 0.333,
-            y = 0.274,
+            x = 0.319,
+            y = 0.276,
             mobs = {
                 ["strat_skeletal_berserker"] = 1,
                 ["strat_skeletal_guardian"] = 1,
@@ -743,7 +739,7 @@ local mapDefinition = {
         },
         {
             id = 57,
-            x = 0.295,
+            x = 0.259,
             y = 0.405,
             mobs = {
                 ["strat_crimson_guardsman"] = 3,
@@ -846,7 +842,7 @@ local mapDefinition = {
         {
             id = 68,
             x = 0.196,
-            y = 0.580,
+            y = 0.576,
             mobs = {
                 ["strat_crimson_monk"] = 1,--patrol
                 ["strat_crimson_sorcerer"] = 1,--patrol
@@ -901,7 +897,7 @@ local mapDefinition = {
         {
             id = 74,
             x = 0.256,
-            y = 0.714,
+            y = 0.710,
             mobs = {
                 ["strat_crimson_monk"] = 2,
             }
@@ -941,8 +937,8 @@ local mapDefinition = {
         },
         {
             id = 1004,
-            x = 0.407,
-            y = 0.455,
+            x = 0.348,
+            y = 0.250,
             mobs = {
                 ["strat_boss_timmy_the_cruel"] = 1,
             }
@@ -976,7 +972,7 @@ local mapDefinition = {
             x = 0.205,
             y = 0.822,
             mobs = {
-                ["strat_boss_grand_crusader_dathrohan"] = 1,
+                ["strat_boss_balnazzar"] = 1,
             }
         },
     },

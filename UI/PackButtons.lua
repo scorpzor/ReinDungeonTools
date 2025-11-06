@@ -95,6 +95,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
 
     local totalMobs = #mobList
     local minRadius = 16
+    local triRadius = 8
     local dynamicRadius = 14 + (totalMobs * 0.6)
     local radius = math.max(minRadius, dynamicRadius)
 
@@ -105,8 +106,15 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
 
     for iconIndex, mobInfo in ipairs(mobList) do
         local xOffset, yOffset
-        
-        if iconIndex == 1 then
+
+        if totalMobs == 3 then
+            local angleStep = 360 / 3
+            local angle = 270 - (angleStep * (iconIndex - 1))
+            local radians = math.rad(angle)
+
+            xOffset = triRadius * math.cos(radians)
+            yOffset = triRadius * math.sin(radians)
+        elseif iconIndex == 1 then
             xOffset, yOffset = 0, 0
         else
             local satelliteMobs = totalMobs - 1
@@ -114,11 +122,11 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
             local satelliteIndex = iconIndex - 2
             local angle = 270 - (angleStep * satelliteIndex)
             local radians = math.rad(angle)
-            
+
             xOffset = radius * math.cos(radians)
             yOffset = radius * math.sin(radians)
         end
-        
+
         local mobButton = self:CreateMobIcon(packGroup, mobInfo, xOffset, yOffset)
         tinsert(packGroup.mobButtons, mobButton)
     end
