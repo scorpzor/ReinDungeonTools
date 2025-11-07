@@ -14,7 +14,7 @@ end
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
 -- Constants
-local IDENTIFIER_ICON_SIZE = 24  -- Base size for identifier icons
+local IDENTIFIER_ICON_SIZE = 32  -- Base size for identifier icons
 
 -- Object pools for reusing frames/textures
 local identifierButtonPool = {}
@@ -99,57 +99,57 @@ function UI:CreateIdentifierIcon(data)
         return
     end
 
-    -- Try to reuse a button from the pool
-    local button = table.remove(identifierButtonPool)
-    if not button then
-        -- No pooled button available, create a new one
-        button = CreateFrame("Button", nil, self.mapContainer)
+    -- Try to reuse a frame from the pool
+    local frame = table.remove(identifierButtonPool)
+    if not frame then
+        -- No pooled frame available, create a new one
+        frame = CreateFrame("Frame", nil, self.mapContainer)
 
-        local icon = button:CreateTexture(nil, "ARTWORK")
-        icon:SetAllPoints(button)
+        local icon = frame:CreateTexture(nil, "ARTWORK")
+        icon:SetAllPoints(frame)
         local atlasTexture = RDT.Data:GetIdentifierAtlasTexture()
         icon:SetTexture(atlasTexture)
-        button.icon = icon
+        frame.icon = icon
     end
 
-    -- Reset button parent in case it was pooled
-    button:SetParent(self.mapContainer)
-    button:ClearAllPoints()
+    -- Reset frame parent in case it was pooled
+    frame:SetParent(self.mapContainer)
+    frame:ClearAllPoints()
 
     -- Apply scale from type definition or data override
     local scale = data.scale or identifierType.scale or 1.0
     local iconSize = IDENTIFIER_ICON_SIZE * scale
 
-    button:SetSize(iconSize, iconSize)
+    frame:SetSize(iconSize, iconSize)
 
     -- Position on map using normalized coordinates
     local mapWidth, mapHeight = self:GetMapDimensions()
-    button:SetPoint("CENTER", self.mapTexture, "TOPLEFT",
+    frame:SetPoint("CENTER", self.mapTexture, "TOPLEFT",
         data.x * mapWidth,
         -(data.y * mapHeight))
 
     if identifierType.texCoords then
-        button.icon:SetTexCoord(unpack(identifierType.texCoords))
+        frame.icon:SetTexCoord(unpack(identifierType.texCoords))
     else
-        button.icon:SetTexCoord(0, 1, 0, 1)
+        frame.icon:SetTexCoord(0, 1, 0, 1)
     end
 
     -- Store reference data
-    button.identifierId = data.id
-    button.identifierType = data.type
-    button.identifierData = data
-    button.typeDefinition = identifierType
+    frame.identifierId = data.id
+    frame.identifierType = data.type
+    frame.identifierData = data
+    frame.typeDefinition = identifierType
 
     -- Setup interaction handlers
-    self:SetupIdentifierIconHandlers(button)
+    self:SetupIdentifierIconHandlers(frame)
 
-    -- Store button reference
+    -- Store frame reference
     if not RDT.State.identifierButtons then
         RDT.State.identifierButtons = {}
     end
-    RDT.State.identifierButtons[data.id] = button
+    RDT.State.identifierButtons[data.id] = frame
 
-    button:Show()
+    frame:Show()
 end
 
 --- Setup mouse interaction handlers for identifier icons

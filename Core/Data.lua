@@ -369,7 +369,7 @@ local defaultIdentifierTypes = {
         description = "Main dungeon entrance",
         icon = identifierAtlas.texture,
         texCoords = identifierAtlas.icons["dungeon-entrance"],
-        scale = 1.1,
+        scale = 1.0,
     },
 
     -- Action
