@@ -735,6 +735,12 @@ function UI:ClearPacks()
                     table.insert(mobButtonPool, mobBtn)
                 end
             end
+
+            if packGroup.pullLabel then
+                packGroup.pullLabel:Hide()
+                packGroup.pullLabel:ClearAllPoints()
+            end
+
             packGroup:Hide()
             packGroup:ClearAllPoints()
             -- Clear pack group references
