@@ -44,8 +44,8 @@ function UI:CreateIdentifierIcons()
         self:CreateIdentifierIcon(identifierData)
     end
 
-    -- Draw portal connection lines
-    self:DrawPortalConnections(dungeon.identifiers)
+    -- Draw connection lines between linked identifiers
+    self:DrawIdentifierConnections(dungeon.identifiers)
 end
 
 --- Clear all identifier icons from the map
@@ -189,22 +189,33 @@ function UI:OnIdentifierIconEnter(button)
         GameTooltip:AddLine(displayDescription, 1, 1, 1, true)
     end
 
-    -- Show linked portal information if this is a portal
-    if data.type == "portal" and data.linkedTo then
+    -- Show linked identifier information
+    if data.linkedTo then
         GameTooltip:AddLine(" ", 1, 1, 1)
-        GameTooltip:AddLine("Linked to Portal #" .. data.linkedTo, 0.5, 0.8, 1)
+
+        -- Get friendly name based on identifier type
+        local linkTypeName = "Identifier"
+        if data.type == "portal" then
+            linkTypeName = "Portal"
+        elseif data.type == "stairs-up" or data.type == "stairs-down" or data.type == "stairs" then
+            linkTypeName = "Stairs"
+        elseif data.type == "door-in" or data.type == "door-out" or data.type == "door" then
+            linkTypeName = "Door"
+        end
+
+        GameTooltip:AddLine("Linked to " .. linkTypeName .. " #" .. data.linkedTo, 0.5, 0.8, 1)
     end
 
     GameTooltip:Show()
 end
 
 --------------------------------------------------------------------------------
--- Portal Connection Lines
+-- Identifier Connection Lines
 --------------------------------------------------------------------------------
 
---- Draw lines connecting linked portals
+--- Draw lines connecting linked identifiers (portals, stairs, doors, etc.)
 -- @param identifiers table Array of identifier data
-function UI:DrawPortalConnections(identifiers)
+function UI:DrawIdentifierConnections(identifiers)
     if not identifiers then
         return
     end
@@ -218,41 +229,41 @@ function UI:DrawPortalConnections(identifiers)
     end
     RDT.State.portalLines = {}
 
-    -- Find all portal pairs
-    local portals = {}
+    -- Find all identifiers with links
+    local linkedIdentifiers = {}
     for _, identifier in ipairs(identifiers) do
-        if identifier.type == "portal" and identifier.linkedTo then
-            portals[identifier.id] = identifier
+        if identifier.linkedTo then
+            linkedIdentifiers[identifier.id] = identifier
         end
     end
 
-    -- Draw lines between linked portals
+    -- Draw lines between linked identifiers
     local drawnPairs = {}
-    for id, portal in pairs(portals) do
-        local linkedPortal = portals[portal.linkedTo]
-        if linkedPortal then
+    for id, identifier in pairs(linkedIdentifiers) do
+        local linkedIdentifier = linkedIdentifiers[identifier.linkedTo]
+        if linkedIdentifier then
             -- Create a unique key for this pair (sorted to avoid duplicates)
-            local pairKey = id < portal.linkedTo and (id .. "_" .. portal.linkedTo) or (portal.linkedTo .. "_" .. id)
+            local pairKey = id < identifier.linkedTo and (id .. "_" .. identifier.linkedTo) or (identifier.linkedTo .. "_" .. id)
 
             if not drawnPairs[pairKey] then
-                self:DrawPortalLine(portal, linkedPortal)
+                self:DrawConnectionLine(identifier, linkedIdentifier)
                 drawnPairs[pairKey] = true
             end
         end
     end
 end
 
---- Draw a line between two portals
--- @param portal1 table First portal data {x, y, ...}
--- @param portal2 table Second portal data {x, y, ...}
-function UI:DrawPortalLine(portal1, portal2)
+--- Draw a line between two linked identifiers
+-- @param identifier1 table First identifier data {x, y, type, ...}
+-- @param identifier2 table Second identifier data {x, y, type, ...}
+function UI:DrawConnectionLine(identifier1, identifier2)
     local mapWidth, mapHeight = self:GetMapDimensions()
 
     -- Convert normalized coordinates to screen space
-    local x1 = portal1.x * mapWidth
-    local y1 = portal1.y * mapHeight
-    local x2 = portal2.x * mapWidth
-    local y2 = portal2.y * mapHeight
+    local x1 = identifier1.x * mapWidth
+    local y1 = identifier1.y * mapHeight
+    local x2 = identifier2.x * mapWidth
+    local y2 = identifier2.y * mapHeight
 
     -- Calculate line properties
     local dx = x2 - x1
@@ -260,7 +271,7 @@ function UI:DrawPortalLine(portal1, portal2)
     local length = math.sqrt(dx * dx + dy * dy)
 
     if length < 1 then
-        return  -- Portals are too close
+        return  -- Identifiers are too close
     end
 
     -- Create dotted line effect with multiple small textures

@@ -215,19 +215,21 @@ local mapDefinition = {
         -- Entrance and main doors
         {
             id = 1,
-            type = "door",
+            type = "door-in",
             x = 0.49,
             y = 0.12,
             name = "Entrance Portal",
             description = "Main entrance to Blackfathom Deeps",
+            linkedTo = 2,
         },
         {
             id = 2,
-            type = "door",
+            type = "door-out",
             x = 0.52,
             y = 0.22,
             name = "Iron Gate",
             description = "Sealed iron gate to the depths",
+            linkedTo = 1,
         },
 
         -- Underwater passages

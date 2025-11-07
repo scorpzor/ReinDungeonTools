@@ -46,6 +46,21 @@ local mobDatabase = {}
 -- Identifier icon type database (doors, stairs, portals, etc.)
 local identifierTypes = {}
 
+-- Identifier atlas configuration
+local identifierAtlas = {
+    texture = "Interface\\Minimap\\ObjectIconsAtlas",
+    icons = {
+        ["stairs-up"] = {0.027344, 0.051758, 0.969727, 0.993164},
+        ["stairs-down"] = {0.734375, 0.758789, 0.09668, 0.120117},
+        ["door-in"] = {0.000977, 0.025391, 0.969727, 0.993164},
+        ["door-out"] = {0.760742, 0.785156, 0.09668, 0.120117},
+        ["gate"] = {0.708008, 0.732422, 0.09668, 0.120117},
+        ["portal"] = {0.000977, 0.063477, 0.454102, 0.516602},
+        ["dungeon-entrance"] = {0.198242, 0.24707, 0.313477, 0.362305},
+        ["action"] = {0.766602, 0.797852, 0.46582, 0.49707},
+    }
+}
+
 --------------------------------------------------------------------------------
 -- Core Registry Functions
 --------------------------------------------------------------------------------
@@ -296,28 +311,6 @@ local genericMobs = {
 Data:RegisterMobs(genericMobs)
 
 --------------------------------------------------------------------------------
--- Identifier Icon Atlas
---------------------------------------------------------------------------------
-
-local identifierAtlas = {
-    texture = "Interface\\Minimap\\ObjectIconsAtlas",
-    icons = {
-        -- Atlas coordinates format: {left, right, top, bottom}
-        -- These are normalized UV coordinates (0-1 range)
-        -- Source format from game data: {width, height, left, right, top, bottom}
-
-        ["stairs-up"] = {0.027344, 0.051758, 0.969727, 0.993164},
-        ["stairs-down"] = {0.734375, 0.758789, 0.09668, 0.120117},
-        ["door-in"] = {0.000977, 0.025391, 0.969727, 0.993164},
-        ["door-out"] = {0.760742, 0.785156, 0.09668, 0.120117},
-        ["gate"] = {0.708008, 0.732422, 0.09668, 0.120117},
-        ["portal"] = {0.000977, 0.063477, 0.454102, 0.516602},
-        ["dungeon-entrance"] = {0.198242, 0.24707, 0.313477, 0.362305},
-        ["action"] = {0.766602, 0.797852, 0.46582, 0.49707},
-    }
-}
-
---------------------------------------------------------------------------------
 -- Default Identifier Types (Doors, Stairs, Portals, etc.)
 --------------------------------------------------------------------------------
 
@@ -325,14 +318,14 @@ local defaultIdentifierTypes = {
     -- Stair variants
     ["stairs-up"] = {
         name = "Stairs Up",
-        description = "Stairs leading upward",
+        description = "Stairs upward",
         icon = identifierAtlas.texture,
         texCoords = identifierAtlas.icons["stairs-up"],
         scale = 1.0,
     },
     ["stairs-down"] = {
         name = "Stairs Down",
-        description = "Stairs leading downward",
+        description = "Stairs downward",
         icon = identifierAtlas.texture,
         texCoords = identifierAtlas.icons["stairs-down"],
         scale = 1.0,
