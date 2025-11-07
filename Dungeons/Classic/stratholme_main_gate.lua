@@ -976,6 +976,41 @@ local mapDefinition = {
             }
         },
     },
+    identifiers = {
+        -- Entrance and main doors
+        {
+            id = 1,
+            type = "dungeon-entrance",
+            x = 0.638,
+            y = 0.880,
+            name = "Entrance Portal",
+            description = "Main entrance",
+        },
+        {
+            id = 2,
+            type = "dungeon-entrance",
+            x = 0.687,
+            y = 0.880,
+            name = "Entrance Portal",
+            description = "Main entrance",
+        },
+        {
+            id = 3,
+            type = "gate",
+            x = 0.751,
+            y = 0.530,
+            name = "Gate",
+            description = "Requires key or rogue lockpicking to open",
+        },
+        {
+            id = 4,
+            type = "gate",
+            x = 0.602,
+            y = 0.414,
+            name = "Gate",
+            description = "Rats attack you when you enter, make sure tank goes in first",
+        },
+    },
 }
 
 RDT.Data:RegisterDungeon("Stratholme Main Gate", mapDefinition)

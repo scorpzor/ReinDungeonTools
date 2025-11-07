@@ -24,8 +24,8 @@ local mapTexture
 local mapTiles = {}
 local titleText
 local versionText
-local dungeonDropdown  -- Dungeon dropdown object
-local routeDropdown  -- Route dropdown object
+local dungeonDropdown
+local routeDropdown
 local buttonContainer
 
 -- Local convenience wrapper for button styling
@@ -33,12 +33,10 @@ local function StyleSquareButton(button)
     UIHelpers:StyleSquareButton(button)
 end
 
-
 --------------------------------------------------------------------------------
 -- Main Frame Creation
 --------------------------------------------------------------------------------
 
---- Create the main addon window
 function UI:CreateMainFrame()
     if mainFrame then
         RDT:DebugPrint("MainFrame already exists")
@@ -48,7 +46,6 @@ function UI:CreateMainFrame()
     
     RDT:DebugPrint("Creating main frame")
     
-    -- Main frame
     mainFrame = CreateFrame("Frame", "RDT_MainFrame", UIParent)
     mainFrame:SetSize(FRAME_WIDTH, FRAME_HEIGHT)
     mainFrame:SetPoint("CENTER")
@@ -78,11 +75,11 @@ function UI:CreateMainFrame()
     mainFrame.titleBg = titleBg
 
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    titleText:SetPoint("CENTER", titleBg, "CENTER", 0, 0)  -- Vertically centered in title bar
+    titleText:SetPoint("CENTER", titleBg, "CENTER", 0, 0)
     titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
     titleText:SetText(L["TITLE"])
     titleText:SetJustifyH("CENTER")
-    titleText:SetTextColor(1, 1, 1, 1)  -- White text
+    titleText:SetTextColor(1, 1, 1, 1)
 
     local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
@@ -103,7 +100,7 @@ function UI:CreateMainFrame()
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     helpText:SetPoint("BOTTOMLEFT", 7, 6)
     helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    helpText:SetText("Left-Click Pack: Add to Pull | Click Pull Sidebar: Switch Pull | Right-Click: Remove")
+    helpText:SetText("Left-Click Pack: Add to Pull | Right-Click: Remove")
     helpText:SetTextColor(0.6, 0.6, 0.6)
 
     versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -380,7 +377,7 @@ function UI:CreateMapContainer(parent)
 end
 
 --------------------------------------------------------------------------------
--- Tile-based Map Rendering (for high-res and multi-floor maps)
+-- Tile-based Map Rendering
 --------------------------------------------------------------------------------
 
 function UI:ClearMapTiles()

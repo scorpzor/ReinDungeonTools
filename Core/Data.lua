@@ -351,7 +351,7 @@ local defaultIdentifierTypes = {
         description = "A gate or barrier",
         icon = identifierAtlas.texture,
         texCoords = identifierAtlas.icons["gate"],
-        scale = 1.0,
+        scale = 0.7,
     },
 
     -- Portal
@@ -360,7 +360,7 @@ local defaultIdentifierTypes = {
         description = "Teleport portal",
         icon = identifierAtlas.texture,
         texCoords = identifierAtlas.icons["portal"],
-        scale = 1.2,
+        scale = 1.0,
     },
 
     -- Dungeon entrance
