@@ -63,6 +63,24 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     if not packGroup then
         -- No pooled frame available, create a new one
         packGroup = CreateFrame("Frame", nil, UI.mapContainer)
+
+        local labelFrame = CreateFrame("Frame", nil, UI.mapContainer)
+        labelFrame:SetFrameStrata("HIGH")
+        labelFrame:SetFrameLevel(1000)
+        labelFrame:SetSize(40, 40)
+
+        local pullLabel = labelFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+        pullLabel:SetAllPoints(labelFrame)
+        pullLabel:SetFont("Fonts\\FRIZQT__.TTF", 18, "OUTLINE")
+        pullLabel:SetTextColor(0.5, 0.5, 0.5, 1)
+        pullLabel:SetShadowColor(0, 0, 0, 0.5)
+        pullLabel:SetShadowOffset(1, -1)
+        pullLabel:SetJustifyH("CENTER")
+        pullLabel:SetJustifyV("MIDDLE")
+
+        labelFrame:Hide()
+        labelFrame.text = pullLabel
+        packGroup.pullLabel = labelFrame
     end
 
     -- Reset/set pack group properties
@@ -130,7 +148,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
         local mobButton = self:CreateMobIcon(packGroup, mobInfo, xOffset, yOffset)
         tinsert(packGroup.mobButtons, mobButton)
     end
-    
+
     return packGroup
 end
 
@@ -157,12 +175,6 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
         highlight:SetPoint("CENTER")
         highlight:Hide()
         button.highlight = highlight
-
-        local label = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        label:SetPoint("CENTER", 0, 0)
-        label:SetTextColor(1, 1, 1)
-        label:Hide()
-        button.label = label
 
         local glowBorder = button:CreateTexture(nil, "OVERLAY")
         glowBorder:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
@@ -218,11 +230,6 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     local highlight = button.highlight
     local scaledHighlightSize = MOB_HIGHLIGHT_SIZE * scale
     highlight:SetSize(scaledHighlightSize, scaledHighlightSize)
-
-    -- Update label font size
-    local label = button.label
-    local scaledFontSize = math.max(9, 12 * scale)
-    label:SetFont("Fonts\\FRIZQT__.TTF", scaledFontSize, "OUTLINE")
 
     -- Update glow border size
     local glowBorder = button.glowBorder
@@ -422,6 +429,50 @@ local function ExpandHull(hull, padding)
     return expanded
 end
 
+local function CalculatePullCenter(packIds)
+    if #packIds == 0 then
+        return nil, nil
+    end
+
+    -- Collect all mob button positions
+    local points = {}
+    for _, packId in ipairs(packIds) do
+        local packGroup = RDT.State.packButtons["pack" .. packId]
+        if packGroup and packGroup.mobButtons then
+            local packPt, packRelTo, packRelPt, packX, packY = packGroup:GetPoint(1)
+
+            if packX and packY then
+                for mobIdx, mobBtn in ipairs(packGroup.mobButtons) do
+                    local mobPt, mobRelTo, mobRelPt, mobX, mobY = mobBtn:GetPoint(1)
+
+                    if mobX and mobY then
+                        local absX = packX + mobX
+                        local absY = packY + mobY
+                        tinsert(points, {x = absX, y = absY})
+                    end
+                end
+            end
+        end
+    end
+
+    if #points < 1 then
+        return nil, nil
+    end
+
+    local hull = CalculateConvexHull(points)
+
+    -- Calculate center of convex hull
+    local cx, cy = 0, 0
+    for _, p in ipairs(hull) do
+        cx = cx + p.x
+        cy = cy + p.y
+    end
+    cx = cx / #hull
+    cy = cy / #hull
+
+    return cx, cy
+end
+
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if #packIds == 0 then
         if pullBorders[pullNum] then
@@ -547,12 +598,16 @@ end
 
 function UI:UpdateLabels()
     if not RDT.State.currentRoute then return end
-    
+
     RDT:DebugPrint("Updating pack labels")
 
     ClearAllPullBorders()
 
     for _, packGroup in pairs(RDT.State.packButtons) do
+        if packGroup.pullLabel then
+            packGroup.pullLabel:Hide()
+        end
+
         local pullNum = RDT.State.currentRoute.pulls[packGroup.packId] or 0
         packGroup.pullNum = pullNum
 
@@ -576,6 +631,28 @@ function UI:UpdateLabels()
             if #packIds > 0 then
                 local r, g, b = unpack(RDT:GetPullColor(pullNum))
                 UpdatePullBorder(pullNum, packIds, r, g, b, 0.8)
+
+                local centerX, centerY = CalculatePullCenter(packIds)
+
+                if centerX and centerY then
+                    -- Position the label on the first pack in the pull (arbitrary choice for label parent)
+                    local firstPackGroup = RDT.State.packButtons["pack" .. packIds[1]]
+
+                    if firstPackGroup and firstPackGroup.pullLabel then
+                        local labelFrame = firstPackGroup.pullLabel
+                        labelFrame:ClearAllPoints()
+                        labelFrame:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", centerX, centerY)
+                        labelFrame.text:SetText(tostring(pullNum))
+
+                        if pullNum == RDT.State.currentPull then
+                            labelFrame.text:SetTextColor(1, 1, 1, 1)
+                        else
+                            labelFrame.text:SetTextColor(0.5, 0.5, 0.5, 1)
+                        end
+
+                        labelFrame:Show()
+                    end
+                end
             end
         end
     end

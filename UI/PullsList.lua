@@ -317,6 +317,9 @@ function UI:RenderPullEntry(pullNum, yOffset)
                 if RDT.UI and RDT.UI.UpdatePullList then
                     RDT.UI:UpdatePullList()
                 end
+                if RDT.UI and RDT.UI.UpdateLabels then
+                    RDT.UI:UpdateLabels()
+                end
                 RDT:Print(string.format("Switched to pull #%d", self.pullNum))
             end
         end)
