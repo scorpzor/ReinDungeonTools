@@ -8,6 +8,26 @@ RDT.UIHelpers = RDT.UIHelpers or {}
 local UIHelpers = RDT.UIHelpers
 
 --------------------------------------------------------------------------------
+-- Atlas Definitions
+--------------------------------------------------------------------------------
+
+local scrollbarAtlas = {
+    texture = "Interface\\buttons\\minimalscrollbarsmallproportional",
+    size = {17, 11},
+    sizeEnd = {17, 15},
+    arrows = {
+        ["arrow-up"] = {0.015625, 0.28125, 0.484375, 0.64225},
+        ["arrow-up-over"] = {0.3125, 0.578125, 0.484375, 0.64225},
+        ["arrow-up-down"] = {0.015625, 0.28125, 0.6875, 0.845375},
+        ["arrow-down"] = {0.015625, 0.28125, 0.28125, 0.453125},
+        ["arrow-down-over"] = {0.609375, 0.875, 0.28125, 0.453125},
+        ["arrow-down-down"] = {0.3125, 0.578125, 0.28125, 0.453125},
+        ["arrow-up-end"] = {0.015625, 0.28125, 0.25, 0.015625},
+        ["arrow-down-end"] = {0.015625, 0.28125, 0.015625, 0.25},
+    }
+}
+
+--------------------------------------------------------------------------------
 -- Button Styling
 --------------------------------------------------------------------------------
 
@@ -113,73 +133,61 @@ function UIHelpers:StyleScrollBar(scrollFrame)
     end
     
     if scrollUpButton then
-        scrollUpButton:SetNormalTexture(nil)
-        scrollUpButton:SetPushedTexture(nil)
-        scrollUpButton:SetHighlightTexture(nil)
-        scrollUpButton:SetDisabledTexture(nil)
-        scrollUpButton:SetSize(16, 16)
-        
-        -- Style as square button
-        scrollUpButton:SetBackdrop({
-            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-            tile = false,
-            edgeSize = 1,
-            insets = { left = 1, right = 1, top = 1, bottom = 1 }
-        })
-        scrollUpButton:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        scrollUpButton:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-        
-        -- Add arrow text (check if it already exists to avoid duplicates)
-        if not scrollUpButton.styledArrow then
-            local upArrow = scrollUpButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            upArrow:SetPoint("CENTER", 0, 0)
-            upArrow:SetText("^")
-            upArrow:SetTextColor(0.7, 0.7, 0.7)
-            scrollUpButton.styledArrow = upArrow
-        end
-        
-        scrollUpButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.35, 0.35, 0.35, 1)
-        end)
-        scrollUpButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        end)
+        scrollUpButton:SetSize(unpack(scrollbarAtlas.size))
+
+        local normalTex = scrollUpButton:CreateTexture(nil, "ARTWORK")
+        normalTex:SetAllPoints()
+        normalTex:SetTexture(scrollbarAtlas.texture)
+        normalTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up"]))
+        scrollUpButton:SetNormalTexture(normalTex)
+
+        local hoverTex = scrollUpButton:CreateTexture(nil, "ARTWORK")
+        hoverTex:SetAllPoints()
+        hoverTex:SetTexture(scrollbarAtlas.texture)
+        hoverTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up-over"]))
+        scrollUpButton:SetHighlightTexture(hoverTex)
+
+        local pushedTex = scrollUpButton:CreateTexture(nil, "ARTWORK")
+        pushedTex:SetAllPoints()
+        pushedTex:SetTexture(scrollbarAtlas.texture)
+        pushedTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up-down"]))
+        scrollUpButton:SetPushedTexture(pushedTex)
+
+        local disabledTex = scrollUpButton:CreateTexture(nil, "ARTWORK")
+        disabledTex:SetSize(unpack(scrollbarAtlas.sizeEnd))
+        disabledTex:SetPoint("BOTTOM")
+        disabledTex:SetTexture(scrollbarAtlas.texture)
+        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up-end"]))
+        scrollUpButton:SetDisabledTexture(disabledTex)
     end
     
     if scrollDownButton then
-        scrollDownButton:SetNormalTexture(nil)
-        scrollDownButton:SetPushedTexture(nil)
-        scrollDownButton:SetHighlightTexture(nil)
-        scrollDownButton:SetDisabledTexture(nil)
-        scrollDownButton:SetSize(16, 16)
-        
-        -- Style as square button
-        scrollDownButton:SetBackdrop({
-            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-            tile = false,
-            edgeSize = 1,
-            insets = { left = 1, right = 1, top = 1, bottom = 1 }
-        })
-        scrollDownButton:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        scrollDownButton:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-        
-        -- Add arrow text (check if it already exists to avoid duplicates)
-        if not scrollDownButton.styledArrow then
-            local downArrow = scrollDownButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            downArrow:SetPoint("CENTER", 0, 0)
-            downArrow:SetText("v")
-            downArrow:SetTextColor(0.7, 0.7, 0.7)
-            scrollDownButton.styledArrow = downArrow
-        end
-        
-        scrollDownButton:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(0.35, 0.35, 0.35, 1)
-        end)
-        scrollDownButton:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
-        end)
+        scrollDownButton:SetSize(unpack(scrollbarAtlas.size))
+
+        local normalTex = scrollDownButton:CreateTexture(nil, "ARTWORK")
+        normalTex:SetAllPoints()
+        normalTex:SetTexture(scrollbarAtlas.texture)
+        normalTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down"]))
+        scrollDownButton:SetNormalTexture(normalTex)
+
+        local hoverTex = scrollDownButton:CreateTexture(nil, "ARTWORK")
+        hoverTex:SetAllPoints()
+        hoverTex:SetTexture(scrollbarAtlas.texture)
+        hoverTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down-over"]))
+        scrollDownButton:SetHighlightTexture(hoverTex)
+
+        local pushedTex = scrollDownButton:CreateTexture(nil, "ARTWORK")
+        pushedTex:SetAllPoints()
+        pushedTex:SetTexture(scrollbarAtlas.texture)
+        pushedTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down-down"]))
+        scrollDownButton:SetPushedTexture(pushedTex)
+
+        local disabledTex = scrollDownButton:CreateTexture(nil, "ARTWORK")
+        disabledTex:SetSize(unpack(scrollbarAtlas.sizeEnd))
+        disabledTex:SetPoint("TOP")
+        disabledTex:SetTexture(scrollbarAtlas.texture)
+        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down-end"]))
+        scrollDownButton:SetDisabledTexture(disabledTex)
     end
     
     if thumbTexture then
