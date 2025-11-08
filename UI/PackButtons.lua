@@ -9,7 +9,7 @@ local UI = RDT.UI
 
 -- Pack button styling constants
 local MOB_ICON_SIZE = 20
-local MOB_ICON_SPACING = 1
+local MOB_ICON_SPACING = 16
 local MOB_HIGHLIGHT_SIZE = 24
 local MOB_PACK_HIGHLIGHT_SIZE = 28
 local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
@@ -53,8 +53,72 @@ function UI:CreatePacks(packData)
     end
 
     self:UpdateLabels()
-    
+
     RDT:DebugPrint("Pack mob icons created successfully")
+end
+
+--- Calculate hexagonal grid positions for mob icons
+-- Arranges mobs in concentric hexagonal rings: center, then rings of 6, 12, 18, etc.
+-- @param count number Number of mobs to position
+-- @return table Array of {x, y} positions
+function UI:CalculateHexPositions(count)
+    local positions = {}
+
+    if count == 0 then
+        return positions
+    end
+
+    if count == 1 then
+        tinsert(positions, {x = 0, y = 0})
+        return positions
+    end
+
+    local spacing = MOB_ICON_SPACING
+    local currentRing = 0
+    local mobsPlaced = 0
+
+    while mobsPlaced < count do
+        if currentRing == 0 then
+            tinsert(positions, {x = 0, y = 0})
+            mobsPlaced = mobsPlaced + 1
+        else
+            -- Each ring holds currentRing * 6 mobs (ring 1 = 6, ring 2 = 12, etc.)
+            local mobsInRing = math.min(currentRing * 6, count - mobsPlaced)
+            local radius = currentRing * spacing
+
+            for i = 0, mobsInRing - 1 do
+                -- Determine which hexagon edge (0-5) and position along that edge
+                local segment = math.floor(i / currentRing)
+                local posInSegment = i % currentRing
+
+                -- Hexagon vertices are at 0°, 60°, 120°, 180°, 240°, 300°
+                local angle1 = math.rad(segment * 60)
+                local angle2 = math.rad((segment + 1) * 60)
+
+                -- Interpolate position along the hexagon edge
+                local t = currentRing > 1 and posInSegment / currentRing or 0
+
+                local x1 = radius * math.cos(angle1)
+                local y1 = radius * math.sin(angle1)
+                local x2 = radius * math.cos(angle2)
+                local y2 = radius * math.sin(angle2)
+
+                local x = x1 + (x2 - x1) * t
+                local y = y1 + (y2 - y1) * t
+
+                tinsert(positions, {x = x, y = y})
+                mobsPlaced = mobsPlaced + 1
+
+                if mobsPlaced >= count then
+                    break
+                end
+            end
+        end
+
+        currentRing = currentRing + 1
+    end
+
+    return positions
 end
 
 function UI:CreatePackGroup(data, mapWidth, mapHeight)
@@ -112,40 +176,22 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     table.sort(mobList, function(a, b) return (a.scale or 1.0) > (b.scale or 1.0) end)
 
     local totalMobs = #mobList
-    local minRadius = 16
-    local triRadius = 8
-    local dynamicRadius = 14 + (totalMobs * 0.6)
-    local radius = math.max(minRadius, dynamicRadius)
 
-    local containerSize = radius * 2 + MOB_ICON_SIZE
+    local positions = self:CalculateHexPositions(totalMobs)
+
+    local maxDist = 0
+    for _, pos in ipairs(positions) do
+        local dist = math.sqrt(pos.x * pos.x + pos.y * pos.y)
+        maxDist = math.max(maxDist, dist)
+    end
+    local containerSize = (maxDist + MOB_ICON_SIZE) * 2
     packGroup:SetSize(containerSize, containerSize)
 
     packGroup:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", data.x * mapWidth, -(data.y * mapHeight))
 
     for iconIndex, mobInfo in ipairs(mobList) do
-        local xOffset, yOffset
-
-        if totalMobs == 3 then
-            local angleStep = 360 / 3
-            local angle = 270 - (angleStep * (iconIndex - 1))
-            local radians = math.rad(angle)
-
-            xOffset = triRadius * math.cos(radians)
-            yOffset = triRadius * math.sin(radians)
-        elseif iconIndex == 1 then
-            xOffset, yOffset = 0, 0
-        else
-            local satelliteMobs = totalMobs - 1
-            local angleStep = 360 / satelliteMobs
-            local satelliteIndex = iconIndex - 2
-            local angle = 270 - (angleStep * satelliteIndex)
-            local radians = math.rad(angle)
-
-            xOffset = radius * math.cos(radians)
-            yOffset = radius * math.sin(radians)
-        end
-
-        local mobButton = self:CreateMobIcon(packGroup, mobInfo, xOffset, yOffset)
+        local pos = positions[iconIndex]
+        local mobButton = self:CreateMobIcon(packGroup, mobInfo, pos.x, pos.y)
         tinsert(packGroup.mobButtons, mobButton)
     end
 
@@ -153,13 +199,11 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
 end
 
 function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
-    -- Try to reuse a mob button from the pool, or create a new one
+    -- Try to reuse a mob button from the pool
     local button = table.remove(mobButtonPool)
     if not button then
-        -- No pooled button available, create a new one
         button = CreateFrame("Button", nil, parent)
 
-        -- Create textures only once when creating new button
         local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetPoint("CENTER")
         button.icon = icon
@@ -183,7 +227,6 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
         glowBorder:Hide()
         button.glowBorder = glowBorder
 
-        -- Setup handlers once
         self:SetupMobIconHandlers(button)
     end
 
