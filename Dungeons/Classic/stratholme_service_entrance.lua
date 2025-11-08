@@ -59,6 +59,12 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\risen_lackey",
         scale = 0.7,
     },
+    ["strat_crypt_crawler"] = {
+        name = "Crypt Crawler",
+        count = 0,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crypt_crawler",
+        scale = 0.7,
+    },
 }
 
 local bosses = {
@@ -245,6 +251,31 @@ local mapDefinition = {
             mobs = {
                 ["strat_ghoul_ravener"] = 1,
                 ["strat_fleshflayer_ghoul"] = 2,
+            }
+        },
+        {
+            id = 13,
+            x = 0.628,
+            y = 0.475,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 14,
+            x = 0.618,
+            y = 0.450, 
+            mobs = {
+                ["strat_crypt_beast"] = 1,
+            }
+        },
+        {
+            id = 15,
+            x = 0.590,
+            y = 0.493,
+            mobs = {
+                ["strat_thuzadin_shadowcaster"] = 2,
             }
         },
         -------------------------------- Bosses --------------------------------
