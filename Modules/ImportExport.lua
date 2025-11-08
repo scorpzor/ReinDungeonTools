@@ -97,8 +97,6 @@ end
 -- @param exportData table The export data structure
 -- @param label string Debug section label (e.g., "EXPORT" or "IMPORT")
 local function DebugPrintRouteData(exportData, label)
-    if not RDT.db.profile.debugMode then return end
-
     RDT:DebugPrint("=== " .. label .. " DEBUG ===")
     RDT:DebugPrint("Dungeon: " .. tostring(exportData.dungeon))
     RDT:DebugPrint("Route Name: " .. tostring(exportData.routeName))
