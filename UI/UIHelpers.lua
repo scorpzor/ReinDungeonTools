@@ -7,25 +7,7 @@ local RDT = _G.RDT
 RDT.UIHelpers = RDT.UIHelpers or {}
 local UIHelpers = RDT.UIHelpers
 
---------------------------------------------------------------------------------
--- Atlas Definitions
---------------------------------------------------------------------------------
-
-local scrollbarAtlas = {
-    texture = "Interface\\buttons\\minimalscrollbarsmallproportional",
-    size = {17, 11},
-    sizeEnd = {17, 15},
-    arrows = {
-        ["arrow-up"] = {0.015625, 0.28125, 0.484375, 0.64225},
-        ["arrow-up-over"] = {0.3125, 0.578125, 0.484375, 0.64225},
-        ["arrow-up-down"] = {0.015625, 0.28125, 0.6875, 0.845375},
-        ["arrow-down"] = {0.015625, 0.28125, 0.28125, 0.453125},
-        ["arrow-down-over"] = {0.609375, 0.875, 0.28125, 0.453125},
-        ["arrow-down-down"] = {0.3125, 0.578125, 0.28125, 0.453125},
-        ["arrow-up-end"] = {0.015625, 0.28125, 0.25, 0.015625},
-        ["arrow-down-end"] = {0.015625, 0.28125, 0.015625, 0.25},
-    }
-}
+local scrollbarAtlas = RDT.Data:GetScrollbarAtlas()
 
 --------------------------------------------------------------------------------
 -- Button Styling
@@ -108,7 +90,7 @@ function UIHelpers:StyleScrollBar(scrollFrame)
     -- Try to get scrollbar by name (for named frames) or directly (for unnamed frames)
     local scrollBar
     local frameName = scrollFrame:GetName()
-    
+
     if frameName then
         -- Named frame - use global lookup
         scrollBar = _G[frameName.."ScrollBar"]
@@ -116,12 +98,12 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         -- Unnamed frame - try direct property access (UIPanelScrollFrameTemplate)
         scrollBar = scrollFrame.ScrollBar
     end
-    
+
     if not scrollBar then return end
-    
+
     -- Get child elements (try both methods)
     local scrollUpButton, scrollDownButton, thumbTexture
-    
+
     if frameName then
         scrollUpButton = _G[frameName.."ScrollBarScrollUpButton"]
         scrollDownButton = _G[frameName.."ScrollBarScrollDownButton"]
@@ -131,7 +113,7 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         scrollDownButton = scrollBar.ScrollDownButton
         thumbTexture = scrollBar.ThumbTexture
     end
-    
+
     if scrollUpButton then
         scrollUpButton:SetSize(unpack(scrollbarAtlas.size))
 
