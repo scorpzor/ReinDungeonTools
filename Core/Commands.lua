@@ -225,7 +225,7 @@ local commands = {
             -- Validate all if no specific dungeon given
             local results = RDT.Data:ValidateAll()
             if results.invalid == 0 then
-                RDT:Print(string.format("|cFF00FF00✓ All %d dungeons validated successfully|r", results.valid))
+                RDT:Print(string.format("All %d dungeons validated successfully", results.valid))
             else
                 RDT:PrintError(string.format("Validation complete: %d valid, %d invalid", results.valid, results.invalid))
                 for name, error in pairs(results.errors) do
@@ -236,9 +236,9 @@ local commands = {
             -- Validate specific dungeon
             local success, msg = RDT.Data:ValidateDungeon(args)
             if success then
-                RDT:Print("✓ Dungeon validated: " .. args)
+                RDT:Print("Dungeon validated: " .. args)
             else
-                RDT:PrintError("✗ Validation failed: " .. msg)
+                RDT:PrintError("Validation failed: " .. msg)
             end
         end
     end,

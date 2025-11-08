@@ -468,11 +468,11 @@ function Data:ValidateAll()
         local success, msg = self:ValidateDungeon(name)
         if success then
             results.valid = results.valid + 1
-            RDT:DebugPrint("✓ Validated: " .. name)
+            RDT:DebugPrint("Validated: " .. name)
         else
             results.invalid = results.invalid + 1
             results.errors[name] = msg
-            RDT:PrintError("✗ Validation failed for " .. name .. ": " .. msg)
+            RDT:PrintError("Validation failed for " .. name .. ": " .. msg)
         end
     end
     
