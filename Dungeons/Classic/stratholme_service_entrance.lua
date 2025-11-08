@@ -10,29 +10,110 @@ end
 -- Mob Definitions
 --------------------------------------------------------------------------------
 
---local mobs = {
---    -- Generic example mobs (replace with actual Stratholme mobs)
---    ["strat_trash"] = {
---        name = "Stratholme Trash",
---        count = 1.0,
---        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
---        scale = 0.8,
---    },
---    ["strat_elite"] = {
---        name = "Stratholme Elite",
---        count = 2.0,
---        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
---        scale = 1.0,
---    },
---    ["strat_abomination"] = {
---        name = "Abomination",
---        count = 3.0,
---        displayIcon = "Interface\\Icons\\Spell_Shadow_AnimateDead",
---        scale = 1.0,
---    },
---}
---
---RDT.Data:RegisterMobs(mobs)
+local mobs = {
+    ["strat_shrieking_banshee"] = {
+        name = "Shrieking Banshee",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\shrieking_banshee",
+        scale = 0.7,
+    },
+    ["strat_crypt_beast"] = {
+        name = "Crypt Beast",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crypt_beast",
+        scale = 0.7,
+    },
+    ["strat_rockwing_screecher"] = {
+        name = "Rockwing Screecher",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\rockwing_screecher",
+        scale = 0.7,
+    },
+    ["strat_ghoul_ravener"] = {
+        name = "Ghoul Ravener",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ghoul_ravener",
+        scale = 0.7,
+    },
+    ["strat_fleshflayer_ghoul"] = {
+        name = "Fleshflayer Ghoul",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fleshflayer_ghoul",
+        scale = 0.7,
+    },
+    ["strat_thuzadin_necromancer"] = {
+        name = "Thuzadin Necromancer",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\thuzadin_necromancer",
+        scale = 0.7,
+    },
+    ["strat_thuzadin_shadowcaster"] = {
+        name = "Thuzadin Shadowcaster",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\thuzadin_shadowcaster",
+        scale = 0.7,
+    },
+    ["strat_risen_lackey"] = {
+        name = "Risen Lackey",
+        count = 0,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\risen_lackey",
+        scale = 0.7,
+    },
+}
+
+local bosses = {
+    ["strat_boss_magistrate_barthilas"] = {
+        name = "Magistrate Barthilas",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_stonespine"] = {
+        name = "Stonespine",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_nerubenkan"] = {
+        name = "Nerub'enkan",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_black_guard_swordsmith"] = {
+        name = "Black Guard Swordsmith",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_maleki_the_pallid"] = {
+        name = "Maleki the Pallid",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_baroness_anastari"] = {
+        name = "Baroness Anastari",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_ramstein_the_gorger"] = {
+        name = "Ramstein the Gorger",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+    ["strat_boss_baron_rivendare"] = {
+        name = "Baron Rivendare",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        scale = 1.25,
+    },
+}
+
+RDT.Data:RegisterMobs(mobs)
+RDT.Data:RegisterMobs(bosses)
 
 --------------------------------------------------------------------------------
 -- Stratholme - Service Entrance
@@ -57,22 +138,141 @@ local mapDefinition = {
     packData = {
         {
             id = 1,
-            x = 0.5,
-            y = 0.15,
+            x = 0.677,
+            y = 0.795,
             mobs = {
-                ["generic_trash_mob"] = 2,
-                ["generic_elite_mob"] = 1,
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 2,
             }
         },
         {
             id = 2,
-            x = 0.45,
-            y = 0.25,
+            x = 0.622,
+            y = 0.737,
             mobs = {
-                ["generic_trash_mob"] = 3,
-                ["generic_elite_mob"] = 1,
-                ["generic_big_mob"] = 1,
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 2,
+                ["strat_mangled_cadaver"] = 2,
+                ["strat_ravaged_cadaver"] = 1,
             }
+        },
+        {
+            id = 3,
+            x = 0.642,
+            y = 0.680,
+            mobs = {
+                ["strat_skeletal_berserker"] = 2,
+                ["strat_skeletal_guardian"] = 3,
+                ["strat_mangled_cadaver"] = 1,
+                ["strat_ravaged_cadaver"] = 1,
+            }
+        },
+        {
+            id = 4,
+            x = 0.651,
+            y = 0.553,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 5,
+            x = 0.658,
+            y = 0.522,
+            mobs = {
+                ["strat_crypt_beast"] = 1,
+                ["strat_rockwing_screecher"] = 1,
+            }
+        },
+        {
+            id = 6,
+            x = 0.665,
+            y = 0.496,
+            mobs = {
+                ["strat_rockwing_screecher"] = 1,
+            }
+        },
+        {
+            id = 7,
+            x = 0.679,
+            y = 0.510,
+            mobs = {
+                ["strat_rockwing_screecher"] = 1,
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 8,
+            x = 0.693,
+            y = 0.550,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_fleshflayer_ghoul"] = 1,
+            }
+        },
+        {
+            id = 9,
+            x = 0.679,
+            y = 0.478,
+            mobs = {
+                ["strat_ghoul_ravener"] = 2,
+            }
+        },
+        {
+            id = 10,
+            x = 0.658,
+            y = 0.495,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 11,
+            x = 0.649,
+            y = 0.466,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 1,
+                ["strat_risen_lackey"] = 1,
+            }
+        },
+        {
+            id = 12,
+            x = 0.621,
+            y = 0.512,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_fleshflayer_ghoul"] = 2,
+            }
+        },
+        -------------------------------- Bosses --------------------------------
+        {
+            id = 1000,
+            x = 0.658,
+            y = 0.750,
+            mobs = {
+                ["strat_boss_magistrate_barthilas"] = 1,
+            }
+        },
+    },
+    identifiers = {
+        {
+            id = 1,
+            type = "dungeon-entrance",
+            x = 0.657,
+            y = 0.908,
+            name = "Entrance Portal",
+            description = "Main entrance",
+        },
+        {
+            id = 2,
+            type = "gate",
+            x = 0.597,
+            y = 0.766,
+            name = "Main Gate",
+            description = "",
         },
     },
 }

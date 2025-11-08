@@ -977,7 +977,6 @@ local mapDefinition = {
         },
     },
     identifiers = {
-        -- Entrance and main doors
         {
             id = 1,
             type = "dungeon-entrance",
