@@ -538,13 +538,19 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                     if mobX and mobY then
                         local absX = packX + mobX
                         local absY = packY + mobY
-                        tinsert(points, {x = absX, y = absY})
+
+                        local offset = 5
+                        tinsert(points, {x = absX, y = absY})  -- Center
+                        tinsert(points, {x = absX - offset, y = absY - offset})  -- Top-left
+                        tinsert(points, {x = absX + offset, y = absY - offset})  -- Top-right
+                        tinsert(points, {x = absX - offset, y = absY + offset})  -- Bottom-left
+                        tinsert(points, {x = absX + offset, y = absY + offset})  -- Bottom-right
                     end
                 end
             end
         end
     end
-    
+
     if #points < 3 then
         if pullBorders[pullNum] then
             pullBorders[pullNum]:Hide()
@@ -554,7 +560,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     
     local hull = CalculateConvexHull(points)
 
-    local padding = 15
+    local padding = 5
     hull = ExpandHull(hull, padding)
 
     local border = pullBorders[pullNum]
@@ -583,20 +589,20 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     for _, seg in ipairs(border.segments) do
         seg:Hide()
     end
-    
-    local pixelsPerDot = 4
+
+    local pixelsPerDot = 5
     local dotSize = 3
 
     local segmentIdx = 1
     for i = 1, #hull do
         local p1 = hull[i]
         local p2 = hull[(i % #hull) + 1]
-        
+
         local dx = p2.x - p1.x
         local dy = p2.y - p1.y
         local lineLength = math.sqrt(dx * dx + dy * dy)
-        
-        local dotsForThisLine = math.max(2, math.floor(lineLength / pixelsPerDot))
+
+        local dotsForThisLine = math.max(1, math.floor(lineLength / pixelsPerDot))
 
         for j = 0, dotsForThisLine do
             local t = j / dotsForThisLine
@@ -608,24 +614,24 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                 seg = CreateFrame("Frame", nil, border)
                 seg:SetSize(dotSize, dotSize)
                 seg:SetFrameLevel(border:GetFrameLevel() + 1)
-                
+
                 local tex = seg:CreateTexture(nil, "OVERLAY")
                 tex:SetAllPoints()
                 tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
                 seg.texture = tex
-                
+
                 border.segments[segmentIdx] = seg
             end
-            
+
             seg:ClearAllPoints()
             seg:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", x, y)
             seg.texture:SetVertexColor(r, g, b, alpha)
             seg:Show()
-            
+
             segmentIdx = segmentIdx + 1
         end
     end
-    
+
     border:Show()
 end
 
