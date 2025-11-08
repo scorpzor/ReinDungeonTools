@@ -7,7 +7,9 @@ local RDT = _G.RDT
 RDT.UIHelpers = RDT.UIHelpers or {}
 local UIHelpers = RDT.UIHelpers
 
+-- Get atlas references once at module load
 local scrollbarAtlas = RDT.Data:GetScrollbarAtlas()
+local dropdownAtlas = RDT.Data:GetDropdownAtlas()
 
 --------------------------------------------------------------------------------
 -- Button Styling
@@ -390,16 +392,17 @@ function UIHelpers:CreateModernDropdown(config)
     text:SetPoint("RIGHT", -20, 0)
     text:SetJustifyH("LEFT")
     text:SetText(config.defaultText or "Select...")
-    text:SetTextColor(1, 1, 1, 1)  -- White text
+    text:SetTextColor(1, 1, 1, 1)
     button.text = text
-    
-    -- Dropdown arrow
-    local arrow = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+
+    -- Dropdown arrow (using dropdown atlas down arrow)
+    local arrow = button:CreateTexture(nil, "OVERLAY")
+    arrow:SetSize(12, 5)
     arrow:SetPoint("RIGHT", -5, 0)
-    arrow:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-    arrow:SetText("v")
-    arrow:SetTextColor(0.7, 0.7, 0.7)
-    
+    arrow:SetTexture(dropdownAtlas.texture)
+    arrow:SetTexCoord(unpack(dropdownAtlas.icons["icon-down-small"]))
+    arrow:SetVertexColor(1, 1, 0.5)
+
     -- Create dropdown menu frame
     local menuFrame = CreateFrame("Frame", config.name.."Menu", UIParent)
     menuFrame:SetSize(config.width or 200, config.menuHeight or 200)
@@ -493,13 +496,15 @@ function UIHelpers:CreateModernDropdown(config)
                 btnText:SetJustifyH("LEFT")
                 btnText:SetTextColor(1, 1, 1, 1)
                 btn.text = btnText
-                
-                local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+
+                local checkmark = btn:CreateTexture(nil, "OVERLAY")
+                checkmark:SetSize(12, 12)
                 checkmark:SetPoint("RIGHT", -5, 0)
-                checkmark:SetText("<")
-                checkmark:SetTextColor(0, 1, 0)
+                checkmark:SetTexture(dropdownAtlas.texture)
+                checkmark:SetTexCoord(unpack(dropdownAtlas.icons["icon-left"]))
+                checkmark:SetVertexColor(0, 1, 0)
                 btn.checkmark = checkmark
-                
+
                 btn:SetScript("OnEnter", function(self)
                     self:SetBackdropColor(0.4, 0.4, 0.4, 0.8)
                 end)

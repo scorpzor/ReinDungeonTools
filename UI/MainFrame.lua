@@ -242,7 +242,7 @@ function UI:CreateRouteDropdown(container)
     newRouteBtn.text:SetAllPoints()
     newRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     newRouteBtn.text:SetText("New")
-    newRouteBtn.text:SetTextColor(0.2, 1, 0.2)
+    newRouteBtn.text:SetTextColor(1, 1, 1, 1)
     
     newRouteBtn:SetScript("OnClick", function()
         if RDT.Dialogs and RDT.Dialogs.ShowNewRoute then
@@ -267,7 +267,7 @@ function UI:CreateRouteDropdown(container)
     renameRouteBtn.text:SetAllPoints()
     renameRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     renameRouteBtn.text:SetText("Rename")
-    renameRouteBtn.text:SetTextColor(0.8, 0.8, 1)
+    renameRouteBtn.text:SetTextColor(1, 1, 1, 1)
     
     renameRouteBtn:SetScript("OnClick", function()
         if RDT.Dialogs and RDT.Dialogs.ShowRenameRoute then
@@ -283,7 +283,7 @@ function UI:CreateRouteDropdown(container)
     deleteRouteBtn.text:SetAllPoints()
     deleteRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     deleteRouteBtn.text:SetText("Delete")
-    deleteRouteBtn.text:SetTextColor(1, 0.3, 0.3)
+    deleteRouteBtn.text:SetTextColor(1, 1, 1, 1)
     
     deleteRouteBtn:SetScript("OnClick", function()
         if RDT.Dialogs and RDT.Dialogs.ShowDeleteRoute then

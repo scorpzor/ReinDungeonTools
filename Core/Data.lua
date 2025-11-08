@@ -77,6 +77,15 @@ local scrollbarAtlas = {
     }
 }
 
+local dropdownAtlas = {
+    texture = "Interface\\common\\commondropdown2x",
+    size = {34, 34},
+    icons = {
+        ["icon-left"] = {0.767578, 0.833984, 0.357422, 0.423828},
+        ["icon-down-small"] = {0.626953, 0.673828, 0.322266, 0.341797},
+    }
+}
+
 --------------------------------------------------------------------------------
 -- Core Registry Functions
 --------------------------------------------------------------------------------
@@ -242,6 +251,12 @@ end
 -- @return table Atlas configuration with texture, size, and arrow coordinates
 function Data:GetScrollbarAtlas()
     return scrollbarAtlas
+end
+
+--- Get the dropdown atlas configuration
+-- @return table Atlas configuration with texture, size, and icon coordinates
+function Data:GetDropdownAtlas()
+    return dropdownAtlas
 end
 
 --- Get the required enemy forces count for a dungeon
