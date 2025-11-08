@@ -523,8 +523,10 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         end
         return
     end
-    
+
     local points = {}
+    local totalMobs = 0
+    local singleMobButton = nil
 
     for _, packId in ipairs(packIds) do
         local packGroup = RDT.State.packButtons["pack" .. packId]
@@ -545,6 +547,11 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                         tinsert(points, {x = absX + offset, y = absY - offset})  -- Top-right
                         tinsert(points, {x = absX - offset, y = absY + offset})  -- Bottom-left
                         tinsert(points, {x = absX + offset, y = absY + offset})  -- Bottom-right
+
+                        totalMobs = totalMobs + 1
+                        if totalMobs == 1 then
+                            singleMobButton = mobBtn
+                        end
                     end
                 end
             end
@@ -557,11 +564,27 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         end
         return
     end
-    
-    local hull = CalculateConvexHull(points)
 
-    local padding = 5
-    hull = ExpandHull(hull, padding)
+    local hull
+    if totalMobs == 1 and singleMobButton then
+        local centerX = points[1].x
+        local centerY = points[1].y
+        local mobScale = singleMobButton.iconScale or 1.0
+        local radius = (MOB_ICON_SIZE * mobScale * 0.5) + 2
+
+        hull = {}
+        local numPoints = math.max(12, math.floor(radius * 0.8))
+        for i = 0, numPoints - 1 do
+            local angle = (i / numPoints) * 2 * math.pi
+            tinsert(hull, {
+                x = centerX + radius * math.cos(angle),
+                y = centerY + radius * math.sin(angle)
+            })
+        end
+    else
+        hull = CalculateConvexHull(points)
+        hull = ExpandHull(hull, 5)
+    end
 
     local border = pullBorders[pullNum]
     if not border then
