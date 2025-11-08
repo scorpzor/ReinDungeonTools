@@ -501,7 +501,7 @@ function UIHelpers:CreateModernDropdown(config)
                 local btnText = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
                 btnText:SetPoint("LEFT", 8, 0)
                 btnText:SetJustifyH("LEFT")
-                btnText:SetTextColor(1, 1, 1, 1)  -- White text
+                btnText:SetTextColor(1, 1, 1, 1)
                 btn.text = btnText
                 
                 local checkmark = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -511,12 +511,12 @@ function UIHelpers:CreateModernDropdown(config)
                 btn.checkmark = checkmark
                 
                 btn:SetScript("OnEnter", function(self)
-                    self:SetBackdropColor(0.2, 0.2, 0.2, 0.8)
+                    self:SetBackdropColor(0.4, 0.4, 0.4, 0.8)
                 end)
                 
                 btn:SetScript("OnLeave", function(self)
                     if self.isSelected then
-                        self:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+                        self:SetBackdropColor(0.3, 0.3, 0.3, 0.5)
                     else
                         self:SetBackdropColor(0, 0, 0, 0)
                     end
@@ -533,7 +533,7 @@ function UIHelpers:CreateModernDropdown(config)
             btn.isSelected = item.isSelected
             btn.checkmark:SetShown(item.isSelected)
             if item.isSelected then
-                btn:SetBackdropColor(0.1, 0.15, 0.2, 0.5)
+                btn:SetBackdropColor(0.3, 0.3, 0.3, 0.5)
             else
                 btn:SetBackdropColor(0, 0, 0, 0)
             end
