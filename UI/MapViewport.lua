@@ -157,8 +157,12 @@ function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
     local clampedZoom = math.max(viewport.minZoom, math.min(viewport.maxZoom, newZoom))
 
     if clampedZoom ~= oldZoom then
-        -- If center point provided, adjust pan to keep that point stationary
-        if centerX and centerY then
+        -- If zooming to 1.0x, reset to center position
+        if clampedZoom == 1.0 then
+            viewport.panX = 0
+            viewport.panY = 0
+        -- Otherwise, adjust pan to keep zoom point stationary
+        elseif centerX and centerY then
             local oldPanX = viewport.panX
             local oldPanY = viewport.panY
 
