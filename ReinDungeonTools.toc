@@ -51,6 +51,8 @@ Dungeons\Classic\wailing_caverns.lua
 Dungeons\Classic\zulfarrak.lua
 
 # Core continued
+Core\Base64.lua
+Core\RouteSerializer.lua
 Core\Database.lua
 Core\Commands.lua
 Core\RouteManager.lua
@@ -59,6 +61,7 @@ Core\DevTools.lua
 
 # Modules
 Modules\ImportExport.lua
+Modules\RouteSharing.lua
 
 # UI Components
 UI\UIHelpers.lua
