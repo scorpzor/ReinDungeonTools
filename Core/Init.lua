@@ -81,9 +81,15 @@ function RDT:OnEnable()
         self:PrintError("Data module not loaded - check TOC file load order")
         return
     end
-    
+
     -- Validate dungeon data
     self.Data:ValidateAll()
+
+    -- Initialize route sharing system
+    if self.RouteSharing then
+        self.RouteSharing:Initialize()
+        self.RouteSharing:RegisterSlashCommands()
+    end
 
     if self.UI and self.UI.CreateMainFrame then
         self.UI:CreateMainFrame()
