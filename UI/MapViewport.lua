@@ -22,37 +22,35 @@ function MapViewport:Create(container, mapTexture)
     local viewport = {
         -- State
         zoom = 1.0,
-        panX = 0,
-        panY = 0,
+        scrollH = 0,
+        scrollV = 0,
+        maxScrollH = 0,
+        maxScrollV = 0,
         minZoom = 1.0,
         maxZoom = 5.0,
         isDragging = false,
         dragStartX = 0,
         dragStartY = 0,
-        dragStartPanX = 0,
-        dragStartPanY = 0,
+        dragStartScrollH = 0,
+        dragStartScrollV = 0,
 
         -- References
         container = container,
         mapTexture = mapTexture,
+        scrollFrame = nil,
         canvas = nil,
     }
 
-    -- Create a clipping frame to contain the canvas
-    local clipFrame = CreateFrame("Frame", "RDT_MapClipFrame", container)
-    clipFrame:SetAllPoints(container)
-    clipFrame:SetFrameLevel(container:GetFrameLevel())
-    -- Note: SetClipsChildren() not available in WoW 3.3.5a API
+    local scrollFrame = CreateFrame("ScrollFrame", "RDT_MapScrollFrame", container)
+    scrollFrame:SetAllPoints(container)
+    scrollFrame:EnableMouse(true)
+    scrollFrame:EnableMouseWheel(true)
+    viewport.scrollFrame = scrollFrame
 
-    -- Create the canvas frame inside the clip frame
-    viewport.canvas = CreateFrame("Frame", "RDT_MapCanvas", clipFrame)
+    viewport.canvas = CreateFrame("Frame", "RDT_MapCanvas", scrollFrame)
     viewport.canvas:SetSize(container:GetWidth(), container:GetHeight())
-    viewport.canvas:SetPoint("TOPLEFT", clipFrame, "TOPLEFT", 0, 0)
-    viewport.canvas:EnableMouse(true)
-    viewport.canvas:EnableMouseWheel(true)
 
-    -- Store clip frame reference
-    viewport.clipFrame = clipFrame
+    scrollFrame:SetScrollChild(viewport.canvas)
 
     -- Reparent map texture to canvas and re-anchor it to fill the canvas
     if mapTexture then
@@ -66,7 +64,7 @@ function MapViewport:Create(container, mapTexture)
     -- Set up mouse interactions
     self:SetupMouseHandlers(viewport)
 
-    RDT:DebugPrint("Map viewport created")
+    RDT:DebugPrint("Map viewport created with ScrollFrame clipping")
 
     return viewport
 end
@@ -76,25 +74,23 @@ end
 --------------------------------------------------------------------------------
 
 function MapViewport:SetupMouseHandlers(viewport)
-    local canvas = viewport.canvas
+    local scrollFrame = viewport.scrollFrame
     local container = viewport.container
 
-    -- Mouse wheel for zooming (Ctrl+Wheel)
-    canvas:SetScript("OnMouseWheel", function(self, delta)
+    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
         if IsControlKeyDown() then
-            -- Get cursor position relative to container
+            -- Get cursor position relative to scroll frame
             local scale = UIParent:GetEffectiveScale()
             local cursorX, cursorY = GetCursorPosition()
             cursorX = cursorX / scale
             cursorY = cursorY / scale
 
-            -- Get container position
-            local containerLeft = container:GetLeft()
-            local containerTop = container:GetTop()
+            local frameLeft = scrollFrame:GetLeft()
+            local frameTop = scrollFrame:GetTop()
 
-            -- Calculate cursor position relative to container
-            local relativeX = cursorX - containerLeft
-            local relativeY = containerTop - cursorY  -- Y increases downward
+            -- Calculate cursor position relative to scroll frame
+            local relativeX = cursorX - frameLeft
+            local relativeY = frameTop - cursorY
 
             if delta > 0 then
                 MapViewport:ZoomIn(viewport, relativeX, relativeY)
@@ -104,10 +100,9 @@ function MapViewport:SetupMouseHandlers(viewport)
         end
     end)
 
-    -- Left-click drag for panning
-    canvas:SetScript("OnMouseDown", function(self, button)
+    scrollFrame:SetScript("OnMouseDown", function(self, button)
         if button == "LeftButton" then
-            local scale = self:GetEffectiveScale()
+            local scale = UIParent:GetEffectiveScale()
             local x, y = GetCursorPosition()
             x = x / scale
             y = y / scale
@@ -126,15 +121,14 @@ function MapViewport:SetupMouseHandlers(viewport)
         end
     end)
 
-    canvas:SetScript("OnMouseUp", function(self, button)
+    scrollFrame:SetScript("OnMouseUp", function(self, button)
         if button == "LeftButton" then
             MapViewport:StopDrag(viewport)
             self:SetScript("OnUpdate", nil)
         end
     end)
 
-    -- Stop dragging if mouse leaves canvas
-    canvas:SetScript("OnLeave", function(self)
+    scrollFrame:SetScript("OnLeave", function(self)
         if viewport.isDragging then
             MapViewport:StopDrag(viewport)
             self:SetScript("OnUpdate", nil)
@@ -146,11 +140,11 @@ end
 -- Zoom Functions
 --------------------------------------------------------------------------------
 
---- Set zoom level (clamped to min/max range)
+--- Set zoom level
 -- @param viewport table The viewport object
 -- @param newZoom number New zoom level
--- @param centerX number Optional X coordinate to zoom towards (container space)
--- @param centerY number Optional Y coordinate to zoom towards (container space)
+-- @param centerX number Optional X coordinate to zoom towards (scroll frame space)
+-- @param centerY number Optional Y coordinate to zoom towards (scroll frame space)
 function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
     -- Clamp zoom to valid range
     local oldZoom = viewport.zoom
@@ -159,22 +153,18 @@ function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
     if clampedZoom ~= oldZoom then
         -- If zooming to 1.0x, reset to center position
         if clampedZoom == 1.0 then
-            viewport.panX = 0
-            viewport.panY = 0
-        -- Otherwise, adjust pan to keep zoom point stationary
+            viewport.scrollH = 0
+            viewport.scrollV = 0
+        -- Otherwise, adjust scroll to keep zoom point stationary
         elseif centerX and centerY then
-            local oldPanX = viewport.panX
-            local oldPanY = viewport.panY
+            local oldScrollH = viewport.scrollH
+            local oldScrollV = viewport.scrollV
 
-            -- MDT-style zoom formula adapted for SetPoint:
-            -- Calculate scale change ratio
             local scaleChange = clampedZoom / oldZoom
 
-            -- Calculate new pan offset to keep zoom point stationary
-            -- X formula: inverted (negative pan moves left)
-            viewport.panX = oldPanX + (centerX - scaleChange * centerX) / clampedZoom
-            -- Y formula: not inverted (positive pan moves down in WoW's coordinate system)
-            viewport.panY = oldPanY + (scaleChange * centerY - centerY) / clampedZoom
+            -- Calculate new scroll position to keep zoom point stationary
+            viewport.scrollH = (scaleChange * centerX - centerX) / clampedZoom + oldScrollH
+            viewport.scrollV = (scaleChange * centerY - centerY) / clampedZoom + oldScrollV
         end
 
         -- Update zoom level
@@ -207,8 +197,8 @@ end
 -- @param viewport table The viewport object
 function MapViewport:Reset(viewport)
     viewport.zoom = 1.0
-    viewport.panX = 0
-    viewport.panY = 0
+    viewport.scrollH = 0
+    viewport.scrollV = 0
     self:ApplyTransform(viewport)
 end
 
@@ -216,13 +206,13 @@ end
 -- Pan Functions
 --------------------------------------------------------------------------------
 
---- Set pan offset
+--- Set scroll offset
 -- @param viewport table The viewport object
--- @param panX number X offset
--- @param panY number Y offset
-function MapViewport:SetPan(viewport, panX, panY)
-    viewport.panX = panX
-    viewport.panY = panY
+-- @param scrollH number Horizontal scroll offset
+-- @param scrollV number Vertical scroll offset
+function MapViewport:SetScroll(viewport, scrollH, scrollV)
+    viewport.scrollH = scrollH
+    viewport.scrollV = scrollV
     self:ApplyTransform(viewport)
 end
 
@@ -234,8 +224,8 @@ function MapViewport:StartDrag(viewport, x, y)
     viewport.isDragging = true
     viewport.dragStartX = x
     viewport.dragStartY = y
-    viewport.dragStartPanX = viewport.panX
-    viewport.dragStartPanY = viewport.panY
+    viewport.dragStartScrollH = viewport.scrollH
+    viewport.dragStartScrollV = viewport.scrollV
 end
 
 --- Update drag position
@@ -248,8 +238,9 @@ function MapViewport:UpdateDrag(viewport, x, y)
     local deltaX = x - viewport.dragStartX
     local deltaY = y - viewport.dragStartY
 
-    viewport.panX = viewport.dragStartPanX + deltaX
-    viewport.panY = viewport.dragStartPanY + deltaY
+    -- For ScrollFrame, dragging right/down should decrease scroll
+    viewport.scrollH = viewport.dragStartScrollH - deltaX / viewport.zoom
+    viewport.scrollV = viewport.dragStartScrollV + deltaY / viewport.zoom
 
     self:ApplyTransform(viewport)
 end
@@ -264,18 +255,30 @@ end
 -- Transform Application
 --------------------------------------------------------------------------------
 
---- Apply current zoom and pan to the map canvas
+--- Apply current zoom and scroll to the map canvas
 -- @param viewport table The viewport object
 function MapViewport:ApplyTransform(viewport)
-    if not viewport.canvas then return end
+    if not viewport.canvas or not viewport.scrollFrame then return end
 
     -- Apply scale to canvas (this scales all children)
     viewport.canvas:SetScale(viewport.zoom)
 
-    -- Apply pan offset directly without division
-    viewport.canvas:ClearAllPoints()
-    viewport.canvas:SetPoint("TOPLEFT", viewport.clipFrame, "TOPLEFT",
-        viewport.panX, viewport.panY)
+    -- Calculate scroll boundaries
+    local canvasWidth = viewport.canvas:GetWidth() * viewport.zoom
+    local canvasHeight = viewport.canvas:GetHeight() * viewport.zoom
+    local frameWidth = viewport.scrollFrame:GetWidth()
+    local frameHeight = viewport.scrollFrame:GetHeight()
+
+    viewport.maxScrollH = math.max(0, (canvasWidth - frameWidth) / viewport.zoom)
+    viewport.maxScrollV = math.max(0, (canvasHeight - frameHeight) / viewport.zoom)
+
+    -- Clamp scroll position to boundaries
+    viewport.scrollH = math.max(0, math.min(viewport.scrollH, viewport.maxScrollH))
+    viewport.scrollV = math.max(0, math.min(viewport.scrollV, viewport.maxScrollV))
+
+    -- Apply scroll position
+    viewport.scrollFrame:SetHorizontalScroll(viewport.scrollH)
+    viewport.scrollFrame:SetVerticalScroll(viewport.scrollV)
 
     -- Trigger UI refresh if callback exists
     if RDT.UI and RDT.UI.RefreshPackButtons then
@@ -292,12 +295,12 @@ end
 
 --- Get current viewport state
 -- @param viewport table The viewport object
--- @return table Viewport state {zoom, panX, panY}
+-- @return table Viewport state {zoom, scrollH, scrollV}
 function MapViewport:GetState(viewport)
     return {
         zoom = viewport.zoom,
-        panX = viewport.panX,
-        panY = viewport.panY
+        scrollH = viewport.scrollH,
+        scrollV = viewport.scrollV
     }
 end
 
@@ -308,4 +311,4 @@ function MapViewport:GetCanvas(viewport)
     return viewport.canvas
 end
 
-RDT:DebugPrint("MapViewport module loaded")
+RDT:DebugPrint("MapViewport module loaded (ScrollFrame version)")
