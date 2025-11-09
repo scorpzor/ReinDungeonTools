@@ -82,19 +82,24 @@ function MapViewport:SetupMouseHandlers(viewport)
     -- Mouse wheel for zooming (Ctrl+Wheel)
     canvas:SetScript("OnMouseWheel", function(self, delta)
         if IsControlKeyDown() then
-            -- Zoom toward center of container for now
-            local containerWidth = container:GetWidth()
-            local containerHeight = container:GetHeight()
-            local centerX = containerWidth / 2
-            local centerY = containerHeight / 2
+            -- Get cursor position relative to container
+            local scale = UIParent:GetEffectiveScale()
+            local cursorX, cursorY = GetCursorPosition()
+            cursorX = cursorX / scale
+            cursorY = cursorY / scale
 
-            RDT:DebugPrint(string.format("Container size: %.1fx%.1f, Center: (%.1f, %.1f)",
-                containerWidth, containerHeight, centerX, centerY))
+            -- Get container position
+            local containerLeft = container:GetLeft()
+            local containerTop = container:GetTop()
+
+            -- Calculate cursor position relative to container
+            local relativeX = cursorX - containerLeft
+            local relativeY = containerTop - cursorY  -- Y increases downward
 
             if delta > 0 then
-                MapViewport:ZoomIn(viewport, centerX, centerY)
+                MapViewport:ZoomIn(viewport, relativeX, relativeY)
             else
-                MapViewport:ZoomOut(viewport, centerX, centerY)
+                MapViewport:ZoomOut(viewport, relativeX, relativeY)
             end
         end
     end)
@@ -161,17 +166,11 @@ function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
             -- Calculate scale change ratio
             local scaleChange = clampedZoom / oldZoom
 
-            -- Calculate new pan offset to keep center point stationary
-            -- X formula: inverted from MDT (positive moves down/right)
+            -- Calculate new pan offset to keep zoom point stationary
+            -- X formula: inverted (negative pan moves left)
             viewport.panX = oldPanX + (centerX - scaleChange * centerX) / clampedZoom
-            -- Y formula: NOT inverted because Y increases downward in WoW
+            -- Y formula: not inverted (positive pan moves down in WoW's coordinate system)
             viewport.panY = oldPanY + (scaleChange * centerY - centerY) / clampedZoom
-
-            RDT:DebugPrint(string.format("Zoom: %.2f -> %.2f (ratio %.2f)",
-                oldZoom, clampedZoom, scaleChange))
-            RDT:DebugPrint(string.format("Center: (%.1f, %.1f)", centerX, centerY))
-            RDT:DebugPrint(string.format("Pan: (%.1f, %.1f) -> (%.1f, %.1f)",
-                oldPanX, oldPanY, viewport.panX, viewport.panY))
         end
 
         -- Update zoom level
@@ -179,9 +178,6 @@ function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
 
         -- Apply the transform
         self:ApplyTransform(viewport)
-
-        RDT:DebugPrint(string.format("Zoom: %.2fx, Pan: (%.1f, %.1f)",
-            viewport.zoom, viewport.panX, viewport.panY))
     end
 end
 
