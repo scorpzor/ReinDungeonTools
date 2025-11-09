@@ -103,7 +103,7 @@ function UI:CreateIdentifierIcon(data)
     local frame = table.remove(identifierButtonPool)
     if not frame then
         -- No pooled frame available, create a new one
-        frame = CreateFrame("Frame", nil, self.mapContainer)
+        frame = CreateFrame("Frame", nil, self.mapCanvas)
 
         local icon = frame:CreateTexture(nil, "ARTWORK")
         icon:SetAllPoints(frame)
@@ -113,7 +113,7 @@ function UI:CreateIdentifierIcon(data)
     end
 
     -- Reset frame parent in case it was pooled
-    frame:SetParent(self.mapContainer)
+    frame:SetParent(self.mapCanvas)
     frame:ClearAllPoints()
 
     -- Apply scale from type definition or data override
@@ -286,7 +286,7 @@ function UI:DrawConnectionLine(identifier1, identifier2)
         local dot = table.remove(lineTexturePool)
         if not dot then
             -- No pooled texture available, create a new one
-            dot = self.mapContainer:CreateTexture(nil, "OVERLAY")
+            dot = self.mapCanvas:CreateTexture(nil, "OVERLAY")
             dot:SetSize(4, 4)
             dot:SetTexture("Interface\\Buttons\\WHITE8X8")
         end

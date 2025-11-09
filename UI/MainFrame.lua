@@ -8,7 +8,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
--- Local reference to UIHelpers
+-- Local references to modules
 local UIHelpers = RDT.UIHelpers
 
 -- UI Constants
@@ -374,6 +374,14 @@ function UI:CreateMapContainer(parent)
 
     UI.mapContainer = mapContainer
     UI.mapTexture = mapTexture
+
+    -- Create map viewport for zoom/pan support (access RDT.MapViewport directly)
+    if RDT.MapViewport then
+        UI.mapViewport = RDT.MapViewport:Create(mapContainer, mapTexture)
+        UI.mapCanvas = RDT.MapViewport:GetCanvas(UI.mapViewport)
+    else
+        RDT:PrintError("MapViewport module not loaded")
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -413,19 +421,19 @@ function UI:LoadTiledMap(tileData)
     for i, tileInfo in ipairs(tiles) do
         local tile = mapTiles[i]
         if not tile then
-            tile = mapContainer:CreateTexture(nil, "ARTWORK")
+            tile = UI.mapCanvas:CreateTexture(nil, "ARTWORK")
             mapTiles[i] = tile
         end
-        
+
         local col = (i - 1) % cols
         local row = math.floor((i - 1) / cols)
-        
+
         local x = col * displayTileWidth + 1
         local y = -(row * displayTileHeight) - 1
-        
+
         tile:SetSize(displayTileWidth, displayTileHeight)
         tile:ClearAllPoints()
-        tile:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", x, y)
+        tile:SetPoint("TOPLEFT", UI.mapCanvas, "TOPLEFT", x, y)
         
         local texturePath = tileInfo.texture or tileInfo
         tile:SetTexture(texturePath)
@@ -455,14 +463,15 @@ function UI:LoadSingleTextureMap(texturePath)
     end
 
     RDT:DebugPrint("Loading single texture map: " .. tostring(texturePath))
-    
+
     self:ClearMapTiles()
-    
+
+    -- Anchor texture to canvas (for zoom support) or container (fallback)
+    local anchorFrame = self.mapCanvas or mapContainer
     mapTexture:ClearAllPoints()
-    mapTexture:SetPoint("TOPLEFT", mapContainer, "TOPLEFT", 1, -1)
-    mapTexture:SetPoint("TOPRIGHT", mapContainer, "TOPRIGHT", -1, -1)
-    mapTexture:SetHeight(MAP_HEIGHT - 2)
-    
+    mapTexture:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 1, -1)
+    mapTexture:SetPoint("BOTTOMRIGHT", anchorFrame, "BOTTOMRIGHT", -1, 1)
+
     mapTexture:Show()
     mapTexture:SetTexture(texturePath or "Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
