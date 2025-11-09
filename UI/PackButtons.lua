@@ -126,9 +126,9 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     local packGroup = table.remove(packGroupPool)
     if not packGroup then
         -- No pooled frame available, create a new one
-        packGroup = CreateFrame("Frame", nil, UI.mapContainer)
+        packGroup = CreateFrame("Frame", nil, UI.mapCanvas)
 
-        local labelFrame = CreateFrame("Frame", nil, UI.mapContainer)
+        local labelFrame = CreateFrame("Frame", nil, UI.mapCanvas)
         labelFrame:SetFrameStrata("HIGH")
         labelFrame:SetFrameLevel(1000)
         labelFrame:SetSize(40, 40)
@@ -148,7 +148,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     end
 
     -- Reset/set pack group properties
-    packGroup:SetParent(UI.mapContainer)
+    packGroup:SetParent(UI.mapCanvas)
     packGroup:ClearAllPoints()
     packGroup:Show()
     packGroup.packId = data.id
@@ -592,13 +592,13 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         border = table.remove(borderFramePool)
         if not border then
             -- No pooled border available, create a new one
-            border = CreateFrame("Frame", nil, UI.mapContainer)
-            border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
+            border = CreateFrame("Frame", nil, UI.mapCanvas)
+            border:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
             border.segments = {}
         else
             -- Reset pooled border properties
-            border:SetParent(UI.mapContainer)
-            border:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 1)
+            border:SetParent(UI.mapCanvas)
+            border:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
             -- Ensure segments are reparented to the border
             if border.segments then
                 for _, seg in ipairs(border.segments) do

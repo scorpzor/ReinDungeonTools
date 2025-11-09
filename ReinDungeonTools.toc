@@ -62,6 +62,7 @@ Modules\ImportExport.lua
 
 # UI Components
 UI\UIHelpers.lua
+UI\MapViewport.lua
 UI\MainFrame.lua
 UI\PackButtons.lua
 UI\IdentifierIcons.lua
