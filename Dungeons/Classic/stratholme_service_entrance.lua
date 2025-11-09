@@ -1,5 +1,5 @@
 -- Dungeons/Classic/Stratholme.lua
--- Stratholme dungeon data for WotLK 3.3.5a
+-- Stratholme dungeon data
 
 local RDT = _G.RDT
 if not RDT or not RDT.Data then
@@ -20,7 +20,7 @@ local mobs = {
     ["strat_crypt_beast"] = {
         name = "Crypt Beast",
         count = 0.5,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crypt_beast",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\nerubenkan",
         scale = 0.7,
     },
     ["strat_rockwing_screecher"] = {
@@ -32,7 +32,7 @@ local mobs = {
     ["strat_ghoul_ravener"] = {
         name = "Ghoul Ravener",
         count = 0.5,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ghoul_ravener",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\timmy_the_cruel",
         scale = 0.7,
     },
     ["strat_fleshflayer_ghoul"] = {
@@ -56,7 +56,7 @@ local mobs = {
     ["strat_risen_lackey"] = {
         name = "Risen Lackey",
         count = 0,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\risen_lackey",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\skeletal_berserker",
         scale = 0.5,
     },
     ["strat_crypt_crawler"] = {
@@ -74,7 +74,19 @@ local mobs = {
     ["strat_wailing_banshee"] = {
         name = "Wailing Banshee",
         count = 0.5,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\wailing_banshee",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\shrieking_banshee",
+        scale = 0.7,
+    },
+    ["strat_bile_spewer"] = {
+        name = "Bile Spewer",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\patchwork_horror",
+        scale = 0.9,
+    },
+    ["strat_black_guard_sentry"] = {
+        name = "Black Guard Sentry",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\black_guard_swordsmith",
         scale = 0.7,
     },
 }
@@ -89,43 +101,43 @@ local bosses = {
     ["strat_boss_stonespine"] = {
         name = "Stonespine",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\stonespine",
         scale = 1.25,
     },
     ["strat_boss_nerubenkan"] = {
         name = "Nerub'enkan",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\nerubenkan",
         scale = 1.25,
     },
     ["strat_boss_black_guard_swordsmith"] = {
         name = "Black Guard Swordsmith",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\black_guard_swordsmith",
         scale = 1.25,
     },
     ["strat_boss_maleki_the_pallid"] = {
         name = "Maleki the Pallid",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\maleki_the_pallid",
         scale = 1.25,
     },
     ["strat_boss_baroness_anastari"] = {
         name = "Baroness Anastari",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\baroness_anastari",
         scale = 1.25,
     },
     ["strat_boss_ramstein_the_gorger"] = {
         name = "Ramstein the Gorger",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\patchwork_horror",
         scale = 1.25,
     },
     ["strat_boss_baron_rivendare"] = {
         name = "Baron Rivendare",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magistrate_barthilas",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\baron_rivendare",
         scale = 1.25,
     },
 }
@@ -603,12 +615,92 @@ local mapDefinition = {
             }
         },
         {
-            id = 48,
+            id = 50,
             x = 0.547,
             y = 0.164,
             mobs = {
                 ["strat_plague_ghoul"] = 1,
                 ["strat_ghoul_ravener"] = 1,
+            }
+        },
+        {
+            id = 51,
+            x = 0.493,
+            y = 0.199,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 52,
+            x = 0.484,
+            y = 0.173,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 53,
+            x = 0.484,
+            y = 0.226,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 54,
+            x = 0.466,
+            y = 0.265,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 55,
+            x = 0.434,
+            y = 0.270,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 56,
+            x = 0.443,
+            y = 0.235,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 58,
+            x = 0.465,
+            y = 0.122,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 59,
+            x = 0.449,
+            y = 0.160,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 60,
+            x = 0.429,
+            y = 0.135,
+            mobs = {
+                ["strat_bile_spewer"] = 1,
+            }
+        },
+        {
+            id = 61,
+            x = 0.429,
+            y = 0.323,
+            mobs = {
+                ["strat_black_guard_sentry"] = 5,
             }
         },
         -------------------------------- Bosses --------------------------------
@@ -651,6 +743,22 @@ local mapDefinition = {
             mobs = {
                 ["strat_boss_maleki_the_pallid"] = 1,
                 ["strat_thuzadin_shadowcaster"] = 3,
+            }
+        },
+        {
+            id = 1005,
+            x = 0.448,
+            y = 0.202,
+            mobs = {
+                ["strat_boss_ramstein_the_gorger"] = 1,
+            }
+        },
+        {
+            id = 1006,
+            x = 0.392,
+            y = 0.205,
+            mobs = {
+                ["strat_boss_baron_rivendare"] = 1,
             }
         },
     },
