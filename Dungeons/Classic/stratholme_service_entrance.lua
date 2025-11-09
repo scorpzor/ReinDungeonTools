@@ -57,7 +57,7 @@ local mobs = {
         name = "Risen Lackey",
         count = 0,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\risen_lackey",
-        scale = 0.4,
+        scale = 0.5,
     },
     ["strat_crypt_crawler"] = {
         name = "Crypt Crawler",
@@ -630,8 +630,8 @@ local mapDefinition = {
         },
         {
             id = 1002,
-            x = 0.568,
-            y = 0.364,
+            x = 0.570,
+            y = 0.469,
             mobs = {
                 ["strat_boss_nerubenkan"] = 1,
             }
@@ -666,8 +666,8 @@ local mapDefinition = {
         {
             id = 2,
             type = "gate",
-            x = 0.570,
-            y = 0.469,
+            x = 0.597,
+            y = 0.766,
             name = "Main Gate",
             description = "",
         },
