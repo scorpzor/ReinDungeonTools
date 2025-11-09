@@ -122,10 +122,15 @@ function DevTools:EnableCoordinatePicker()
     -- Show indicators
     if coordPickerLabel then coordPickerLabel:Show() end
     if crosshair then crosshair:Show() end
-    
+
+    -- Disable drag detection while coord picker is active
+    if UI.mapViewport and UI.mapViewport.DisableDragDetection then
+        UI.mapViewport.DisableDragDetection()
+    end
+
     -- Enable mouse interaction on map container (textures don't support mouse events)
     UI.mapContainer:EnableMouse(true)
-    
+
     -- Click handler (on container, but calculate relative to texture)
     UI.mapContainer:SetScript("OnMouseDown", function(frame, button)
         if not coordPickerEnabled then return end
@@ -239,7 +244,12 @@ function DevTools:DisableCoordinatePicker()
         UI.mapContainer:SetScript("OnMouseDown", nil)
         UI.mapContainer:SetScript("OnUpdate", nil)
     end
-    
+
+    -- Re-enable drag detection
+    if UI.mapViewport and UI.mapViewport.EnableDragDetection then
+        UI.mapViewport.EnableDragDetection()
+    end
+
     RDT:Print("|cFFFF0000Coordinate Picker disabled|r")
 end
 

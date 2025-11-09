@@ -43,14 +43,21 @@ function MapViewport:Create(container, mapTexture)
 
     local scrollFrame = CreateFrame("ScrollFrame", "RDT_MapScrollFrame", container)
     scrollFrame:SetAllPoints(container)
-    scrollFrame:EnableMouse(true)
+    scrollFrame:EnableMouse(false)
     scrollFrame:EnableMouseWheel(true)
     viewport.scrollFrame = scrollFrame
 
     viewport.canvas = CreateFrame("Frame", "RDT_MapCanvas", scrollFrame)
     viewport.canvas:SetSize(container:GetWidth(), container:GetHeight())
+    viewport.canvas:EnableMouse(false)
 
     scrollFrame:SetScrollChild(viewport.canvas)
+
+    local dragDetector = CreateFrame("Frame", "RDT_MapDragDetector", container)
+    dragDetector:SetAllPoints(container)
+    dragDetector:SetFrameLevel(container:GetFrameLevel() + 1)
+    dragDetector:EnableMouse(false)
+    viewport.dragDetector = dragDetector
 
     -- Reparent map texture to canvas and re-anchor it to fill the canvas
     if mapTexture then
@@ -75,9 +82,9 @@ end
 
 function MapViewport:SetupMouseHandlers(viewport)
     local scrollFrame = viewport.scrollFrame
-    local container = viewport.container
+    local dragDetector = viewport.dragDetector
 
-    scrollFrame:SetScript("OnMouseWheel", function(self, delta)
+    local function handleMouseWheel(self, delta)
         if IsControlKeyDown() then
             -- Get cursor position relative to scroll frame
             local scale = UIParent:GetEffectiveScale()
@@ -98,42 +105,48 @@ function MapViewport:SetupMouseHandlers(viewport)
                 MapViewport:ZoomOut(viewport, relativeX, relativeY)
             end
         end
-    end)
+    end
 
-    scrollFrame:SetScript("OnMouseDown", function(self, button)
-        if button == "LeftButton" then
+    scrollFrame:SetScript("OnMouseWheel", handleMouseWheel)
+
+    dragDetector:SetScript("OnMouseDown", function(self, button)
+        if button == "MiddleButton" then
             local scale = UIParent:GetEffectiveScale()
             local x, y = GetCursorPosition()
             x = x / scale
             y = y / scale
 
             MapViewport:StartDrag(viewport, x, y)
-
-            -- Update cursor position during drag
-            self:SetScript("OnUpdate", function(self)
-                if viewport.isDragging then
-                    local cx, cy = GetCursorPosition()
-                    cx = cx / scale
-                    cy = cy / scale
-                    MapViewport:UpdateDrag(viewport, cx, cy)
-                end
-            end)
         end
     end)
 
-    scrollFrame:SetScript("OnMouseUp", function(self, button)
-        if button == "LeftButton" then
+    dragDetector:SetScript("OnMouseUp", function(self, button)
+        if button == "MiddleButton" and viewport.isDragging then
             MapViewport:StopDrag(viewport)
-            self:SetScript("OnUpdate", nil)
         end
     end)
 
-    scrollFrame:SetScript("OnLeave", function(self)
+    dragDetector:SetScript("OnUpdate", function(self)
         if viewport.isDragging then
-            MapViewport:StopDrag(viewport)
-            self:SetScript("OnUpdate", nil)
+            local scale = UIParent:GetEffectiveScale()
+            local x, y = GetCursorPosition()
+            x = x / scale
+            y = y / scale
+            MapViewport:UpdateDrag(viewport, x, y)
         end
     end)
+
+    dragDetector:EnableMouse(false)
+
+    viewport.EnableDragDetection = function()
+        dragDetector:EnableMouse(true)
+    end
+
+    viewport.DisableDragDetection = function()
+        dragDetector:EnableMouse(false)
+    end
+
+    viewport.EnableDragDetection()
 end
 
 --------------------------------------------------------------------------------
