@@ -57,12 +57,24 @@ local mobs = {
         name = "Risen Lackey",
         count = 0,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\risen_lackey",
-        scale = 0.7,
+        scale = 0.4,
     },
     ["strat_crypt_crawler"] = {
         name = "Crypt Crawler",
         count = 0,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crypt_crawler",
+        scale = 0.7,
+    },
+    ["strat_thuzadin_acolyte"] = {
+        name = "Thuzadin Acolyte",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\thuzadin_acolyte",
+        scale = 0.7,
+    },
+    ["strat_wailing_banshee"] = {
+        name = "Wailing Banshee",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\wailing_banshee",
         scale = 0.7,
     },
 }
@@ -214,7 +226,7 @@ local mapDefinition = {
             x = 0.693,
             y = 0.550,
             mobs = {
-                ["strat_ghoul_ravener"] = 1,
+                ["strat_ghoul_ravener"] = 2,
                 ["strat_fleshflayer_ghoul"] = 1,
             }
         },
@@ -255,8 +267,8 @@ local mapDefinition = {
         },
         {
             id = 13,
-            x = 0.628,
-            y = 0.475,
+            x = 0.648,
+            y = 0.494,
             mobs = {
                 ["strat_shrieking_banshee"] = 1,
                 ["strat_crypt_crawler"] = 1,
@@ -267,6 +279,7 @@ local mapDefinition = {
             x = 0.618,
             y = 0.450, 
             mobs = {
+                ["strat_shrieking_banshee"] = 1,
                 ["strat_crypt_beast"] = 1,
             }
         },
@@ -278,6 +291,326 @@ local mapDefinition = {
                 ["strat_thuzadin_shadowcaster"] = 2,
             }
         },
+        {
+            id = 16,
+            x = 0.590,
+            y = 0.431,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_beast"] = 1,
+            }
+        },
+        {
+            id = 17,
+            x = 0.572,
+            y = 0.417,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 1,
+                ["strat_risen_lackey"] = 1,
+            }
+        },
+        {
+            id = 18,
+            x = 0.550,
+            y = 0.438,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 1,
+                ["strat_risen_lackey"] = 1,
+            }
+        },
+        {
+            id = 19,
+            x = 0.584,
+            y = 0.458,
+            mobs = {
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 20,
+            x = 0.536,
+            y = 0.494,
+            mobs = {
+                ["strat_thuzadin_acolyte"] = 5,
+            }
+        },
+        {
+            id = 21,
+            x = 0.718,
+            y = 0.488,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_beast"] = 1,
+            }
+        },
+        {
+            id = 22,
+            x = 0.695,
+            y = 0.446,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 23,
+            x = 0.707,
+            y = 0.428,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 24,
+            x = 0.724,
+            y = 0.529,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_plague_ghoul"] = 1,
+            }
+        },
+        {
+            id = 25,
+            x = 0.726,
+            y = 0.464,
+            mobs = {
+                ["strat_rockwing_screecher"] = 1,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 26,
+            x = 0.756,
+            y = 0.527,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 2,
+                ["strat_thuzadin_shadowcaster"] = 1,
+                ["strat_risen_lackey"] = 2,
+            }
+        },
+        {
+            id = 27,
+            x = 0.762,
+            y = 0.499,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 28,
+            x = 0.697,
+            y = 0.366,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+            }
+        },
+        {
+            id = 29,
+            x = 0.687,
+            y = 0.400,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_thuzadin_necromancer"] = 2,
+                ["strat_risen_lackey"] = 2,
+            }
+        },
+        {
+            id = 30,
+            x = 0.724,
+            y = 0.396,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_fleshflayer_ghoul"] = 1,
+            }
+        },
+        {
+            id = 31,
+            x = 0.767,
+            y = 0.414,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 2,
+                ["strat_thuzadin_shadowcaster"] = 1,
+                ["strat_risen_lackey"] = 2,
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 32,
+            x = 0.790,
+            y = 0.482,
+            mobs = {
+                ["strat_thuzadin_acolyte"] = 5,
+            }
+        },
+        {
+            id = 33,
+            x = 0.671,
+            y = 0.344,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_fleshflayer_ghoul"] = 2,
+            }
+        },
+        {
+            id = 34,
+            x = 0.669,
+            y = 0.313,
+            mobs = {
+                ["strat_rockwing_screecher"] = 1,
+            }
+        },
+        {
+            id = 35,
+            x = 0.687,
+            y = 0.287,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_plague_ghoul"] = 1,
+                ["strat_shrieking_banshee"] = 1,
+            }
+        },
+        {
+            id = 36,
+            x = 0.647,
+            y = 0.292,
+            mobs = {
+                ["strat_ghoul_ravener"] = 1,
+                ["strat_fleshflayer_ghoul"] = 1,
+            }
+        },
+        {
+            id = 37,
+            x = 0.690,
+            y = 0.242,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 2,
+                ["strat_risen_lackey"] = 1,
+            }
+        },
+        {
+            id = 38,
+            x = 0.655,
+            y = 0.253,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 39,
+            x = 0.700,
+            y = 0.166,
+            mobs = {
+                ["strat_thuzadin_acolyte"] = 5,
+            }
+        },
+        {
+            id = 40,
+            x = 0.644,
+            y = 0.201,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 2,
+                ["strat_thuzadin_shadowcaster"] = 2,
+                ["strat_risen_lackey"] = 2,
+            }
+        },
+        {
+            id = 41,
+            x = 0.622,
+            y = 0.305,
+            mobs = {
+                ["strat_plague_ghoul"] = 2,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 42,
+            x = 0.638,
+            y = 0.262,
+            mobs = {
+                ["strat_rockwing_screecher"] = 1,
+            }
+        },
+        {
+            id = 43,
+            x = 0.626,
+            y = 0.235,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,
+                ["strat_ghoul_ravener"] = 2,
+                ["strat_wailing_banshee"] = 1,
+                ["strat_crypt_beast"] = 1,
+            }
+        },
+        {
+            id = 44,
+            x = 0.605,
+            y = 0.323,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 2,
+                ["strat_wailing_banshee"] = 1,
+            }
+        },
+        {
+            id = 45,
+            x = 0.575,
+            y = 0.307,
+            mobs = {
+                ["strat_fleshflayer_ghoul"] = 2,
+                ["strat_ghoul_ravener"] = 1,
+            }
+        },
+        {
+            id = 46,
+            x = 0.604,
+            y = 0.258,
+            mobs = {
+                ["strat_shrieking_banshee"] = 1,
+                ["strat_crypt_crawler"] = 1,
+            }
+        },
+        {
+            id = 47,
+            x = 0.570,
+            y = 0.269,
+            mobs = {
+                ["strat_thuzadin_necromancer"] = 2,
+                ["strat_risen_lackey"] = 2,
+            }
+        },
+        {
+            id = 48,
+            x = 0.596,
+            y = 0.206,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,
+                ["strat_ghoul_ravener"] = 2,
+            }
+        },
+        {
+            id = 49,
+            x = 0.552,
+            y = 0.243,
+            mobs = {
+                ["strat_fleshflayer_ghoul"] = 1,
+                ["strat_plague_ghoul"] = 3,
+                ["strat_wailing_banshee"] = 1,
+            }
+        },
+        {
+            id = 48,
+            x = 0.547,
+            y = 0.164,
+            mobs = {
+                ["strat_plague_ghoul"] = 1,
+                ["strat_ghoul_ravener"] = 1,
+            }
+        },
         -------------------------------- Bosses --------------------------------
         {
             id = 1000,
@@ -285,6 +618,39 @@ local mapDefinition = {
             y = 0.750,
             mobs = {
                 ["strat_boss_magistrate_barthilas"] = 1,
+            }
+        },
+        {
+            id = 1001,
+            x = 0.568,
+            y = 0.364,
+            mobs = {
+                ["strat_boss_stonespine"] = 1,
+            }
+        },
+        {
+            id = 1002,
+            x = 0.568,
+            y = 0.364,
+            mobs = {
+                ["strat_boss_nerubenkan"] = 1,
+            }
+        },
+        {
+            id = 1003,
+            x = 0.753,
+            y = 0.466,
+            mobs = {
+                ["strat_boss_baroness_anastari"] = 1,
+            }
+        },
+        {
+            id = 1004,
+            x = 0.676,
+            y = 0.200,
+            mobs = {
+                ["strat_boss_maleki_the_pallid"] = 1,
+                ["strat_thuzadin_shadowcaster"] = 3,
             }
         },
     },
@@ -300,8 +666,8 @@ local mapDefinition = {
         {
             id = 2,
             type = "gate",
-            x = 0.597,
-            y = 0.766,
+            x = 0.570,
+            y = 0.469,
             name = "Main Gate",
             description = "",
         },
