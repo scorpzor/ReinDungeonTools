@@ -2,7 +2,7 @@
 -- Addon initialization with Ace3 framework
 
 local ADDON_NAME = "ReinDungeonTools"
-local RDT = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0")
+local RDT = LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceConsole-3.0", "AceEvent-3.0", "AceComm-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
 -- Make globally accessible

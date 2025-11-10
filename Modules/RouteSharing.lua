@@ -16,9 +16,6 @@ local RouteSharing = RDT.RouteSharing
 -- Cache of shared routes (sender -> route data)
 local sharedRoutes = {}
 
--- Chunk assembly for multi-part messages
-local receivingChunks = {}  -- [sender] = {chunks = {}, total = 0}
-
 -- Local references to dependencies
 local RouteSerializer = RDT.RouteSerializer
 
@@ -118,28 +115,12 @@ function RouteSharing:Initialize()
         end
     end)
 
-    -- Register for addon messages
-    local frame = CreateFrame("Frame")
-    frame:RegisterEvent("CHAT_MSG_ADDON")
-    frame:SetScript("OnEvent", function(self, event, prefix, message, distribution, sender)
-        if event == "CHAT_MSG_ADDON" then
-            -- Debug: Log ALL addon messages with RDT_Route prefix
-            if prefix == "RDT_Route" then
-                RDT:DebugPrint("CHAT_MSG_ADDON: prefix=" .. prefix .. ", sender=" .. sender .. ", dist=" .. distribution .. ", msgLen=" .. #message)
-            end
-            RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
-        end
+    RDT:RegisterComm("RDT_Route", function(prefix, message, distribution, sender)
+        RDT:DebugPrint("CHAT_MSG_ADDON: prefix=" .. prefix .. ", sender=" .. sender .. ", dist=" .. distribution .. ", msgLen=" .. #message)
+        RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
     end)
 
-    -- Register the addon message prefix (if the function exists in 3.3.5a)
-    if RegisterAddonMessagePrefix then
-        RegisterAddonMessagePrefix("RDT_Route")
-        RDT:DebugPrint("Addon message prefix registered: RDT_Route")
-    else
-        RDT:DebugPrint("RegisterAddonMessagePrefix not available (pre-4.0), using CHAT_MSG_ADDON directly")
-    end
-
-    RDT:DebugPrint("RouteSharing initialized (SetItemRef hook active)")
+    RDT:DebugPrint("RouteSharing initialized (SetItemRef hook active, AceComm registered)")
 end
 
 --------------------------------------------------------------------------------
@@ -190,9 +171,7 @@ end
 -- @param sender string Player name who shared the route
 function RouteSharing:RequestRoute(sender)
     RDT:Print("Requesting route from " .. sender .. "...")
-
-    -- Send addon message to request the route
-    SendAddonMessage("RDT_Route", "REQUEST", "WHISPER", sender)
+    RDT:SendCommMessage("RDT_Route", "REQUEST", "WHISPER", sender, "NORMAL")
 end
 
 --- Send route to requesting player
@@ -206,50 +185,10 @@ function RouteSharing:SendRoute(target, routeData)
 
     RDT:DebugPrint("Sending route: " .. #exportString .. " chars")
 
-    -- Split into chunks if needed (255 byte limit per addon message)
-    local chunkSize = 250
-    local numChunks = math.ceil(#exportString / chunkSize)
+    RDT:SendCommMessage("RDT_Route", exportString, "WHISPER", target, "NORMAL")
 
-    if numChunks == 1 then
-        -- Single message
-        SendAddonMessage("RDT_Route", exportString, "WHISPER", target)
-        RDT:DebugPrint("Sent route in 1 message")
-        RDT:Print("Sent route to " .. target)
-    else
-        -- Multiple chunks - send with delay to avoid throttling
-        RDT:Print("Sending route to " .. target .. " (" .. numChunks .. " parts)...")
-
-        local currentChunk = 1
-        local sendFrame = CreateFrame("Frame")
-        sendFrame.target = target
-        sendFrame.exportString = exportString
-        sendFrame.numChunks = numChunks
-        sendFrame.chunkSize = chunkSize
-        sendFrame.currentChunk = currentChunk
-        sendFrame.lastSendTime = 0
-
-        sendFrame:SetScript("OnUpdate", function(self, elapsed)
-            self.lastSendTime = self.lastSendTime + elapsed
-
-            -- Send one chunk every 1.2 seconds
-            if self.lastSendTime >= 1.2 and self.currentChunk <= self.numChunks then
-                local start = (self.currentChunk - 1) * self.chunkSize + 1
-                local chunk = self.exportString:sub(start, start + self.chunkSize - 1)
-                local msg = string.format("CHUNK:%d:%d:%s", self.currentChunk, self.numChunks, chunk)
-                SendAddonMessage("RDT_Route", msg, "WHISPER", self.target)
-                RDT:DebugPrint("Sent chunk " .. self.currentChunk .. "/" .. self.numChunks .. " to " .. self.target)
-
-                self.currentChunk = self.currentChunk + 1
-                self.lastSendTime = 0
-
-                -- Clean up when done
-                if self.currentChunk > self.numChunks then
-                    RDT:Print("Finished sending route to " .. self.target)
-                    self:SetScript("OnUpdate", nil)
-                end
-            end
-        end)
-    end
+    RDT:Print("Sent route to " .. target .. " (AceComm handling transmission)")
+    RDT:DebugPrint("AceComm will chunk and throttle automatically")
 end
 
 --------------------------------------------------------------------------------
@@ -266,6 +205,10 @@ function RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
 
     -- Ignore messages from self
     if sender == UnitName("player") then return end
+    -- allow self-messages for testing
+    --if sender == UnitName("player") and message ~= "REQUEST" and not message:find("^RDT1:") then
+    --    return
+    --end
 
     -- Debug: Show full message info
     local msgPreview = message:sub(1, math.min(50, #message))
@@ -283,72 +226,9 @@ function RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
         return
     end
 
-    -- Handle chunked messages
-    if message:find("^CHUNK:") then
-        RouteSharing:HandleChunk(sender, message)
-        return
-    end
-
-    -- Handle complete route data (single message)
     if message:find("^RDT1:") then
         RouteSharing:ReceiveRoute(sender, message)
         return
-    end
-end
-
---- Handle chunked message assembly
--- @param sender string Sender name
--- @param message string Chunk message
-function RouteSharing:HandleChunk(sender, message)
-    local chunkNum, totalChunks, data = message:match("^CHUNK:(%d+):(%d+):(.+)$")
-
-    if not chunkNum then
-        RDT:PrintError("Invalid chunk format")
-        return
-    end
-
-    chunkNum = tonumber(chunkNum)
-    totalChunks = tonumber(totalChunks)
-
-    -- Initialize chunk storage for this sender
-    if not receivingChunks[sender] then
-        receivingChunks[sender] = {chunks = {}, total = totalChunks}
-        RDT:Print("Receiving route from " .. sender .. " (" .. totalChunks .. " parts)...")
-    end
-
-    -- Store chunk
-    receivingChunks[sender].chunks[chunkNum] = data
-    RDT:DebugPrint("Received chunk " .. chunkNum .. "/" .. totalChunks .. " from " .. sender)
-
-    -- Check if we have all chunks
-    local complete = true
-    local missingChunks = {}
-    for i = 1, totalChunks do
-        if not receivingChunks[sender].chunks[i] then
-            complete = false
-            table.insert(missingChunks, i)
-        end
-    end
-
-    if complete then
-        -- Reassemble the message
-        local fullMessage = ""
-        for i = 1, totalChunks do
-            fullMessage = fullMessage .. receivingChunks[sender].chunks[i]
-        end
-
-        -- Clean up
-        receivingChunks[sender] = nil
-
-        RDT:DebugPrint("Reassembled route: " .. #fullMessage .. " chars")
-
-        -- Process the complete route
-        RouteSharing:ReceiveRoute(sender, fullMessage)
-    else
-        -- Show progress with missing chunks
-        local received = totalChunks - #missingChunks
-        local missingStr = table.concat(missingChunks, ", ")
-        RDT:DebugPrint("Progress: " .. received .. "/" .. totalChunks .. " (missing: " .. missingStr .. ")")
     end
 end
 
@@ -429,6 +309,20 @@ function RouteSharing:RegisterSlashCommands()
         end
     end
     SLASH_RDTSHARE1 = "/rdtshare"
+
+    SlashCmdList["RDTSHAREDEBUG"] = function(msg)
+        local exportData = RouteSerializer:CreateExportData()
+        if not exportData then
+            RDT:PrintError("No route to send")
+            return
+        end
+
+        local playerName = UnitName("player")
+        RDT:Print("Debug: Forcing route transmission to yourself...")
+
+        RouteSharing:SendRoute(playerName, exportData)
+    end
+    SLASH_RDTSHAREDEBUG1 = "/rdtsharedebug"
 
     RDT:DebugPrint("RouteSharing slash commands registered")
 end
