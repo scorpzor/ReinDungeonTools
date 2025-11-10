@@ -210,18 +210,42 @@ function RouteSharing:SendRoute(target, routeData)
         -- Single message
         SendAddonMessage("RDT_Route", exportString, "WHISPER", target)
         RDT:DebugPrint("Sent route in 1 message")
+        RDT:Print("Sent route to " .. target)
     else
-        -- Multiple chunks
-        for i = 1, numChunks do
-            local start = (i - 1) * chunkSize + 1
-            local chunk = exportString:sub(start, start + chunkSize - 1)
-            local msg = string.format("CHUNK:%d:%d:%s", i, numChunks, chunk)
-            SendAddonMessage("RDT_Route", msg, "WHISPER", target)
-        end
-        RDT:DebugPrint("Sent route in " .. numChunks .. " chunks")
-    end
+        -- Multiple chunks - send with delay to avoid throttling
+        RDT:Print("Sending route to " .. target .. " (" .. numChunks .. " parts)...")
 
-    RDT:Print("Sent route to " .. target)
+        local currentChunk = 1
+        local sendFrame = CreateFrame("Frame")
+        sendFrame.target = target
+        sendFrame.exportString = exportString
+        sendFrame.numChunks = numChunks
+        sendFrame.chunkSize = chunkSize
+        sendFrame.currentChunk = currentChunk
+        sendFrame.lastSendTime = 0
+
+        sendFrame:SetScript("OnUpdate", function(self, elapsed)
+            self.lastSendTime = self.lastSendTime + elapsed
+
+            -- Send one chunk every 0.2 seconds
+            if self.lastSendTime >= 0.2 and self.currentChunk <= self.numChunks then
+                local start = (self.currentChunk - 1) * self.chunkSize + 1
+                local chunk = self.exportString:sub(start, start + self.chunkSize - 1)
+                local msg = string.format("CHUNK:%d:%d:%s", self.currentChunk, self.numChunks, chunk)
+                SendAddonMessage("RDT_Route", msg, "WHISPER", self.target)
+                RDT:DebugPrint("Sent chunk " .. self.currentChunk .. "/" .. self.numChunks .. " to " .. self.target)
+
+                self.currentChunk = self.currentChunk + 1
+                self.lastSendTime = 0
+
+                -- Clean up when done
+                if self.currentChunk > self.numChunks then
+                    RDT:Print("Finished sending route to " .. self.target)
+                    self:SetScript("OnUpdate", nil)
+                end
+            end
+        end)
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -288,13 +312,15 @@ function RouteSharing:HandleChunk(sender, message)
 
     -- Store chunk
     receivingChunks[sender].chunks[chunkNum] = data
+    RDT:DebugPrint("Received chunk " .. chunkNum .. "/" .. totalChunks .. " from " .. sender)
 
     -- Check if we have all chunks
     local complete = true
+    local missingChunks = {}
     for i = 1, totalChunks do
         if not receivingChunks[sender].chunks[i] then
             complete = false
-            break
+            table.insert(missingChunks, i)
         end
     end
 
@@ -313,14 +339,10 @@ function RouteSharing:HandleChunk(sender, message)
         -- Process the complete route
         RouteSharing:ReceiveRoute(sender, fullMessage)
     else
-        -- Show progress
-        local received = 0
-        for i = 1, totalChunks do
-            if receivingChunks[sender].chunks[i] then
-                received = received + 1
-            end
-        end
-        RDT:DebugPrint("Progress: " .. received .. "/" .. totalChunks)
+        -- Show progress with missing chunks
+        local received = totalChunks - #missingChunks
+        local missingStr = table.concat(missingChunks, ", ")
+        RDT:DebugPrint("Progress: " .. received .. "/" .. totalChunks .. " (missing: " .. missingStr .. ")")
     end
 end
 
