@@ -190,6 +190,9 @@ function UI:UpdatePullList()
     if #pulls == 0 then
         self:ShowEmptyMessage()
         self:UpdateTotalForces()
+        if self.UpdateLabels then
+            self:UpdateLabels()
+        end
         return
     end
     
@@ -197,12 +200,16 @@ function UI:UpdatePullList()
     for _, pullNum in ipairs(pulls) do
         yOffset = self:RenderPullEntry(pullNum, yOffset)
     end
-    
+
     -- Set scroll child height
     pullsScrollChild:SetHeight(math.max(math.abs(yOffset) + 10, PULLS_PANEL_HEIGHT - 50))
-    
+
     -- Update total forces display
     self:UpdateTotalForces()
+
+    if self.UpdateLabels then
+        self:UpdateLabels()
+    end
 end
 
 --- Render a single pull entry

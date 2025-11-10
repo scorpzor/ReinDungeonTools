@@ -120,7 +120,7 @@ function RouteSharing:Initialize()
         RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
     end)
 
-    RDT:DebugPrint("RouteSharing initialized (SetItemRef hook active, AceComm registered)")
+    RDT:DebugPrint("RouteSharing initialized")
 end
 
 --------------------------------------------------------------------------------
@@ -187,8 +187,7 @@ function RouteSharing:SendRoute(target, routeData)
 
     RDT:SendCommMessage("RDT_Route", exportString, "WHISPER", target, "NORMAL")
 
-    RDT:Print("Sent route to " .. target .. " (AceComm handling transmission)")
-    RDT:DebugPrint("AceComm will chunk and throttle automatically")
+    RDT:Print("Sent route to " .. target)
 end
 
 --------------------------------------------------------------------------------

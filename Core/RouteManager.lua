@@ -140,9 +140,6 @@ function RM:AddPackToPull(packId)
     RDT.State.currentRoute.pulls[packId] = RDT.State.currentPull
 
     if RDT.UI then
-        if RDT.UI.UpdateLabels then
-            RDT.UI:UpdateLabels()
-        end
         if RDT.UI.UpdatePullList then
             RDT.UI:UpdatePullList()
         end
@@ -173,14 +170,11 @@ function RM:UnassignPack(packId)
         RDT.State.currentRoute.pulls[packId] = nil
 
         if RDT.UI then
-            if RDT.UI.UpdateLabels then
-                RDT.UI:UpdateLabels()
-            end
             if RDT.UI.UpdatePullList then
                 RDT.UI:UpdatePullList()
             end
         end
-        
+
         RDT:Print(string.format("Pack %d removed from pull %d", packId, oldPull))
     end
 end
@@ -200,14 +194,11 @@ function RM:UnassignPull(pullNum)
     
     if count > 0 then
         if RDT.UI then
-            if RDT.UI.UpdateLabels then
-                RDT.UI:UpdateLabels()
-            end
             if RDT.UI.UpdatePullList then
                 RDT.UI:UpdatePullList()
             end
         end
-        
+
         RDT:Print(string.format("Removed %d packs from pull %d", count, pullNum))
     end
 end
@@ -221,9 +212,6 @@ function RM:ResetPulls()
     RDT.State.currentPull = 1
 
     if RDT.UI then
-        if RDT.UI.UpdateLabels then
-            RDT.UI:UpdateLabels()
-        end
         if RDT.UI.UpdatePullList then
             RDT.UI:UpdatePullList()
         end
