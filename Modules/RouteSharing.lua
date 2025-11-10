@@ -231,8 +231,8 @@ function RouteSharing:SendRoute(target, routeData)
         sendFrame:SetScript("OnUpdate", function(self, elapsed)
             self.lastSendTime = self.lastSendTime + elapsed
 
-            -- Send one chunk every 0.2 seconds
-            if self.lastSendTime >= 0.2 and self.currentChunk <= self.numChunks then
+            -- Send one chunk every 1.2 seconds
+            if self.lastSendTime >= 1.2 and self.currentChunk <= self.numChunks then
                 local start = (self.currentChunk - 1) * self.chunkSize + 1
                 local chunk = self.exportString:sub(start, start + self.chunkSize - 1)
                 local msg = string.format("CHUNK:%d:%d:%s", self.currentChunk, self.numChunks, chunk)
