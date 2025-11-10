@@ -123,6 +123,10 @@ function RouteSharing:Initialize()
     frame:RegisterEvent("CHAT_MSG_ADDON")
     frame:SetScript("OnEvent", function(self, event, prefix, message, distribution, sender)
         if event == "CHAT_MSG_ADDON" then
+            -- Debug: Log ALL addon messages with RDT_Route prefix
+            if prefix == "RDT_Route" then
+                RDT:DebugPrint("CHAT_MSG_ADDON: prefix=" .. prefix .. ", sender=" .. sender .. ", dist=" .. distribution .. ", msgLen=" .. #message)
+            end
             RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
         end
     end)
@@ -263,7 +267,9 @@ function RouteSharing:OnAddonMessage(prefix, message, distribution, sender)
     -- Ignore messages from self
     if sender == UnitName("player") then return end
 
-    RDT:DebugPrint("Addon message from " .. sender .. ": " .. message:sub(1, 50))
+    -- Debug: Show full message info
+    local msgPreview = message:sub(1, math.min(50, #message))
+    RDT:DebugPrint("Addon message from " .. sender .. " (dist: " .. distribution .. "): " .. msgPreview .. " [len=" .. #message .. "]")
 
     -- Handle route request
     if message == "REQUEST" then
