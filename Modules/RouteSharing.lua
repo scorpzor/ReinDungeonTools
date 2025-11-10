@@ -41,16 +41,17 @@ function RouteSharing:Initialize()
         local anyLinkFound = false
 
         repeat
-            -- Pattern: [ReinDungeon: PlayerName - RouteName]
-            local start, finish, characterName, routeName = remaining:find("%[ReinDungeon: ([^%s]+) %- (.*)%]")
+            -- Pattern: [ReinDungeonTools: PlayerName - RouteName]
+            local start, finish, characterName, routeName = remaining:find("%[ReinDungeonTools: ([^%s]+) %- (.*)%]")
             if characterName and routeName then
                 -- Strip any color codes that might be embedded
                 characterName = characterName:gsub("|c[Ff][Ff]......", ""):gsub("|r", "")
                 routeName = routeName:gsub("|c[Ff][Ff]......", ""):gsub("|r", "")
 
                 -- Build new message with hyperlink
+                -- Use BNplayer protocol (like WeakAuras) to avoid tooltip errors
                 newMsg = newMsg .. remaining:sub(1, start - 1)
-                newMsg = newMsg .. "|Hgarrmission:rdt:" .. characterName .. "|h|cFF00FF00[" .. characterName .. " |r|cFF00FF00- " .. routeName .. "]|h|r"
+                newMsg = newMsg .. "|HBNplayer::rdt|h|cFF00FF00[" .. characterName .. " |r|cFF00FF00- " .. routeName .. "]|h|r"
                 remaining = remaining:sub(finish + 1)
                 anyLinkFound = true
             else
@@ -80,41 +81,39 @@ function RouteSharing:Initialize()
 
     -- Hook SetItemRef to detect clicks on RDT links
     hooksecurefunc("SetItemRef", function(link, text, button)
-        if link and link:find("^garrmission:rdt:") then
-            local sender = link:match("^garrmission:rdt:(.+)$")
+        if link == "BNplayer::rdt" then
+            -- Extract player name and route name from the displayed text
+            local _, _, characterName, routeName = text:find("|HBNplayer::rdt|h|cFF00FF00%[([^%s]+) |r|cFF00FF00%- (.*)%]|h")
 
-            if not sender then return end
+            if not characterName or not routeName then return end
 
-            -- Strip any color codes from sender name
-            sender = sender:gsub("|c[Ff][Ff]......", ""):gsub("|r", "")
+            -- Strip any color codes that might be embedded
+            characterName = characterName:gsub("|c[Ff][Ff]......", ""):gsub("|r", "")
+            routeName = routeName:gsub("|c[Ff][Ff]......", ""):gsub("|r", "")
 
-            RDT:DebugPrint("RDT link clicked: sender=" .. sender)
+            RDT:DebugPrint("RDT link clicked: sender=" .. characterName)
 
             -- If Shift is held, re-insert the plain text into chat
             if IsShiftKeyDown() then
                 local editbox = GetCurrentKeyBoardFocus()
                 if editbox then
-                    -- Extract route name from the link text
-                    local _, _, characterName, routeName = text:find("|Hgarrmission:rdt:[^|]+|h|cFF00FF00%[([^%s]+) |r|cFF00FF00%- (.*)%]|h")
-                    if characterName and routeName then
-                        editbox:Insert("[ReinDungeon: " .. characterName .. " - " .. routeName .. "]")
-                    end
+                    editbox:Insert("[ReinDungeonTools: " .. characterName .. " - " .. routeName .. "]")
                 end
                 return
             end
 
             -- Normal click: request or import route
             -- If it's your own link, show the import dialog
-            if sender == UnitName("player") then
-                local routeData = sharedRoutes[sender]
+            if characterName == UnitName("player") then
+                local routeData = sharedRoutes[characterName]
                 if routeData then
-                    RouteSharing:ShowImportDialog(sender, routeData)
+                    RouteSharing:ShowImportDialog(characterName, routeData)
                 else
                     RDT:Print("Route data not found in cache")
                 end
             else
                 -- Request route from sender
-                RouteSharing:RequestRoute(sender)
+                RouteSharing:RequestRoute(characterName)
             end
         end
     end)
@@ -160,9 +159,9 @@ function RouteSharing:ShareToChat(channel)
     sharedRoutes[playerName] = exportData
 
     -- Send plain text message that will be converted to a hyperlink by the chat filter
-    -- Format: [ReinDungeon: PlayerName - RouteName]
+    -- Format: [ReinDungeonTools: PlayerName - RouteName]
     -- The ChatFrame_AddMessageEventFilter will convert this to a clickable hyperlink
-    local msg = "[ReinDungeon: " .. playerName .. " - " .. routeName .. "]"
+    local msg = "[ReinDungeonTools: " .. playerName .. " - " .. routeName .. "]"
 
     -- Send plain message to chat
     local success, errorMsg = pcall(function()
