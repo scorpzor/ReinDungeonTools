@@ -98,14 +98,14 @@ function UI:CreateMainFrame()
     mainFrame.bottomBg = bottomBg
 
     local helpText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    helpText:SetPoint("BOTTOMLEFT", 7, 6)
-    helpText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
-    helpText:SetText("Left-Click Pack: Add to Pull | Right-Click: Remove")
+    helpText:SetPoint("BOTTOMLEFT", 6, 4)
+    helpText:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+    helpText:SetText("Left-Click Pack: Add to Pull | Right-Click: Remove | Ctrl+Mouse Wheel: Zoom Map | Middle-Click: Drag Map")
     helpText:SetTextColor(0.6, 0.6, 0.6)
 
     versionText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    versionText:SetPoint("BOTTOMRIGHT", -7, 6)
-    versionText:SetFont("Fonts\\FRIZQT__.TTF", 9, "")
+    versionText:SetPoint("BOTTOMRIGHT", -6, 4)
+    versionText:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
     versionText:SetText("|cFF888888v" .. RDT.Version .. "|r")
     versionText:SetTextColor(0.5, 0.5, 0.5)
 

@@ -69,9 +69,9 @@ For a 3x2 grid: [1][2][3]
 - [x] Replace sample icons with mob portraits
 - [x] Make icons/portraits round
 - [x] Add Entrance/Floor/Buffs indicators
+- [x] Route sharing in chat
 - [ ] Complete dungeon layouts
 - [ ] Detailed pack information (abilities, patrol paths)
-- [ ] Route sharing in chat
 - [ ] Undo/Redo functionality
 - [ ] Dungeon timer integration
 - [ ] Statistics tracking
