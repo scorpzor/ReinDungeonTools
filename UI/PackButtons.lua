@@ -702,7 +702,7 @@ function UI:UpdateLabels()
             local packIds = RDT.RouteManager:GetPacksInPull(pullNum)
             if #packIds > 0 then
                 local r, g, b = unpack(RDT:GetPullColor(pullNum))
-                UpdatePullBorder(pullNum, packIds, r, g, b, 0.8)
+                UpdatePullBorder(pullNum, packIds, r, g, b, 1.0)
 
                 local centerX, centerY = CalculatePullCenter(packIds)
 
@@ -765,7 +765,7 @@ function UI:HighlightPull(pullNum, enable)
         else
             local r, g, b = unpack(RDT:GetPullColor(pullNum))
             for _, line in ipairs(border.lines or {}) do
-                line:SetVertexColor(r, g, b, 0.8)
+                line:SetVertexColor(r, g, b, 1.0)
             end
         end
     end
