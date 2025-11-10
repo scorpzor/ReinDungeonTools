@@ -592,8 +592,25 @@ function UI:CreateButtonContainer(parent)
         end
     end)
 
+    local shareButton = CreateFrame("Button", "RDT_ShareButton", buttonContainer)
+    shareButton:SetPoint("TOPLEFT", newPullButton, "BOTTOMLEFT", 0, -5)
+    shareButton:SetHeight(24)
+    shareButton:SetText("Share")
+    shareButton:RegisterForClicks("LeftButtonUp")
+    StyleSquareButton(shareButton)
+    local origShareClick = shareButton:GetScript("OnClick")
+    shareButton:SetScript("OnClick", function(self, button, ...)
+        if origShareClick then origShareClick(self, button, ...) end
+        if not RDT.RouteSharing then
+            RDT:PrintError("RouteSharing module not loaded")
+            return
+        end
+
+        RDT.RouteSharing:ShareToChat("PARTY")
+    end)
+
     local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer)
-    exportButton:SetPoint("TOPLEFT", newPullButton, "BOTTOMLEFT", 0, -5)
+    exportButton:SetPoint("LEFT", shareButton, "RIGHT", spacing, 0)
     exportButton:SetHeight(24)
     exportButton:SetText("Export")
     exportButton:RegisterForClicks("LeftButtonUp")
@@ -605,7 +622,7 @@ function UI:CreateButtonContainer(parent)
             RDT:PrintError("ImportExport module not loaded")
             return
         end
-        
+
         local exportString = RDT.ImportExport:Export()
         if exportString and RDT.Dialogs and RDT.Dialogs.ShowExport then
             RDT.Dialogs:ShowExport(exportString)
@@ -627,24 +644,28 @@ function UI:CreateButtonContainer(parent)
             RDT:PrintError("Import dialog not available")
         end
     end)
-    
+
     local containerWidth = buttonContainer:GetWidth() or 290
     local halfWidth = (containerWidth - spacing) / 2
-    
+    local thirdWidth = (containerWidth - spacing * 2) / 3
+
     newPullButton:SetWidth(halfWidth)
     resetButton:SetWidth(halfWidth)
-    exportButton:SetWidth(halfWidth)
-    importButton:SetWidth(halfWidth)
-    
+    shareButton:SetWidth(thirdWidth)
+    exportButton:SetWidth(thirdWidth)
+    importButton:SetWidth(thirdWidth)
+
     local function UpdatePullExportButtonWidths()
         local width = buttonContainer:GetWidth()
         local btnHalfWidth = (width - spacing) / 2
-        
+        local btnThirdWidth = (width - spacing * 2) / 3
+
         newPullButton:SetWidth(btnHalfWidth)
         resetButton:SetWidth(btnHalfWidth)
-        
-        exportButton:SetWidth(btnHalfWidth)
-        importButton:SetWidth(btnHalfWidth)
+
+        shareButton:SetWidth(btnThirdWidth)
+        exportButton:SetWidth(btnThirdWidth)
+        importButton:SetWidth(btnThirdWidth)
     end
     
     buttonContainer:HookScript("OnSizeChanged", UpdatePullExportButtonWidths)
