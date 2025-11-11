@@ -2,7 +2,7 @@
 ## Title: Rein Dungeon Tools
 ## Notes: Route planning tool for WotLK Heroic dungeons - Plan enemy forces pulls
 ## Author: scorpzor
-## Version: 0.2.0
+## Version: 0.3.0
 ## SavedVariables: ReinDungeonToolsDB
 ## OptionalDeps: Ace3, LibCompress, AceSerializer-3.0
 ## X-Category: Map
