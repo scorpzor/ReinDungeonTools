@@ -18,56 +18,61 @@ Locales\enUS.lua
 
 # Core Systems
 Core\Init.lua
-Core\Data.lua
-
-# Dungeon Modules (after Data.lua provides registry)
-Dungeons\Classic\blackfathom_deeps.lua
-Dungeons\Classic\blackrock_caverns.lua
-Dungeons\Classic\blackrock_depths.lua
-Dungeons\Classic\deadmines.lua
-Dungeons\Classic\dire_maul_east.lua
-Dungeons\Classic\dire_maul_north.lua
-Dungeons\Classic\dire_maul_west.lua
-Dungeons\Classic\gnomeregan.lua
-Dungeons\Classic\lower_blackrock_spire.lua
-# Dungeons\Classic\lower_scholomance.lua
-Dungeons\Classic\maraudon.lua
-Dungeons\Classic\ragefire_chasm.lua
-Dungeons\Classic\razorfen_downs.lua
-Dungeons\Classic\razorfen_kraul.lua
-Dungeons\Classic\scarlet_monastery_armory.lua
-Dungeons\Classic\scarlet_monastery_cathedral.lua
-Dungeons\Classic\scarlet_monastery_graveyard.lua
-Dungeons\Classic\scarlet_monastery_library.lua
-Dungeons\Classic\shadowfang_keep.lua
-Dungeons\Classic\stormwind_stockade.lua
-Dungeons\Classic\stratholme_main_gate.lua
-Dungeons\Classic\stratholme_service_entrance.lua
-Dungeons\Classic\sunken_temple.lua
-Dungeons\Classic\uldaman.lua
-Dungeons\Classic\upper_blackrock_spire.lua
-# Dungeons\Classic\upper_scholomance.lua
-Dungeons\Classic\wailing_caverns.lua
-Dungeons\Classic\zulfarrak.lua
-
-# Core continued
-Core\Base64.lua
-Core\RouteSerializer.lua
-Core\Database.lua
+Core\Config.lua
 Core\Commands.lua
-Core\RouteManager.lua
-Core\MinimapButton.lua
 Core\DevTools.lua
 
-# Modules
-Modules\ImportExport.lua
-Modules\RouteSharing.lua
+# Data Registry & Atlases
+Data\Atlases.lua
+Data\Registry.lua
 
-# UI Components
-UI\UIHelpers.lua
-UI\MapViewport.lua
-UI\MainFrame.lua
-UI\PackButtons.lua
-UI\IdentifierIcons.lua
-UI\PullsList.lua
-UI\Dialogs.lua
+# Utility Libraries
+Libs\Base64.lua
+Libs\UIHelpers.lua
+
+# Dungeon Data
+Data\Dungeons\Classic\blackfathom_deeps.lua
+Data\Dungeons\Classic\blackrock_caverns.lua
+Data\Dungeons\Classic\blackrock_depths.lua
+Data\Dungeons\Classic\deadmines.lua
+Data\Dungeons\Classic\dire_maul_east.lua
+Data\Dungeons\Classic\dire_maul_north.lua
+Data\Dungeons\Classic\dire_maul_west.lua
+Data\Dungeons\Classic\gnomeregan.lua
+Data\Dungeons\Classic\lower_blackrock_spire.lua
+# Data\Dungeons\Classic\lower_scholomance.lua
+Data\Dungeons\Classic\maraudon.lua
+Data\Dungeons\Classic\ragefire_chasm.lua
+Data\Dungeons\Classic\razorfen_downs.lua
+Data\Dungeons\Classic\razorfen_kraul.lua
+Data\Dungeons\Classic\scarlet_monastery_armory.lua
+Data\Dungeons\Classic\scarlet_monastery_cathedral.lua
+Data\Dungeons\Classic\scarlet_monastery_graveyard.lua
+Data\Dungeons\Classic\scarlet_monastery_library.lua
+Data\Dungeons\Classic\shadowfang_keep.lua
+Data\Dungeons\Classic\stormwind_stockade.lua
+Data\Dungeons\Classic\stratholme_main_gate.lua
+Data\Dungeons\Classic\stratholme_service_entrance.lua
+Data\Dungeons\Classic\sunken_temple.lua
+Data\Dungeons\Classic\uldaman.lua
+Data\Dungeons\Classic\upper_blackrock_spire.lua
+# Data\Dungeons\Classic\upper_scholomance.lua
+Data\Dungeons\Classic\wailing_caverns.lua
+Data\Dungeons\Classic\zulfarrak.lua
+
+# Route Management Module
+Modules\Routes\Manager.lua
+Modules\Routes\Serializer.lua
+Modules\Routes\ImportExport.lua
+Modules\Routes\Sharing.lua
+
+# Map Display Module
+Modules\Map\Viewport.lua
+Modules\Map\Packs.lua
+Modules\Map\Identifiers.lua
+
+# UI Module
+Modules\UI\MainFrame.lua
+Modules\UI\Dialogs.lua
+Modules\UI\PullsList.lua
+Modules\UI\MinimapButton.lua
