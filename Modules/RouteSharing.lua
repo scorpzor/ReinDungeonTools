@@ -263,28 +263,17 @@ function RouteSharing:ShowImportDialog(sender, data)
     -- Parse route info for display
     local routeInfo = RouteSerializer:ParseRouteInfo(exportString)
 
-    -- Create confirmation dialog
-    StaticPopupDialogs["RDT_IMPORT_ROUTE"] = {
-        text = "Import route from |cFFFFAA00" .. sender .. "|r?\n\n" ..
-               "|cFFFFFFFFDungeon:|r " .. (routeInfo.dungeon or "Unknown") .. "\n" ..
-               "|cFFFFFFFFRoute:|r " .. (routeInfo.routeName or "Unnamed") .. "\n" ..
-               "|cFFFFFFFFPacks:|r " .. (routeInfo.packCount or 0),
-        button1 = "Import",
-        button2 = "Cancel",
-        OnAccept = function()
-            if RDT.ImportExport then
-                RDT.ImportExport:Import(exportString)
-            else
-                RDT:PrintError("ImportExport module not found")
-            end
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,  -- Avoid UI taint
-    }
+    if not RDT.Dialogs then
+        RDT:PrintError("Dialogs module not loaded - cannot show import dialog")
+        return
+    end
 
-    StaticPopup_Show("RDT_IMPORT_ROUTE")
+    RDT.Dialogs:ShowImport({
+        sender = sender,
+        importString = exportString,
+        routeInfo = routeInfo,
+        compact = true
+    })
 end
 
 

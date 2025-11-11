@@ -149,28 +149,34 @@ end
 
 --- Parse basic route info from export string (without full validation)
 -- @param exportString string The RDT1: export string
--- @return table Route information (dungeon, routeName, packCount) or nil
+-- @return table Route information (dungeon, routeName, pullCount) or nil
 function RouteSerializer:ParseRouteInfo(exportString)
     local data = self:DecodeRouteData(exportString)
     if not data then
         return {
             dungeon = "Unknown",
             routeName = "Unknown",
-            packCount = 0
+            pullCount = 0
         }
     end
 
-    local packCount = 0
+    local pullCount = 0
+    local uniquePulls = {}
     if data.pulls and type(data.pulls) == "table" then
-        for _ in pairs(data.pulls) do
-            packCount = packCount + 1
+        for packId, pullNum in pairs(data.pulls) do
+            if pullNum and type(pullNum) == "number" and pullNum > 0 then
+                uniquePulls[pullNum] = true
+            end
+        end
+        for _ in pairs(uniquePulls) do
+            pullCount = pullCount + 1
         end
     end
 
     return {
         dungeon = data.dungeon or "Unknown",
         routeName = data.routeName or "Unnamed",
-        packCount = packCount,
+        pullCount = pullCount,
         author = data.author,
         addonVersion = data.addonVersion,
         timestamp = data.timestamp

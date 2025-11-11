@@ -216,6 +216,7 @@ function Dialogs:CreateImportDialog()
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText("Import Route")
+    frame.titleText = title
     
     -- Modern close button (X)
     local closeBtn = CreateModernCloseButton(frame)
@@ -228,12 +229,14 @@ function Dialogs:CreateImportDialog()
     local instructions = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     instructions:SetPoint("TOP", 0, -40)
     instructions:SetText("Paste the import string below:")
+    frame.instructions = instructions
     
     -- Scroll frame for the import string (with proper insets for scrollbar)
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -70)
     scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)  -- Extra space for scrollbar
     scrollFrame:SetHeight(200)
+    frame.scrollFrame = scrollFrame
     
     -- Style the scrollbar with modern appearance
     if UIHelpers and UIHelpers.StyleScrollBar then
@@ -266,7 +269,7 @@ function Dialogs:CreateImportDialog()
     -- Warning text - positioned above buttons
     local warning = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     warning:SetPoint("BOTTOM", frame, "BOTTOM", 0, 50)
-    warning:SetText("|cFFFFFF00Warning:|r This will create a new route with the imported data")
+    warning:SetText("This will create a new route with the imported data.\nIf the name matches an existing route, an incremental number will be added.")
     warning:SetTextColor(1, 0.8, 0)
     
     -- Buttons horizontally aligned at the bottom
@@ -313,20 +316,61 @@ function Dialogs:CreateImportDialog()
 end
 
 --- Show the import dialog
-function Dialogs:ShowImport()
-    -- Create dialog if it doesn't exist
+-- @param options table Optional configuration {sender=string, importString=string, routeInfo=table, compact=boolean}
+function Dialogs:ShowImport(options)
     if not importFrame then
         self:CreateImportDialog()
     end
-    
-    -- Clear any previous text
-    importFrame.editBox:SetText("")
-    importFrame.editBox:SetFocus()
-    
-    -- Show the dialog
+
+    local isCompact = options and options.routeInfo and options.compact
+
+    if importFrame.titleText then
+        if options and options.sender then
+            importFrame.titleText:SetText("Import Route from " .. options.sender)
+        else
+            importFrame.titleText:SetText("Import Route")
+        end
+    end
+
+    if importFrame.instructions then
+        if options and options.routeInfo then
+            local info = options.routeInfo
+            local infoText = string.format(
+                "|cFFFFFFFFDungeon:|r %s\n|cFFFFFFFFRoute:|r %s\n|cFFFFFFFFPulls:|r %d",
+                info.dungeon or "Unknown",
+                info.routeName or "Unnamed",
+                info.pullCount or 0
+            )
+            importFrame.instructions:SetText(infoText)
+            importFrame.instructions:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+        else
+            importFrame.instructions:SetText("Paste the import string below:")
+            importFrame.instructions:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+        end
+    end
+
+    if importFrame.scrollFrame then
+        if isCompact then
+            importFrame.scrollFrame:Hide()
+        else
+            importFrame.scrollFrame:Show()
+        end
+    end
+
+    if options and options.importString then
+        importFrame.editBox:SetText(options.importString)
+        importFrame.editBox:SetCursorPosition(0)
+    else
+        importFrame.editBox:SetText("")
+    end
+
+    if not isCompact then
+        importFrame.editBox:SetFocus()
+    end
+
     importFrame:Show()
-    
-    RDT:DebugPrint("Import dialog shown")
+
+    RDT:DebugPrint("Import dialog shown (compact=" .. tostring(isCompact) .. ")")
 end
 
 --------------------------------------------------------------------------------

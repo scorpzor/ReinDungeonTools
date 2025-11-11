@@ -404,7 +404,7 @@ function UIHelpers:CreateModernDropdown(config)
     arrow:SetVertexColor(1, 1, 0.5)
 
     -- Create dropdown menu frame
-    local menuFrame = CreateFrame("Frame", config.name.."Menu", UIParent)
+    local menuFrame = CreateFrame("Frame", config.name.."Menu", config.parent)
     menuFrame:SetSize(config.width or 200, config.menuHeight or 200)
     menuFrame:SetFrameStrata("DIALOG")
     menuFrame:SetBackdrop({
