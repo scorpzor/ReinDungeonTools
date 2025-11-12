@@ -2,7 +2,7 @@
 
 A route planning addon for classic dungeons.
 
-<img width="1967" height="1120" alt="image" src="https://github.com/user-attachments/assets/2ab1956f-1f78-4263-a373-87f36fe4ac30" />
+<img width="1964" height="1117" alt="image" src="https://github.com/user-attachments/assets/dc6ec34f-56a3-4448-8488-7fc9e618a645" />
 
 ## Features
 
