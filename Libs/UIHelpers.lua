@@ -587,5 +587,84 @@ function UIHelpers:CreateModernDropdown(config)
     return dropdown
 end
 
+--------------------------------------------------------------------------------
+-- Line Drawing Utilities
+--------------------------------------------------------------------------------
+
+--- Draw a dotted line between two points on the map
+-- @param config table Configuration:
+--   - mapCanvas: Frame to draw on
+--   - mapTexture: Frame to anchor points to
+--   - x1, y1: Start point (pixel coordinates)
+--   - x2, y2: End point (pixel coordinates)
+--   - texturePool: Pool to reuse textures from (optional)
+--   - outputTable: Table to store created textures in
+--   - dotSize: Size of each dot (default: 4)
+--   - dotSpacing: Pixels between dots (default: 15)
+--   - color: {r, g, b, a} color (default: {1, 1, 1, 1})
+--- Draw a dotted line between two points
+-- @param config table Configuration table with:
+--   - mapCanvas: Frame to create textures on
+--   - mapTexture: Texture to anchor points to
+--   - x1, y1: Start coordinates (pixels)
+--   - x2, y2: End coordinates (pixels)
+--   - texturePool: Optional table to reuse textures from
+--   - outputTable: Optional table to store created textures in
+--   - dotSize: Optional size of each dot (default 4)
+--   - dotSpacing: Optional spacing between dots (default 15)
+--   - color: Optional {r, g, b, a} color table (default white)
+-- @return table Array of texture objects created for this line
+function UIHelpers:DrawDottedLine(config)
+    local x1, y1 = config.x1, config.y1
+    local x2, y2 = config.x2, config.y2
+
+    -- Calculate line properties
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local length = math.sqrt(dx * dx + dy * dy)
+
+    if length < 1 then
+        return {}  -- Points are too close, return empty table
+    end
+
+    -- Create dotted line effect with multiple small textures
+    local dotSpacing = config.dotSpacing or 15
+    local numDots = math.max(5, math.floor(length / dotSpacing))
+    local createdTextures = {}
+
+    for i = 0, numDots do
+        local t = i / numDots
+        local x = x1 + dx * t
+        local y = y1 + dy * t
+
+        -- Try to reuse a texture from the pool, or create a new one
+        local dot = config.texturePool and table.remove(config.texturePool)
+        if not dot then
+            -- No pooled texture available, create a new one
+            dot = config.mapCanvas:CreateTexture(nil, "OVERLAY")
+            local dotSize = config.dotSize or 4
+            dot:SetSize(dotSize, dotSize)
+            dot:SetTexture("Interface\\Buttons\\WHITE8X8")
+        end
+
+        -- Update properties
+        dot:ClearAllPoints()
+        local color = config.color or {1, 1, 1, 1}
+        dot:SetVertexColor(color[1], color[2], color[3], color[4])
+        dot:SetPoint("CENTER", config.mapTexture, "TOPLEFT", x, -y)
+        dot:Show()
+
+        -- Track this texture
+        table.insert(createdTextures, dot)
+
+        -- Store in output table if provided (for backwards compatibility)
+        if config.outputTable then
+            table.insert(config.outputTable, dot)
+        end
+    end
+
+    return createdTextures
+end
+
 RDT:DebugPrint("UIHelpers module loaded")
 

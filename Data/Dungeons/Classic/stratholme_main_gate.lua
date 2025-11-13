@@ -306,7 +306,12 @@ local mapDefinition = {
             x = 0.652,
             y = 0.588,
             mobs = {
-                ["strat_patchwork_horror"] = 1,--patrol
+                ["strat_patchwork_horror"] = 1,
+            },
+            patrol = {
+                { x = 0.595, y = 0.552 },
+                { x = 0.652, y = 0.588 },
+                { x = 0.699, y = 0.587 },
             }
         },
         {

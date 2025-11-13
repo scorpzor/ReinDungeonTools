@@ -25,7 +25,7 @@ RDT.State = {
     currentRoute = nil,      -- Reference to current route table from DB
     packButtons = {},        -- Map of packID -> button frame
     identifierButtons = {},  -- Map of identifierID -> button frame
-    portalLines = {},        -- Array of portal connection line textures
+    identifierLines = {},    -- Array of identifier connection line textures
     isInitialized = false,   -- Whether addon has finished loading
 }
 

@@ -260,9 +260,10 @@ function Data:GetProcessedDungeon(dungeonName)
             x = pack.x,
             y = pack.y,
             mobs = pack.mobs,
+            patrol = pack.patrol,
             count = 0  -- Will be calculated
         }
-        
+
         -- Calculate pack count from mobs
         if pack.mobs then
             for mobKey, quantity in pairs(pack.mobs) do
@@ -272,7 +273,7 @@ function Data:GetProcessedDungeon(dungeonName)
                 end
             end
         end
-        
+
         table.insert(processed.packData, packCopy)
     end
     

@@ -8,6 +8,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
+local UIHelpers = RDT.UIHelpers
+
 -- Pack button styling constants
 local MOB_ICON_SIZE = 20
 local MOB_ICON_SPACING = 16
@@ -20,8 +22,11 @@ local packGroupPool = {}
 local mobButtonPool = {}
 local borderFramePool = {}
 local borderLinePool = {}
+local patrolLinePool = {}
 
 local pullBorders = {}
+local patrolLines = {}
+local patrolLinesByPack = {}
 
 --------------------------------------------------------------------------------
 -- Pack Button Creation
@@ -48,9 +53,16 @@ function UI:CreatePacks(packData)
             RDT:PrintError(string.format(L["ERROR_INVALID_COORDS"], data.id or 0))
             return
         end
-        
+
         local packGroup = self:CreatePackGroup(data, mapWidth, mapHeight)
         RDT.State.packButtons["pack" .. data.id] = packGroup
+    end
+
+    for _, data in ipairs(packData) do
+        if data.patrol and #data.patrol > 1 then
+            RDT:DebugPrint(string.format("Rendering patrol path for pack %d with %d points", data.id, #data.patrol))
+            self:RenderPatrolPath(data.id, data.patrol, mapWidth, mapHeight)
+        end
     end
 
     self:UpdateLabels()
@@ -155,6 +167,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     packGroup.packId = data.id
     packGroup.count = data.count or 0
     packGroup.mobs = data.mobs or {}
+    packGroup.isPatrol = data.patrol and #data.patrol > 1  -- Boolean flag for tooltip
     packGroup.mobButtons = {}
 
     local mobList = {}
@@ -301,8 +314,9 @@ function UI:SetupMobIconHandlers(button)
         UI:OnMobIconEnter(self)
     end)
     
-    button:SetScript("OnLeave", function()
+    button:SetScript("OnLeave", function(self)
         GameTooltip:Hide()
+        UI:OnMobIconLeave(self)
     end)
 end
 
@@ -329,8 +343,12 @@ end
 
 function UI:OnMobIconEnter(button)
     local packGroup = RDT.State.packButtons["pack" .. button.packId]
-    
-    GameTooltip:SetOwner(button, "ANCHOR_CURSOR")
+
+    GameTooltip:SetOwner(button, "ANCHOR_NONE")
+    local x, y = GetCursorPosition()
+    local scale = GameTooltip:GetEffectiveScale()
+    GameTooltip:ClearAllPoints()
+    GameTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (x / scale) + 10, (y / scale) + 10)
 
     if button.mobInfo then
         GameTooltip:SetText(button.mobInfo.name, 1, 1, 0.5, 1, true)
@@ -350,7 +368,11 @@ function UI:OnMobIconEnter(button)
 
         if packGroup.mobs and next(packGroup.mobs) then
             GameTooltip:AddLine(" ")
-            GameTooltip:AddLine("Pack Composition:", 1, 0.82, 0)
+            local compositionText = "Pack Composition"
+            if packGroup.isPatrol then
+                compositionText = compositionText .. " (Patrol)"
+            end
+            GameTooltip:AddLine(compositionText .. ":", 1, 0.82, 0)
 
             local mobList = {}
             for mobKey, quantity in pairs(packGroup.mobs) do
@@ -380,11 +402,14 @@ function UI:OnMobIconEnter(button)
             GameTooltip:AddLine("Assigned to " .. L["PULL"] .. " " .. pullNum, unpack(RDT:GetPullColor(pullNum)))
         end
     end
-    
-    GameTooltip:AddLine(" ")
-    GameTooltip:AddLine(L["TOOLTIP_CLICK_ADD"], 0.5, 0.5, 0.5)
-    GameTooltip:AddLine(L["TOOLTIP_RIGHT_CLICK"], 0.5, 0.5, 0.5)
+
     GameTooltip:Show()
+
+    self:HighlightPatrolLines(button.packId, true)
+end
+
+function UI:OnMobIconLeave(button)
+    self:HighlightPatrolLines(button.packId, false)
 end
 
 --------------------------------------------------------------------------------
@@ -773,11 +798,91 @@ function UI:HighlightPull(pullNum, enable)
 end
 
 --------------------------------------------------------------------------------
+-- Patrol Path Rendering
+--------------------------------------------------------------------------------
+
+--- Render patrol path for a pack with patrol points
+-- @param packId number Pack ID for tracking
+-- @param patrolPoints table Array of {x, y} patrol waypoints (normalized 0-1 coordinates)
+-- @param mapWidth number Map width in pixels
+-- @param mapHeight number Map height in pixels
+function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
+    if not patrolPoints or #patrolPoints < 2 then
+        return  -- Need at least 2 points to draw a path
+    end
+
+    RDT:DebugPrint(string.format("RenderPatrolPath: UIHelpers is %s", tostring(UIHelpers)))
+
+    patrolLinesByPack[packId] = {}
+    local packPatrolLines = {}
+
+    for i = 1, #patrolPoints - 1 do
+        local point1 = patrolPoints[i]
+        local point2 = patrolPoints[i + 1]
+
+        -- Convert normalized coordinates to screen space
+        local x1 = point1.x * mapWidth
+        local y1 = point1.y * mapHeight
+        local x2 = point2.x * mapWidth
+        local y2 = point2.y * mapHeight
+
+        RDT:DebugPrint(string.format("Drawing line from (%.1f, %.1f) to (%.1f, %.1f)", x1, y1, x2, y2))
+
+        local lineTextures = UIHelpers:DrawDottedLine({
+            mapCanvas = self.mapCanvas,
+            mapTexture = self.mapTexture,
+            x1 = x1,
+            y1 = y1,
+            x2 = x2,
+            y2 = y2,
+            texturePool = patrolLinePool,
+            outputTable = patrolLines,
+            dotSize = 3,
+            dotSpacing = 10,
+            color = {0, 0.176, 0.451, 0.8}
+        })
+
+        for _, texture in ipairs(lineTextures) do
+            table.insert(packPatrolLines, texture)
+        end
+    end
+
+    patrolLinesByPack[packId] = packPatrolLines
+end
+
+--- Highlight or unhighlight patrol lines for a pack
+-- @param packId number Pack ID
+-- @param enable boolean True to highlight, false to restore normal color
+function UI:HighlightPatrolLines(packId, enable)
+    local lines = patrolLinesByPack[packId]
+    if not lines then
+        return
+    end
+
+    for _, line in ipairs(lines) do
+        if enable then
+            line:SetVertexColor(0.2, 0.8, 1.0, 1.0)
+        else
+            line:SetVertexColor(0, 0.176, 0.451, 0.8)
+        end
+    end
+end
+
+--------------------------------------------------------------------------------
 -- Pack Cleanup
 --------------------------------------------------------------------------------
 
 function UI:ClearPacks()
     RDT:DebugPrint("Clearing pack groups")
+
+    -- Return patrol line textures to pool
+    for _, line in ipairs(patrolLines) do
+        line:Hide()
+        line:ClearAllPoints()
+        table.insert(patrolLinePool, line)
+    end
+    wipe(patrolLines)
+    wipe(patrolLinesByPack)
 
     -- Return pull border frames to pool
     for _, border in pairs(pullBorders) do

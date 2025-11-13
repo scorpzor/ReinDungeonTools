@@ -13,6 +13,8 @@ end
 
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
+local UIHelpers = RDT.UIHelpers
+
 -- Constants
 local IDENTIFIER_ICON_SIZE = 32  -- Base size for identifier icons
 
@@ -67,15 +69,15 @@ function UI:ClearIdentifierIcons()
     RDT.State.identifierButtons = {}
 
     -- Return line textures to pool
-    if RDT.State.portalLines then
-        for _, line in ipairs(RDT.State.portalLines) do
+    if RDT.State.identifierLines then
+        for _, line in ipairs(RDT.State.identifierLines) do
             line:Hide()
             line:ClearAllPoints()
             -- Return to pool for reuse
             table.insert(lineTexturePool, line)
         end
     end
-    RDT.State.portalLines = {}
+    RDT.State.identifierLines = {}
 end
 
 --- Create a single identifier icon
@@ -221,13 +223,13 @@ function UI:DrawIdentifierConnections(identifiers)
     end
 
     -- Clear existing lines
-    if RDT.State.portalLines then
-        for _, line in ipairs(RDT.State.portalLines) do
+    if RDT.State.identifierLines then
+        for _, line in ipairs(RDT.State.identifierLines) do
             line:Hide()
             line:SetParent(nil)
         end
     end
-    RDT.State.portalLines = {}
+    RDT.State.identifierLines = {}
 
     -- Find all identifiers with links
     local linkedIdentifiers = {}
@@ -265,38 +267,17 @@ function UI:DrawConnectionLine(identifier1, identifier2)
     local x2 = identifier2.x * mapWidth
     local y2 = identifier2.y * mapHeight
 
-    -- Calculate line properties
-    local dx = x2 - x1
-    local dy = y2 - y1
-    local length = math.sqrt(dx * dx + dy * dy)
-
-    if length < 1 then
-        return  -- Identifiers are too close
-    end
-
-    -- Create dotted line effect with multiple small textures
-    local numDots = math.max(5, math.floor(length / 15))  -- One dot every 15 pixels
-
-    for i = 0, numDots do
-        local t = i / numDots
-        local x = x1 + dx * t
-        local y = y1 + dy * t
-
-        -- Try to reuse a texture from the pool, or create a new one
-        local dot = table.remove(lineTexturePool)
-        if not dot then
-            -- No pooled texture available, create a new one
-            dot = self.mapCanvas:CreateTexture(nil, "OVERLAY")
-            dot:SetSize(4, 4)
-            dot:SetTexture("Interface\\Buttons\\WHITE8X8")
-        end
-
-        -- Update properties
-        dot:ClearAllPoints()
-        dot:SetVertexColor(0.5, 0.8, 1.0, 0.6)  -- Light blue, semi-transparent
-        dot:SetPoint("CENTER", self.mapTexture, "TOPLEFT", x, -y)
-        dot:Show()
-
-        table.insert(RDT.State.portalLines, dot)
-    end
+    UIHelpers:DrawDottedLine({
+        mapCanvas = self.mapCanvas,
+        mapTexture = self.mapTexture,
+        x1 = x1,
+        y1 = y1,
+        x2 = x2,
+        y2 = y2,
+        texturePool = lineTexturePool,
+        outputTable = RDT.State.identifierLines,
+        dotSize = 4,
+        dotSpacing = 15,
+        color = {0.5, 0.8, 1.0, 0.6}
+    })
 end
