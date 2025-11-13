@@ -9,6 +9,7 @@ RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 local UIHelpers = RDT.UIHelpers
+local Colors = RDT.Colors
 
 -- Pack button styling constants
 local MOB_ICON_SIZE = 20
@@ -399,7 +400,7 @@ function UI:OnMobIconEnter(button)
         local pullNum = RDT.State.currentRoute.pulls[button.packId]
         if pullNum then
             GameTooltip:AddLine(" ")
-            GameTooltip:AddLine("Assigned to " .. L["PULL"] .. " " .. pullNum, unpack(RDT:GetPullColor(pullNum)))
+            GameTooltip:AddLine("Assigned to " .. L["PULL"] .. " " .. pullNum, unpack(UIHelpers:GetPullColor(pullNum)))
         end
     end
 
@@ -712,7 +713,7 @@ function UI:UpdateLabels()
         if packGroup.mobButtons then
             for _, mobBtn in ipairs(packGroup.mobButtons) do
                 if pullNum > 0 then
-                    local r, g, b = unpack(RDT:GetPullColor(pullNum))
+                    local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
                     mobBtn.glowBorder:SetVertexColor(r, g, b, 0.9)
                     mobBtn.glowBorder:Show()
                 else
@@ -727,7 +728,7 @@ function UI:UpdateLabels()
         for _, pullNum in ipairs(pulls) do
             local packIds = RDT.RouteManager:GetPacksInPull(pullNum)
             if #packIds > 0 then
-                local r, g, b = unpack(RDT:GetPullColor(pullNum))
+                local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
                 UpdatePullBorder(pullNum, packIds, r, g, b, 1.0)
 
                 local centerX, centerY = CalculatePullCenter(packIds)
@@ -789,7 +790,7 @@ function UI:HighlightPull(pullNum, enable)
                 line:SetVertexColor(1, 1, 0, 1)
             end
         else
-            local r, g, b = unpack(RDT:GetPullColor(pullNum))
+            local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
             for _, line in ipairs(border.lines or {}) do
                 line:SetVertexColor(r, g, b, 1.0)
             end
@@ -838,8 +839,8 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             texturePool = patrolLinePool,
             outputTable = patrolLines,
             dotSize = 3,
-            dotSpacing = 10,
-            color = {0, 0.176, 0.451, 0.8}
+            dotSpacing = 7,
+            color = Colors.Patrol.Normal
         })
 
         for _, texture in ipairs(lineTextures) do
@@ -861,10 +862,12 @@ function UI:HighlightPatrolLines(packId, enable)
 
     for _, line in ipairs(lines) do
         if enable then
-            line:SetVertexColor(0.4, 1.0, 1.0, 1.0)
+            local color = Colors.Patrol.Highlight
+            line:SetVertexColor(color[1], color[2], color[3], color[4])
             line:SetSize(4, 4)
         else
-            line:SetVertexColor(0, 0.176, 0.451, 0.8)
+            local color = Colors.Patrol.Normal
+            line:SetVertexColor(color[1], color[2], color[3], color[4])
             line:SetSize(3, 3)
         end
     end

@@ -14,6 +14,7 @@ end
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
 local UIHelpers = RDT.UIHelpers
+local Colors = RDT.Colors
 
 -- Constants
 local IDENTIFIER_ICON_SIZE = 32  -- Base size for identifier icons
@@ -278,6 +279,6 @@ function UI:DrawConnectionLine(identifier1, identifier2)
         outputTable = RDT.State.identifierLines,
         dotSize = 4,
         dotSpacing = 15,
-        color = {0.5, 0.8, 1.0, 0.6}
+        color = Colors.Identifier
     })
 end

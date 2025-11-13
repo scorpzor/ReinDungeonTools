@@ -8,6 +8,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
+local UIHelpers = RDT.UIHelpers
+
 -- Local references
 local pullsPanel
 local pullsScrollFrame
@@ -248,7 +250,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
     local entryHeight = 34  -- Fixed height for each pull entry
     
     -- Get pull color
-    local r, g, b = unpack(RDT:GetPullColor(pullNum))
+    local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
     if isCurrentPull then
         -- Brighten the text color for selected pull
         r, g, b = math.min(1, r * 1.3), math.min(1, g * 1.3), math.min(1, b * 1.3)
@@ -342,7 +344,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
     
     -- Update background color
     if pullButton.bgTexture then
-        local bgR, bgG, bgB = unpack(RDT:GetPullColor(pullNum))
+        local bgR, bgG, bgB = unpack(UIHelpers:GetPullColor(pullNum))
         -- Selected pull: bright full background; Non-selected: medium fade
         local fadeAlpha = isCurrentPull and 0.55 or 0.25
         pullButton.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
@@ -351,7 +353,7 @@ function UI:RenderPullEntry(pullNum, yOffset)
     -- Update selection overlay
     if pullButton.selectionOverlay then
         if isCurrentPull then
-            local overlayR, overlayG, overlayB = unpack(RDT:GetPullColor(pullNum))
+            local overlayR, overlayG, overlayB = unpack(UIHelpers:GetPullColor(pullNum))
             pullButton.selectionOverlay:SetVertexColor(overlayR, overlayG, overlayB)
             pullButton.selectionOverlay:SetAlpha(0.25)  -- Subtle additive glow
         else

@@ -24,6 +24,7 @@ Core\DevTools.lua
 
 # Data Registry & Atlases
 Data\Atlases.lua
+Data\Colors.lua
 Data\Registry.lua
 
 # Utility Libraries

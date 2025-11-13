@@ -629,8 +629,9 @@ function UIHelpers:DrawDottedLine(config)
 
     -- Create dotted line effect with multiple small textures
     local dotSpacing = config.dotSpacing or 15
-    local numDots = math.max(5, math.floor(length / dotSpacing))
+    local numDots = math.max(2, math.floor(length / dotSpacing))
     local createdTextures = {}
+    local dotSize = config.dotSize or 4
 
     for i = 0, numDots do
         local t = i / numDots
@@ -642,12 +643,11 @@ function UIHelpers:DrawDottedLine(config)
         if not dot then
             -- No pooled texture available, create a new one
             dot = config.mapCanvas:CreateTexture(nil, "OVERLAY")
-            local dotSize = config.dotSize or 4
-            dot:SetSize(dotSize, dotSize)
             dot:SetTexture("Interface\\Buttons\\WHITE8X8")
         end
 
         -- Update properties
+        dot:SetSize(dotSize, dotSize)
         dot:ClearAllPoints()
         local color = config.color or {1, 1, 1, 1}
         dot:SetVertexColor(color[1], color[2], color[3], color[4])
@@ -664,6 +664,33 @@ function UIHelpers:DrawDottedLine(config)
     end
 
     return createdTextures
+end
+
+--------------------------------------------------------------------------------
+-- Color Utilities
+--------------------------------------------------------------------------------
+
+local colorCache = {}
+
+--- Get color for a pull number (cached)
+-- @param pullNum number Pull number (0 = unassigned)
+-- @return table RGB color table {r, g, b}
+function UIHelpers:GetPullColor(pullNum)
+    -- Handle unassigned packs
+    if not pullNum or pullNum == 0 then
+        return RDT.Colors.Unassigned
+    end
+
+    if colorCache[pullNum] then
+        return colorCache[pullNum]
+    end
+
+    local colorIndex = ((pullNum - 1) % #RDT.Colors.PullBorders) + 1
+    local color = RDT.Colors.PullBorders[colorIndex]
+
+    colorCache[pullNum] = color
+
+    return color
 end
 
 RDT:DebugPrint("UIHelpers module loaded")
