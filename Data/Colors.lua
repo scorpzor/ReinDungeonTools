@@ -22,11 +22,8 @@ RDT.Colors = {
     -- Unassigned pack color
     Unassigned = {0.5, 0.5, 0.5},  -- Gray
 
-    -- Patrol line colors
-    Patrol = {
-        Normal = {0, 0.176, 0.451, 0.8}, -- Dark blue
-        Highlight = {0.4, 1.0, 1.0, 1.0}, -- Bright cyan
-    },
+    -- Patrol line color
+    Patrol = {0, 0.176, 0.451, 0.8}, -- Dark blue
 
     -- Identifier connection line color
     Identifier = {0.5, 0.8, 1.0, 0.6},  -- Light blue

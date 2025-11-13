@@ -406,11 +406,13 @@ function UI:OnMobIconEnter(button)
 
     GameTooltip:Show()
 
-    self:HighlightPatrolLines(button.packId, true)
+    button:SetScale(1.1)
+    self:ShowPatrolLines(button.packId, true)
 end
 
 function UI:OnMobIconLeave(button)
-    self:HighlightPatrolLines(button.packId, false)
+    button:SetScale(1.0)
+    self:ShowPatrolLines(button.packId, false)
 end
 
 --------------------------------------------------------------------------------
@@ -840,10 +842,11 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             outputTable = patrolLines,
             dotSize = 3,
             dotSpacing = 7,
-            color = Colors.Patrol.Normal
+            color = Colors.Patrol
         })
 
         for _, texture in ipairs(lineTextures) do
+            texture:Hide()
             table.insert(packPatrolLines, texture)
         end
     end
@@ -851,24 +854,20 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
     patrolLinesByPack[packId] = packPatrolLines
 end
 
---- Highlight or unhighlight patrol lines for a pack
+--- Show or hide patrol lines for a pack
 -- @param packId number Pack ID
--- @param enable boolean True to highlight, false to restore normal color
-function UI:HighlightPatrolLines(packId, enable)
+-- @param show boolean True to show, false to hide
+function UI:ShowPatrolLines(packId, show)
     local lines = patrolLinesByPack[packId]
     if not lines then
         return
     end
 
     for _, line in ipairs(lines) do
-        if enable then
-            local color = Colors.Patrol.Highlight
-            line:SetVertexColor(color[1], color[2], color[3], color[4])
-            line:SetSize(4, 4)
+        if show then
+            line:Show()
         else
-            local color = Colors.Patrol.Normal
-            line:SetVertexColor(color[1], color[2], color[3], color[4])
-            line:SetSize(3, 3)
+            line:Hide()
         end
     end
 end
