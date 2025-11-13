@@ -231,7 +231,11 @@ local mapDefinition = {
             x = 0.676,
             y = 0.795,
             mobs = {
-                ["strat_plague_ghoul"] = 1,--patrol
+                ["strat_plague_ghoul"] = 1,
+            },
+            patrol = {
+                { x = 0.680, y = 0.816 },
+                { x = 0.662, y = 0.760 },
             }
         },
         {
@@ -279,7 +283,12 @@ local mapDefinition = {
             x = 0.679,
             y = 0.699,
             mobs = {
-                ["strat_plague_ghoul"] = 1,--patrol
+                ["strat_plague_ghoul"] = 1,
+            },
+            patrol = {
+                { x = 0.668, y = 0.724 },
+                { x = 0.679, y = 0.699 },
+                { x = 0.674, y = 0.611 },
             }
         },
         {
@@ -295,10 +304,14 @@ local mapDefinition = {
         },
         {
             id = 9,
-            x = 0.649,
-            y = 0.546,
+            x = 0.644,
+            y = 0.544,
             mobs = {
-                ["strat_plague_ghoul"] = 1,--patrol
+                ["strat_plague_ghoul"] = 1,
+            },
+            patrol = {
+                { x = 0.644, y = 0.544 },
+                { x = 0.735, y = 0.582 },
             }
         },
         {
@@ -359,7 +372,12 @@ local mapDefinition = {
             x = 0.593,
             y = 0.484,
             mobs = {
-                ["strat_plague_ghoul"] = 1,--patrol
+                ["strat_plague_ghoul"] = 1,
+            },
+            patrol = {
+                { x = 0.601, y = 0.446 },
+                { x = 0.593, y = 0.509 },
+                { x = 0.585, y = 0.570 },
             }
         },
         {
@@ -375,7 +393,7 @@ local mapDefinition = {
         },
         {
             id = 17,
-            x = 0.591,
+            x = 0.584,
             y = 0.608,
             mobs = {
                 ["strat_skeletal_berserker"] = 2,
@@ -412,7 +430,12 @@ local mapDefinition = {
             x = 0.796,
             y = 0.449,
             mobs = {
-                ["strat_patchwork_horror"] = 1,--patrol
+                ["strat_patchwork_horror"] = 1,
+            },
+            patrol = {
+                { x = 0.805, y = 0.424 },
+                { x = 0.796, y = 0.449 },
+                { x = 0.792, y = 0.485 },
             }
         },
         {
@@ -508,9 +531,14 @@ local mapDefinition = {
         {
             id = 31,
             x = 0.716,
-            y = 0.204,
+            y = 0.215,
             mobs = {
-                ["strat_patchwork_horror"] = 1,--patrol
+                ["strat_patchwork_horror"] = 1,
+            },
+            patrol = {
+                { x = 0.701, y = 0.222 },
+                { x = 0.716, y = 0.215 },
+                { x = 0.756, y = 0.195 },
             }
         },
         {
@@ -777,7 +805,14 @@ local mapDefinition = {
             x = 0.223,
             y = 0.489,
             mobs = {
-                ["strat_crimson_guardsman"] = 1,--patrol
+                ["strat_crimson_guardsman"] = 1,
+            },
+            patrol = {
+                { x = 0.251, y = 0.470 },
+                { x = 0.249, y = 0.494 },
+                { x = 0.223, y = 0.489 },
+                { x = 0.225, y = 0.450 },
+                { x = 0.247, y = 0.463 },
             }
         },
         {
@@ -800,10 +835,14 @@ local mapDefinition = {
         },
         {
             id = 63,
-            x = 0.149,
-            y = 0.512,
+            x = 0.139,
+            y = 0.529,
             mobs = {
-                ["strat_crimson_gallant"] = 1,--patrol
+                ["strat_crimson_gallant"] = 1,
+            },
+            patrol = {
+                { x = 0.161, y = 0.560 },
+                { x = 0.131, y = 0.510 },
             }
         },
         {
@@ -846,16 +885,20 @@ local mapDefinition = {
         },
         {
             id = 68,
-            x = 0.196,
+            x = 0.188,
             y = 0.576,
             mobs = {
-                ["strat_crimson_monk"] = 1,--patrol
-                ["strat_crimson_sorcerer"] = 1,--patrol
+                ["strat_crimson_monk"] = 1,
+                ["strat_crimson_sorcerer"] = 1,
+            },
+            patrol = {
+                { x = 0.190, y = 0.572 },
+                { x = 0.249, y = 0.691 },
             }
         },
         {
             id = 69,
-            x = 0.216,
+            x = 0.211,
             y = 0.624,
             mobs = {
                 ["strat_crimson_gallant"] = 2,
@@ -864,7 +907,7 @@ local mapDefinition = {
         },
         {
             id = 70,
-            x = 0.243,
+            x = 0.239,
             y = 0.679,
             mobs = {
                 ["strat_crimson_gallant"] = 3,
@@ -876,13 +919,17 @@ local mapDefinition = {
             x = 0.208,
             y = 0.695,
             mobs = {
-                ["strat_crimson_monk"] = 1,--patrol
-                ["strat_crimson_sorcerer"] = 1,--patrol
+                ["strat_crimson_monk"] = 1,
+                ["strat_crimson_sorcerer"] = 1,
+            },
+            patrol = {
+                { x = 0.205, y = 0.686 },
+                { x = 0.255, y = 0.787 },
             }
         },
         {
             id = 72,
-            x = 0.229,
+            x = 0.219,
             y = 0.738,
             mobs = {
                 ["strat_crimson_gallant"] = 2,
