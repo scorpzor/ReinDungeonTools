@@ -642,7 +642,8 @@ function UIHelpers:DrawDottedLine(config)
         local dot = config.texturePool and table.remove(config.texturePool)
         if not dot then
             -- No pooled texture available, create a new one
-            dot = config.mapCanvas:CreateTexture(nil, "OVERLAY")
+            local drawLayer = config.drawLayer or "OVERLAY"
+            dot = config.mapCanvas:CreateTexture(nil, drawLayer)
             dot:SetTexture("Interface\\Buttons\\WHITE8X8")
         end
 

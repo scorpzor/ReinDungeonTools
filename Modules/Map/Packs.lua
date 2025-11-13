@@ -28,6 +28,7 @@ local patrolLinePool = {}
 local pullBorders = {}
 local patrolLines = {}
 local patrolLinesByPack = {}
+local patrolOverlayFrame = nil
 
 --------------------------------------------------------------------------------
 -- Pack Button Creation
@@ -349,7 +350,7 @@ function UI:OnMobIconEnter(button)
     local x, y = GetCursorPosition()
     local scale = GameTooltip:GetEffectiveScale()
     GameTooltip:ClearAllPoints()
-    GameTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", (x / scale) + 10, (y / scale) + 10)
+    GameTooltip:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", (x / scale) + 30, (y / scale))
 
     if button.mobInfo then
         GameTooltip:SetText(button.mobInfo.name, 1, 1, 0.5, 1, true)
@@ -814,10 +815,39 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         return  -- Need at least 2 points to draw a path
     end
 
+    if not patrolOverlayFrame then
+        patrolOverlayFrame = CreateFrame("Frame", nil, self.mapCanvas)
+        patrolOverlayFrame:SetFrameStrata("HIGH")
+        patrolOverlayFrame:SetFrameLevel(999)
+        patrolOverlayFrame:SetAllPoints(self.mapCanvas)
+    end
+
     RDT:DebugPrint(string.format("RenderPatrolPath: UIHelpers is %s", tostring(UIHelpers)))
 
     patrolLinesByPack[packId] = {}
     local packPatrolLines = {}
+
+    -- Create a larger dot to mark the waypoint
+    for i, point in ipairs(patrolPoints) do
+        local x = point.x * mapWidth
+        local y = point.y * mapHeight
+        
+        local marker = table.remove(patrolLinePool)
+        if not marker then
+            marker = patrolOverlayFrame:CreateTexture(nil, "OVERLAY")
+            marker:SetTexture("Interface\\Buttons\\WHITE8X8")
+        end
+
+        marker:SetSize(6, 6)
+        marker:ClearAllPoints()
+        local color = Colors.Patrol
+        marker:SetVertexColor(color[1], color[2], color[3], color[4])
+        marker:SetPoint("CENTER", self.mapTexture, "TOPLEFT", x, -y)
+        marker:Hide()
+
+        table.insert(patrolLines, marker)
+        table.insert(packPatrolLines, marker)
+    end
 
     for i = 1, #patrolPoints - 1 do
         local point1 = patrolPoints[i]
@@ -832,7 +862,7 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         RDT:DebugPrint(string.format("Drawing line from (%.1f, %.1f) to (%.1f, %.1f)", x1, y1, x2, y2))
 
         local lineTextures = UIHelpers:DrawDottedLine({
-            mapCanvas = self.mapCanvas,
+            mapCanvas = patrolOverlayFrame,
             mapTexture = self.mapTexture,
             x1 = x1,
             y1 = y1,
@@ -842,7 +872,8 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             outputTable = patrolLines,
             dotSize = 3,
             dotSpacing = 7,
-            color = Colors.Patrol
+            color = Colors.Patrol,
+            drawLayer = "OVERLAY"
         })
 
         for _, texture in ipairs(lineTextures) do
