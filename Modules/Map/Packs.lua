@@ -861,9 +861,11 @@ function UI:HighlightPatrolLines(packId, enable)
 
     for _, line in ipairs(lines) do
         if enable then
-            line:SetVertexColor(0.2, 0.8, 1.0, 1.0)
+            line:SetVertexColor(0.4, 1.0, 1.0, 1.0)
+            line:SetSize(4, 4)
         else
             line:SetVertexColor(0, 0.176, 0.451, 0.8)
+            line:SetSize(3, 3)
         end
     end
 end
