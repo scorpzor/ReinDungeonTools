@@ -10,6 +10,7 @@ local UI = RDT.UI
 
 local UIHelpers = RDT.UIHelpers
 local Colors = RDT.Colors
+local LibGraph = LibStub:GetLibrary("LibGraph-2.0", true)
 
 -- Pack button styling constants
 local MOB_ICON_SIZE = 20
@@ -859,26 +860,24 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         local x2 = point2.x * mapWidth
         local y2 = point2.y * mapHeight
 
-        RDT:DebugPrint(string.format("Drawing line from (%.1f, %.1f) to (%.1f, %.1f)", x1, y1, x2, y2))
+        y1 = mapHeight - y1
+        y2 = mapHeight - y2
 
-        local lineTextures = UIHelpers:DrawDottedLine({
-            mapCanvas = patrolOverlayFrame,
-            mapTexture = self.mapTexture,
-            x1 = x1,
-            y1 = y1,
-            x2 = x2,
-            y2 = y2,
-            texturePool = patrolLinePool,
-            outputTable = patrolLines,
-            dotSize = 3,
-            dotSpacing = 7,
-            color = Colors.Patrol,
-            drawLayer = "OVERLAY"
-        })
+        RDT:DebugPrint(string.format("Drawing smooth line from (%.1f, %.1f) to (%.1f, %.1f)", x1, y1, x2, y2))
 
-        for _, texture in ipairs(lineTextures) do
-            texture:Hide()
-            table.insert(packPatrolLines, texture)
+        local lineTexture = LibGraph:DrawLine(
+            patrolOverlayFrame,  -- Canvas frame
+            x1, y1,              -- Start coordinates
+            x2, y2,              -- End coordinates
+            20,                  -- Line width
+            Colors.Patrol,       -- Color {r, g, b, a}
+            "OVERLAY"            -- Draw layer
+        )
+
+        if lineTexture then
+            lineTexture:Hide()
+            table.insert(patrolLines, lineTexture)
+            table.insert(packPatrolLines, lineTexture)
         end
     end
 
