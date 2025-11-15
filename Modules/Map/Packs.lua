@@ -26,7 +26,6 @@ local borderFramePool = {}  -- Pools border container frames
 local patrolLinePool = {}   -- Pools patrol waypoint marker textures
 
 local pullBorders = {}
-local patrolLines = {}
 local patrolLinesByPack = {}
 local patrolOverlayFrame = nil
 
@@ -851,7 +850,6 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         marker:SetPoint("CENTER", self.mapTexture, "TOPLEFT", x, -y)
         marker:Hide()
 
-        table.insert(patrolLines, marker)
         table.insert(packPatrolMarkers, marker)
     end
 
@@ -927,12 +925,15 @@ function UI:ClearPacks()
     RDT:DebugPrint("Clearing pack groups")
 
     -- Return patrol waypoint marker textures to pool
-    for _, marker in ipairs(patrolLines) do
-        marker:Hide()
-        marker:ClearAllPoints()
-        table.insert(patrolLinePool, marker)
+    for _, patrolData in pairs(patrolLinesByPack) do
+        if patrolData.markers then
+            for _, marker in ipairs(patrolData.markers) do
+                marker:Hide()
+                marker:ClearAllPoints()
+                table.insert(patrolLinePool, marker)
+            end
+        end
     end
-    wipe(patrolLines)
     wipe(patrolLinesByPack)
 
     if patrolOverlayFrame then
