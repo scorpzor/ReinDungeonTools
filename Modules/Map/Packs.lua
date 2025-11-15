@@ -575,7 +575,7 @@ local function ExpandPolygonCircular(poly, numCirclePoints)
         local scale = poly[i].scale or 1.0
 
         -- Radius scales with the mob icon scale
-        local r = scale * 10
+        local r = scale * 12
 
         -- Adjust number of circle points based on scale (larger mobs = more points for smoothness)
         local adjustedNumPoints = math.max(1, math.floor(numCirclePoints * scale))
@@ -628,7 +628,9 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
 
                     if mobX and mobY then
                         local absX = packX + mobX
-                        local absY = packY + mobY
+                        -- TODO: I have no idea where I messed up but the Y coordinate is shifted 2px down.
+                        -- Temp(yeah sure) +2 offset added to center everything
+                        local absY = packY + mobY + 2
                         local mobScale = mobBtn.iconScale or 1.0
 
                         tinsert(points, {x = absX, y = absY, scale = mobScale})
@@ -647,12 +649,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         return
     end
 
-    -- Debug: Check first point coordinates
-    if points[1] then
-        RDT:DebugPrint(string.format("Pull %d first mob: x=%.1f, y=%.1f (scale=%.2f)",
-            pullNum, points[1].x, points[1].y, points[1].scale))
-    end
-
     -- Two-pass approach:
     -- 1. Expand each point into a circle of points (higher value = smoother but more expensive)
     -- 2. Calculate convex hull of all expanded points
@@ -666,21 +662,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if not hull or #hull < 2 then
         return
     end
-
-    -- Debug: Check hull bounds
-    local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
-    for _, p in ipairs(hull) do
-        minX = math.min(minX, p.x)
-        maxX = math.max(maxX, p.x)
-        minY = math.min(minY, p.y)
-        maxY = math.max(maxY, p.y)
-    end
-    RDT:DebugPrint(string.format("Pull %d hull bounds: x[%.1f to %.1f], y[%.1f to %.1f]",
-        pullNum, minX, maxX, minY, maxY))
-
-    -- Debug: Check first mob vs first hull point
-    RDT:DebugPrint(string.format("Pull %d: First mob center should be ~%.1f,%.1f | Hull point[1]=%.1f,%.1f",
-        pullNum, points[1].x, points[1].y, hull[1].x, hull[1].y))
 
     if not pullBorders[pullNum] then
         pullBorders[pullNum] = CreateFrame("Frame", nil, UI.mapCanvas)
@@ -696,25 +677,16 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
 
     local mapWidth = UI.mapTexture:GetWidth()
     local mapHeight = UI.mapTexture:GetHeight()
-    RDT:DebugPrint(string.format("Pull %d: mapWidth=%.1f, mapHeight=%.1f", pullNum, mapWidth, mapHeight))
 
     for i = 1, #hull do
         local p1 = hull[i]
         local p2 = hull[(i % #hull) + 1]  -- Wrap around to first point
 
         -- Hull coordinates are TOPLEFT-relative offsets from GetPoint() (X positive, Y negative)
-        -- normalized coords (0-1) → multiply by mapHeight → flip with (mapHeight - y)
-        -- TOPLEFT offsets (negative Y) → treat -Y offset as Y pixels down → transform same way
         local x1 = p1.x
         local y1 = mapHeight + p1.y
         local x2 = p2.x
         local y2 = mapHeight + p2.y
-
-        -- Debug first line segment
-        if i == 1 then
-            RDT:DebugPrint(string.format("Pull %d: Line 1: hull(%.1f,%.1f)→(%.1f,%.1f) | transformed(%.1f,%.1f)→(%.1f,%.1f)",
-                pullNum, p1.x, p1.y, p2.x, p2.y, x1, y1, x2, y2))
-        end
 
         local lineTexture = LibGraph:DrawLine(
             borderFrame,

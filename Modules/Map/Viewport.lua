@@ -64,8 +64,8 @@ function MapViewport:Create(container, mapTexture)
         mapTexture:SetParent(viewport.canvas)
         mapTexture:ClearAllPoints()
         -- Anchor all four corners so the texture scales with the canvas
-        mapTexture:SetPoint("TOPLEFT", viewport.canvas, "TOPLEFT", 1, -1)
-        mapTexture:SetPoint("BOTTOMRIGHT", viewport.canvas, "BOTTOMRIGHT", -1, 1)
+        mapTexture:SetPoint("TOPLEFT", viewport.canvas, "TOPLEFT", 0, 0)
+        mapTexture:SetPoint("BOTTOMRIGHT", viewport.canvas, "BOTTOMRIGHT", 0, 0)
     end
 
     -- Set up mouse interactions
