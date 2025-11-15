@@ -22,12 +22,10 @@ local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 -- Object pools for reusing frames/textures
 local packGroupPool = {}
 local mobButtonPool = {}
-local borderFramePool = {}
-local borderLinePool = {}
-local patrolLinePool = {}
+local borderFramePool = {}  -- Pools border container frames
+local patrolLinePool = {}   -- Pools patrol waypoint marker textures
 
 local pullBorders = {}
-local pullBorderTextures = {}
 local patrolLines = {}
 local patrolLinesByPack = {}
 local patrolOverlayFrame = nil
@@ -599,14 +597,8 @@ end
 
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     -- Hide and clear existing border textures for this pull
-    if pullBorderTextures[pullNum] then
-        for _, tex in ipairs(pullBorderTextures[pullNum]) do
-            tex:Hide()
-            tex:ClearAllPoints()
-        end
-        pullBorderTextures[pullNum] = {}
-    else
-        pullBorderTextures[pullNum] = {}
+    if pullBorders[pullNum] then
+        LibGraph:HideLines(pullBorders[pullNum])
     end
 
     if #packIds == 0 then
@@ -664,9 +656,14 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     end
 
     if not pullBorders[pullNum] then
-        pullBorders[pullNum] = CreateFrame("Frame", nil, UI.mapCanvas)
-        pullBorders[pullNum]:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
-        pullBorders[pullNum]:SetAllPoints(UI.mapCanvas)
+        local borderFrame = table.remove(borderFramePool)
+        if not borderFrame then
+            borderFrame = CreateFrame("Frame", nil, UI.mapCanvas)
+        end
+        borderFrame:SetParent(UI.mapCanvas)
+        borderFrame:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
+        borderFrame:SetAllPoints(UI.mapCanvas)
+        pullBorders[pullNum] = borderFrame
     end
 
     local borderFrame = pullBorders[pullNum]
@@ -688,7 +685,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         local x2 = p2.x
         local y2 = mapHeight + p2.y
 
-        local lineTexture = LibGraph:DrawLine(
+        LibGraph:DrawLine(
             borderFrame,
             x1, y1,
             x2, y2,
@@ -696,23 +693,12 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
             color,
             "OVERLAY"
         )
-
-        if lineTexture then
-            tinsert(pullBorderTextures[pullNum], lineTexture)
-        end
     end
 end
 
 local function ClearAllPullBorders()
-    for pullNum, textures in pairs(pullBorderTextures) do
-        for _, tex in ipairs(textures) do
-            tex:Hide()
-            tex:ClearAllPoints()
-        end
-    end
-    wipe(pullBorderTextures)
-
     for _, border in pairs(pullBorders) do
+        LibGraph:HideLines(border)
         border:Hide()
     end
 end
@@ -809,15 +795,15 @@ function UI:HighlightPull(pullNum, enable)
         end
     end
 
-    local borderTextures = pullBorderTextures[pullNum]
-    if borderTextures then
+    local borderFrame = pullBorders[pullNum]
+    if borderFrame and borderFrame.GraphLib_Lines_Used then
         if enable then
-            for _, tex in ipairs(borderTextures) do
+            for _, tex in ipairs(borderFrame.GraphLib_Lines_Used) do
                 tex:SetVertexColor(1, 1, 0, 1)
             end
         else
             local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
-            for _, tex in ipairs(borderTextures) do
+            for _, tex in ipairs(borderFrame.GraphLib_Lines_Used) do
                 tex:SetVertexColor(r, g, b, 1.0)
             end
         end
@@ -843,16 +829,16 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         patrolOverlayFrame:SetFrameStrata("HIGH")
         patrolOverlayFrame:SetFrameLevel(999)
         patrolOverlayFrame:SetAllPoints(self.mapCanvas)
+    else
+        LibGraph:HideLines(patrolOverlayFrame)
     end
 
-    patrolLinesByPack[packId] = {}
-    local packPatrolLines = {}
-
     -- Create a larger dot to mark the waypoint
+    local packPatrolMarkers = {}
     for i, point in ipairs(patrolPoints) do
         local x = point.x * mapWidth
         local y = point.y * mapHeight
-        
+
         local marker = table.remove(patrolLinePool)
         if not marker then
             marker = patrolOverlayFrame:CreateTexture(nil, "OVERLAY")
@@ -867,7 +853,7 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         marker:Hide()
 
         table.insert(patrolLines, marker)
-        table.insert(packPatrolLines, marker)
+        table.insert(packPatrolMarkers, marker)
     end
 
     for i = 1, #patrolPoints - 1 do
@@ -883,7 +869,7 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         y1 = mapHeight - y1
         y2 = mapHeight - y2
 
-        local lineTexture = LibGraph:DrawLine(
+        LibGraph:DrawLine(
             patrolOverlayFrame,  -- Canvas frame
             x1, y1,              -- Start coordinates
             x2, y2,              -- End coordinates
@@ -891,31 +877,26 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             Colors.Patrol,       -- Color {r, g, b, a}
             "OVERLAY"            -- Draw layer
         )
-
-        if lineTexture then
-            lineTexture:Hide()
-            table.insert(patrolLines, lineTexture)
-            table.insert(packPatrolLines, lineTexture)
-        end
     end
 
-    patrolLinesByPack[packId] = packPatrolLines
+    patrolLinesByPack[packId] = packPatrolMarkers
 end
 
 --- Show or hide patrol lines for a pack
 -- @param packId number Pack ID
 -- @param show boolean True to show, false to hide
 function UI:ShowPatrolLines(packId, show)
-    local lines = patrolLinesByPack[packId]
-    if not lines then
+    local markers = patrolLinesByPack[packId]
+    if not markers then
         return
     end
 
-    for _, line in ipairs(lines) do
+    -- Show/hide waypoint markers (manually created textures)
+    for _, marker in ipairs(markers) do
         if show then
-            line:Show()
+            marker:Show()
         else
-            line:Hide()
+            marker:Hide()
         end
     end
 end
@@ -927,24 +908,21 @@ end
 function UI:ClearPacks()
     RDT:DebugPrint("Clearing pack groups")
 
-    -- Return patrol line textures to pool
-    for _, line in ipairs(patrolLines) do
-        line:Hide()
-        line:ClearAllPoints()
-        table.insert(patrolLinePool, line)
+    -- Return patrol waypoint marker textures to pool
+    for _, marker in ipairs(patrolLines) do
+        marker:Hide()
+        marker:ClearAllPoints()
+        table.insert(patrolLinePool, marker)
     end
     wipe(patrolLines)
     wipe(patrolLinesByPack)
 
-    for pullNum, textures in pairs(pullBorderTextures) do
-        for _, tex in ipairs(textures) do
-            tex:Hide()
-            tex:ClearAllPoints()
-        end
+    if patrolOverlayFrame then
+        LibGraph:HideLines(patrolOverlayFrame)
     end
-    wipe(pullBorderTextures)
 
     for _, border in pairs(pullBorders) do
+        LibGraph:HideLines(border)
         border:Hide()
         border:ClearAllPoints()
         table.insert(borderFramePool, border)
