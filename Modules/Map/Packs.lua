@@ -10,7 +10,7 @@ local UI = RDT.UI
 
 local UIHelpers = RDT.UIHelpers
 local Colors = RDT.Colors
-local LibGraph = LibStub:GetLibrary("LibGraph-2.0", true)
+local LibGraph = LibStub("LibGraph-2.0")
 
 -- Pack button styling constants
 local MOB_ICON_SIZE = 20
@@ -27,6 +27,7 @@ local borderLinePool = {}
 local patrolLinePool = {}
 
 local pullBorders = {}
+local pullBorderTextures = {}
 local patrolLines = {}
 local patrolLinesByPack = {}
 local patrolOverlayFrame = nil
@@ -417,92 +418,103 @@ function UI:OnMobIconLeave(button)
     self:ShowPatrolLines(button.packId, false)
 end
 
---------------------------------------------------------------------------------
--- Pull Border Management (Convex Hull Algorithm)
---------------------------------------------------------------------------------
-
-local function CalculateConvexHull(points)
-    if #points < 3 then return points end
-
-    local pointsCopy = {}
-    for i, p in ipairs(points) do
-        pointsCopy[i] = {x = p.x, y = p.y}
-    end
-
-    local start = 1
-    for i = 2, #pointsCopy do
-        if pointsCopy[i].y > pointsCopy[start].y or 
-           (pointsCopy[i].y == pointsCopy[start].y and pointsCopy[i].x < pointsCopy[start].x) then
-            start = i
-        end
-    end
-
-    local startPoint = pointsCopy[start]
-
-    local sorted = {}
-    for i, p in ipairs(pointsCopy) do
-        if i ~= start then
-            local dx = p.x - startPoint.x
-            local dy = p.y - startPoint.y
-            local angle = math.atan2(dy, dx)
-            local dist = math.sqrt(dx * dx + dy * dy)
-            tinsert(sorted, {x = p.x, y = p.y, angle = angle, dist = dist})
-        end
-    end
-    
-    table.sort(sorted, function(a, b)
-        if math.abs(a.angle - b.angle) < 0.001 then
-            return a.dist < b.dist
-        end
-        return a.angle < b.angle
-    end)
-
-    local hull = {startPoint}
-
-    local function ccw(p1, p2, p3)
-        return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
-    end
-
-    for _, point in ipairs(sorted) do
-        while #hull >= 2 and ccw(hull[#hull - 1], hull[#hull], point) <= 0 do
-            tremove(hull)
-        end
-        tinsert(hull, point)
-    end
-    
-    return hull
+--- Check if point a is more lower-left than point b
+-- TOPLEFT anchor: X is positive right, Y is NEGATIVE down
+-- "Lower" means more negative Y (visually down), "Left" means smaller X
+-- @param a table Point {x, y}
+-- @param b table Point {x, y}
+-- @return boolean True if a is more lower-left
+local function IsLowerLeft(a, b)
+    if a.x < b.x then return true end
+    if a.x > b.x then return false end
+    if a.y < b.y then return true end
+    if a.y > b.y then return false end
+    return false
 end
 
-local function ExpandHull(hull, padding)
-    if #hull < 3 then return hull end
+--- Check if point c is left of line a-b
+-- Uses cross product to determine which side of the line the point is on
+-- @param a table Point {x, y}
+-- @param b table Point {x, y}
+-- @param c table Point {x, y}
+-- @return boolean True if c is left of line a-b
+local function IsLeftOf(a, b, c)
+    local u1 = b.x - a.x
+    local v1 = b.y - a.y
+    local u2 = c.x - a.x
+    local v2 = c.y - a.y
+    return u1 * v2 - v1 * u2 < 0
+end
+
+--- Calculate convex hull using Jarvis march algorithm
+-- @param points table Array of points {x, y}
+-- @return table Array of hull points {x, y}
+local function CalculateConvexHull(points)
+    if not points or #points == 0 then return nil end
+    if #points < 3 then return points end
+
+    -- Find the lower-left point as starting point
+    local lowerLeft = 1
+    for i = 2, #points do
+        if not points[i].x or not points[lowerLeft].x then return nil end
+        if IsLowerLeft(points[i], points[lowerLeft]) then
+            lowerLeft = i
+        end
+    end
+
+    -- Jarvis march: wrap around the points
+    local hull = {}
+    local currentIdx = lowerLeft
+    local finalIdx = 1
+    local tries = 0
+    local maxTries = 100  -- Prevent infinite loops
+
+    repeat
+        tinsert(hull, currentIdx)
+        finalIdx = 1
+
+        -- Find the most counter-clockwise point from current
+        for j = 2, #points do
+            if currentIdx == finalIdx or IsLeftOf(points[currentIdx], points[finalIdx], points[j]) then
+                finalIdx = j
+            end
+        end
+
+        currentIdx = finalIdx
+        tries = tries + 1
+    until finalIdx == hull[1] or tries > maxTries
+
+    -- Convert indices to actual points
+    local hullPoints = {}
+    for _, idx in ipairs(hull) do
+        tinsert(hullPoints, {x = points[idx].x, y = points[idx].y})
+    end
+
+    return hullPoints
+end
+
+--- Calculate centroid of a polygon
+-- @param points table Array of points {x, y}
+-- @return table Centroid point {x, y} or nil
+local function CalculateCentroid(points)
+    if not points or #points == 0 then return nil end
 
     local cx, cy = 0, 0
-    for _, p in ipairs(hull) do
+    for _, p in ipairs(points) do
+        if not p.x or not p.y then return nil end
         cx = cx + p.x
         cy = cy + p.y
     end
-    cx = cx / #hull
-    cy = cy / #hull
 
-    local expanded = {}
-    for _, p in ipairs(hull) do
-        local dx = p.x - cx
-        local dy = p.y - cy
-        local len = math.sqrt(dx * dx + dy * dy)
-        
-        if len > 0 then
-            tinsert(expanded, {
-                x = p.x + (dx / len) * padding,
-                y = p.y + (dy / len) * padding
-            })
-        else
-            tinsert(expanded, {x = p.x, y = p.y})
-        end
-    end
-    
-    return expanded
+    cx = cx / #points
+    cy = cy / #points
+
+    return {x = cx, y = cy}
 end
 
+--- Calculate the center point of a pull (for label positioning)
+-- @param packIds table Array of pack IDs in the pull
+-- @return number, number Center X and Y coordinates, or nil, nil
 local function CalculatePullCenter(packIds)
     if #packIds == 0 then
         return nil, nil
@@ -534,24 +546,70 @@ local function CalculatePullCenter(packIds)
     end
 
     local hull = CalculateConvexHull(points)
-
-    -- Calculate center of convex hull
-    local cx, cy = 0, 0
-    for _, p in ipairs(hull) do
-        cx = cx + p.x
-        cy = cy + p.y
+    if not hull then
+        return nil, nil
     end
-    cx = cx / #hull
-    cy = cy / #hull
 
-    return cx, cy
+    local centroid = CalculateCentroid(hull)
+    if not centroid then
+        return nil, nil
+    end
+
+    return centroid.x, centroid.y
+end
+
+--- Expand polygon by adding circular points around each vertex
+-- Creates a circle of points around each vertex, with the number of points proportional to scale
+-- @param poly table Array of {x, y, scale} points
+-- @param numCirclePoints number Base number of points per circle (scaled by point's scale)
+-- @return table Expanded polygon points {x, y, scale}
+local function ExpandPolygonCircular(poly, numCirclePoints)
+    if not poly or #poly == 0 then return nil end
+
+    local res = {}
+    local resIndex = 1
+
+    for i = 1, #poly do
+        local x = poly[i].x
+        local y = poly[i].y
+        local scale = poly[i].scale or 1.0
+
+        -- Radius scales with the mob icon scale
+        local r = scale * 10
+
+        -- Adjust number of circle points based on scale (larger mobs = more points for smoothness)
+        local adjustedNumPoints = math.max(1, math.floor(numCirclePoints * scale))
+
+        if not x or not y or not r then
+            return nil
+        end
+
+        -- Create circle of points around this vertex
+        for j = 1, adjustedNumPoints do
+            local angle = (2 * math.pi / adjustedNumPoints) * j
+            local cx = x + r * math.cos(angle)
+            local cy = y + r * math.sin(angle)
+            res[resIndex] = {x = cx, y = cy, scale = scale}
+            resIndex = resIndex + 1
+        end
+    end
+
+    return res
 end
 
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
-    if #packIds == 0 then
-        if pullBorders[pullNum] then
-            pullBorders[pullNum]:Hide()
+    -- Hide and clear existing border textures for this pull
+    if pullBorderTextures[pullNum] then
+        for _, tex in ipairs(pullBorderTextures[pullNum]) do
+            tex:Hide()
+            tex:ClearAllPoints()
         end
+        pullBorderTextures[pullNum] = {}
+    else
+        pullBorderTextures[pullNum] = {}
+    end
+
+    if #packIds == 0 then
         return
     end
 
@@ -571,13 +629,9 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                     if mobX and mobY then
                         local absX = packX + mobX
                         local absY = packY + mobY
+                        local mobScale = mobBtn.iconScale or 1.0
 
-                        local offset = 5
-                        tinsert(points, {x = absX, y = absY})  -- Center
-                        tinsert(points, {x = absX - offset, y = absY - offset})  -- Top-left
-                        tinsert(points, {x = absX + offset, y = absY - offset})  -- Top-right
-                        tinsert(points, {x = absX - offset, y = absY + offset})  -- Bottom-left
-                        tinsert(points, {x = absX + offset, y = absY + offset})  -- Bottom-right
+                        tinsert(points, {x = absX, y = absY, scale = mobScale})
 
                         totalMobs = totalMobs + 1
                         if totalMobs == 1 then
@@ -589,107 +643,103 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         end
     end
 
-    if #points < 3 then
-        if pullBorders[pullNum] then
-            pullBorders[pullNum]:Hide()
-        end
+    if #points == 0 then
         return
     end
 
-    local hull
-    if totalMobs == 1 and singleMobButton then
-        local centerX = points[1].x
-        local centerY = points[1].y
-        local mobScale = singleMobButton.iconScale or 1.0
-        local radius = (MOB_ICON_SIZE * mobScale * 0.5) + 2
-
-        hull = {}
-        local numPoints = math.max(12, math.floor(radius * 0.8))
-        for i = 0, numPoints - 1 do
-            local angle = (i / numPoints) * 2 * math.pi
-            tinsert(hull, {
-                x = centerX + radius * math.cos(angle),
-                y = centerY + radius * math.sin(angle)
-            })
-        end
-    else
-        hull = CalculateConvexHull(points)
-        hull = ExpandHull(hull, 5)
+    -- Debug: Check first point coordinates
+    if points[1] then
+        RDT:DebugPrint(string.format("Pull %d first mob: x=%.1f, y=%.1f (scale=%.2f)",
+            pullNum, points[1].x, points[1].y, points[1].scale))
     end
 
-    local border = pullBorders[pullNum]
-    if not border then
-        -- Try to reuse a border frame from the pool, or create a new one
-        border = table.remove(borderFramePool)
-        if not border then
-            -- No pooled border available, create a new one
-            border = CreateFrame("Frame", nil, UI.mapCanvas)
-            border:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
-            border.segments = {}
-        else
-            -- Reset pooled border properties
-            border:SetParent(UI.mapCanvas)
-            border:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
-            -- Ensure segments are reparented to the border
-            if border.segments then
-                for _, seg in ipairs(border.segments) do
-                    seg:SetParent(border)
-                end
-            end
-        end
-        pullBorders[pullNum] = border
+    -- Two-pass approach:
+    -- 1. Expand each point into a circle of points (higher value = smoother but more expensive)
+    -- 2. Calculate convex hull of all expanded points
+    -- 3. Calculate convex hull again for final smoothing
+    local expanded = ExpandPolygonCircular(points, 30)
+    if not expanded then
+        return
     end
 
-    for _, seg in ipairs(border.segments) do
-        seg:Hide()
+    local hull = CalculateConvexHull(expanded)
+    if not hull or #hull < 2 then
+        return
     end
 
-    local pixelsPerDot = 5
-    local dotSize = 3
+    -- Debug: Check hull bounds
+    local minX, maxX, minY, maxY = math.huge, -math.huge, math.huge, -math.huge
+    for _, p in ipairs(hull) do
+        minX = math.min(minX, p.x)
+        maxX = math.max(maxX, p.x)
+        minY = math.min(minY, p.y)
+        maxY = math.max(maxY, p.y)
+    end
+    RDT:DebugPrint(string.format("Pull %d hull bounds: x[%.1f to %.1f], y[%.1f to %.1f]",
+        pullNum, minX, maxX, minY, maxY))
 
-    local segmentIdx = 1
+    -- Debug: Check first mob vs first hull point
+    RDT:DebugPrint(string.format("Pull %d: First mob center should be ~%.1f,%.1f | Hull point[1]=%.1f,%.1f",
+        pullNum, points[1].x, points[1].y, hull[1].x, hull[1].y))
+
+    if not pullBorders[pullNum] then
+        pullBorders[pullNum] = CreateFrame("Frame", nil, UI.mapCanvas)
+        pullBorders[pullNum]:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
+        pullBorders[pullNum]:SetAllPoints(UI.mapCanvas)
+    end
+
+    local borderFrame = pullBorders[pullNum]
+    borderFrame:Show()
+
+    local lineWidth = 30
+    local color = {r, g, b, alpha}
+
+    local mapWidth = UI.mapTexture:GetWidth()
+    local mapHeight = UI.mapTexture:GetHeight()
+    RDT:DebugPrint(string.format("Pull %d: mapWidth=%.1f, mapHeight=%.1f", pullNum, mapWidth, mapHeight))
+
     for i = 1, #hull do
         local p1 = hull[i]
-        local p2 = hull[(i % #hull) + 1]
+        local p2 = hull[(i % #hull) + 1]  -- Wrap around to first point
 
-        local dx = p2.x - p1.x
-        local dy = p2.y - p1.y
-        local lineLength = math.sqrt(dx * dx + dy * dy)
+        -- Hull coordinates are TOPLEFT-relative offsets from GetPoint() (X positive, Y negative)
+        -- normalized coords (0-1) → multiply by mapHeight → flip with (mapHeight - y)
+        -- TOPLEFT offsets (negative Y) → treat -Y offset as Y pixels down → transform same way
+        local x1 = p1.x
+        local y1 = mapHeight + p1.y
+        local x2 = p2.x
+        local y2 = mapHeight + p2.y
 
-        local dotsForThisLine = math.max(1, math.floor(lineLength / pixelsPerDot))
+        -- Debug first line segment
+        if i == 1 then
+            RDT:DebugPrint(string.format("Pull %d: Line 1: hull(%.1f,%.1f)→(%.1f,%.1f) | transformed(%.1f,%.1f)→(%.1f,%.1f)",
+                pullNum, p1.x, p1.y, p2.x, p2.y, x1, y1, x2, y2))
+        end
 
-        for j = 0, dotsForThisLine do
-            local t = j / dotsForThisLine
-            local x = p1.x + (p2.x - p1.x) * t
-            local y = p1.y + (p2.y - p1.y) * t
+        local lineTexture = LibGraph:DrawLine(
+            borderFrame,
+            x1, y1,
+            x2, y2,
+            lineWidth,
+            color,
+            "OVERLAY"
+        )
 
-            local seg = border.segments[segmentIdx]
-            if not seg then
-                seg = CreateFrame("Frame", nil, border)
-                seg:SetSize(dotSize, dotSize)
-                seg:SetFrameLevel(border:GetFrameLevel() + 1)
-
-                local tex = seg:CreateTexture(nil, "OVERLAY")
-                tex:SetAllPoints()
-                tex:SetTexture("Interface\\Tooltips\\UI-Tooltip-Background")
-                seg.texture = tex
-
-                border.segments[segmentIdx] = seg
-            end
-
-            seg:ClearAllPoints()
-            seg:SetPoint("CENTER", UI.mapTexture, "TOPLEFT", x, y)
-            seg.texture:SetVertexColor(r, g, b, alpha)
-            seg:Show()
-
-            segmentIdx = segmentIdx + 1
+        if lineTexture then
+            tinsert(pullBorderTextures[pullNum], lineTexture)
         end
     end
-
-    border:Show()
 end
 
 local function ClearAllPullBorders()
+    for pullNum, textures in pairs(pullBorderTextures) do
+        for _, tex in ipairs(textures) do
+            tex:Hide()
+            tex:ClearAllPoints()
+        end
+    end
+    wipe(pullBorderTextures)
+
     for _, border in pairs(pullBorders) do
         border:Hide()
     end
@@ -787,16 +837,16 @@ function UI:HighlightPull(pullNum, enable)
         end
     end
 
-    local border = pullBorders[pullNum]
-    if border and border:IsShown() then
+    local borderTextures = pullBorderTextures[pullNum]
+    if borderTextures then
         if enable then
-            for _, line in ipairs(border.lines or {}) do
-                line:SetVertexColor(1, 1, 0, 1)
+            for _, tex in ipairs(borderTextures) do
+                tex:SetVertexColor(1, 1, 0, 1)
             end
         else
             local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
-            for _, line in ipairs(border.lines or {}) do
-                line:SetVertexColor(r, g, b, 1.0)
+            for _, tex in ipairs(borderTextures) do
+                tex:SetVertexColor(r, g, b, 1.0)
             end
         end
     end
@@ -822,8 +872,6 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         patrolOverlayFrame:SetFrameLevel(999)
         patrolOverlayFrame:SetAllPoints(self.mapCanvas)
     end
-
-    RDT:DebugPrint(string.format("RenderPatrolPath: UIHelpers is %s", tostring(UIHelpers)))
 
     patrolLinesByPack[packId] = {}
     local packPatrolLines = {}
@@ -862,8 +910,6 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
 
         y1 = mapHeight - y1
         y2 = mapHeight - y2
-
-        RDT:DebugPrint(string.format("Drawing smooth line from (%.1f, %.1f) to (%.1f, %.1f)", x1, y1, x2, y2))
 
         local lineTexture = LibGraph:DrawLine(
             patrolOverlayFrame,  -- Canvas frame
@@ -918,14 +964,15 @@ function UI:ClearPacks()
     wipe(patrolLines)
     wipe(patrolLinesByPack)
 
-    -- Return pull border frames to pool
-    for _, border in pairs(pullBorders) do
-        -- Hide all segments but keep them attached to the border for reuse
-        if border.segments then
-            for _, seg in ipairs(border.segments) do
-                seg:Hide()
-            end
+    for pullNum, textures in pairs(pullBorderTextures) do
+        for _, tex in ipairs(textures) do
+            tex:Hide()
+            tex:ClearAllPoints()
         end
+    end
+    wipe(pullBorderTextures)
+
+    for _, border in pairs(pullBorders) do
         border:Hide()
         border:ClearAllPoints()
         table.insert(borderFramePool, border)
