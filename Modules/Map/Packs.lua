@@ -829,12 +829,11 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         patrolOverlayFrame:SetFrameStrata("HIGH")
         patrolOverlayFrame:SetFrameLevel(999)
         patrolOverlayFrame:SetAllPoints(self.mapCanvas)
-    else
-        LibGraph:HideLines(patrolOverlayFrame)
     end
 
     -- Create a larger dot to mark the waypoint
     local packPatrolMarkers = {}
+    local packPatrolLines = {}
     for i, point in ipairs(patrolPoints) do
         local x = point.x * mapWidth
         local y = point.y * mapHeight
@@ -869,7 +868,7 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         y1 = mapHeight - y1
         y2 = mapHeight - y2
 
-        LibGraph:DrawLine(
+        local lineTexture = LibGraph:DrawLine(
             patrolOverlayFrame,  -- Canvas frame
             x1, y1,              -- Start coordinates
             x2, y2,              -- End coordinates
@@ -877,26 +876,45 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             Colors.Patrol,       -- Color {r, g, b, a}
             "OVERLAY"            -- Draw layer
         )
+
+        if lineTexture then
+            lineTexture:Hide()
+            table.insert(packPatrolLines, lineTexture)
+        end
     end
 
-    patrolLinesByPack[packId] = packPatrolMarkers
+    patrolLinesByPack[packId] = {
+        markers = packPatrolMarkers,
+        lines = packPatrolLines
+    }
 end
 
 --- Show or hide patrol lines for a pack
 -- @param packId number Pack ID
 -- @param show boolean True to show, false to hide
 function UI:ShowPatrolLines(packId, show)
-    local markers = patrolLinesByPack[packId]
-    if not markers then
+    local patrolData = patrolLinesByPack[packId]
+    if not patrolData then
         return
     end
 
-    -- Show/hide waypoint markers (manually created textures)
-    for _, marker in ipairs(markers) do
-        if show then
-            marker:Show()
-        else
-            marker:Hide()
+    if patrolData.markers then
+        for _, marker in ipairs(patrolData.markers) do
+            if show then
+                marker:Show()
+            else
+                marker:Hide()
+            end
+        end
+    end
+
+    if patrolData.lines then
+        for _, lineTexture in ipairs(patrolData.lines) do
+            if show then
+                lineTexture:Show()
+            else
+                lineTexture:Hide()
+            end
         end
     end
 end
