@@ -64,6 +64,36 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blindlight_oracle",
         scale = 0.8,
     },
+    ["bfd_twilight_reaver"] = {
+        name = "Twilight Reaver",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_reaver",
+        scale = 0.8,
+    },
+    ["bfd_twilight_aquamancer"] = {
+        name = "Twilight Aquamancer",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_aquamancer",
+        scale = 0.8,
+    },
+    ["bfd_twilight_loreseeker"] = {
+        name = "Twilight Loreseeker",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_loreseeker",
+        scale = 0.8,
+    },
+    ["bfd_twilight_acolyte"] = {
+        name = "Twilight Acolyte",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_acolyte",
+        scale = 0.8,
+    },
+    ["bfd_summoned_aqua_guardian"] = {
+        name = "Summoned Aqua Guardian",
+        count = 0,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\summoned_aqua_guardian",
+        scale = 0.6,
+    },
 }
 
 local bosses = {
@@ -899,6 +929,157 @@ local mapDefinition = {
             mobs = {
                 ["bfd_blindlight_muckdweller"] = 2,
                 ["bfd_blindlight_oracle"] = 1,
+            }
+        },
+        {
+            id = 98,
+            x = 0.538,
+            y = 0.725,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+                ["bfd_blackfathom_myrmidon"] = 1,
+                ["bfd_fallenroot_hellcaller"] = 1,
+            }
+        },
+        {
+            id = 99,
+            x = 0.536,
+            y = 0.652,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 1,
+            }
+        },
+        {
+            id = 100,
+            x = 0.568,
+            y = 0.724,
+            mobs = {
+                ["bfd_blackfathom_myrmidon"] = 2,
+                ["bfd_fallenroot_hellcaller"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 1,
+            }
+        },
+        {
+            id = 101,
+            x = 0.776,
+            y = 0.176,
+            mobs = {
+                ["bfd_fallenroot_hellcaller"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 2,
+            }
+        },
+        {
+            id = 102,
+            x = 0.773,
+            y = 0.229,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 2,
+            }
+        },
+        {
+            id = 103,
+            x = 0.735,
+            y = 0.300,
+            mobs = {
+                ["bfd_blackfathom_myrmidon"] = 1,
+                ["bfd_fallenroot_hellcaller"] = 1,
+            }
+        },
+        {
+            id = 103,
+            x = 0.778,
+            y = 0.312,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+                ["bfd_fallenroot_hellcaller"] = 1,
+            }
+        },
+        {
+            id = 104,
+            x = 0.754,
+            y = 0.354,
+            mobs = {
+                ["bfd_blackfathom_myrmidon"] = 1,
+            }
+        },
+        {
+            id = 105,
+            x = 0.715,
+            y = 0.385,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+                ["bfd_fallenroot_hellcaller"] = 1,
+            }
+        },
+        {
+            id = 106,
+            x = 0.695,
+            y = 0.423,
+            mobs = {
+                ["bfd_fallenroot_hellcaller"] = 2,
+            }
+        },
+        {
+            id = 107,
+            x = 0.667,
+            y = 0.470,
+            mobs = {
+                ["bfd_blackfathom_myrmidon"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 1,
+            }
+        },
+        {
+            id = 108,
+            x = 0.721,
+            y = 0.473,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 1,
+                ["bfd_twilight_reaver"] = 1,
+            }
+        },
+        {
+            id = 109,
+            x = 0.720,
+            y = 0.530,
+            mobs = {
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_twilight_reaver"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+            }
+        },
+        {
+            id = 110,
+            x = 0.757,
+            y = 0.473,
+            mobs = {
+                ["bfd_twilight_reaver"] = 2,
+            }
+        },
+        {
+            id = 111,
+            x = 0.789,
+            y = 0.482,
+            mobs = {
+                ["bfd_twilight_reaver"] = 2,
+            }
+        },
+        {
+            id = 112,
+            x = 0.814,
+            y = 0.471,
+            mobs = {
+                ["bfd_twilight_acolyte"] = 1,
+            },
+            patrol = {
+                { x = 0.825, y = 0.467 },
+                { x = 0.765, y = 0.467 },
+                { x = 0.765, y = 0.441 },
+                { x = 0.760, y = 0.441 },
+                { x = 0.760, y = 0.467 },
+                { x = 0.747, y = 0.467 },
+                { x = 0.747, y = 0.477 },
+                { x = 0.825, y = 0.477 },
             }
         },
         -------------------------------- Bosses --------------------------------
