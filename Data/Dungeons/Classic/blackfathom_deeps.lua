@@ -46,6 +46,24 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fallenroot_shadowstalker",
         scale = 0.8,
     },
+    ["bfd_fallenroot_hellcaller"] = {
+        name = "Fallenroot Hellcaller",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fallenroot_hellcaller",
+        scale = 0.8,
+    },
+    ["bfd_blindlight_muckdweller"] = {
+        name = "Blindlight Muckdweller",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blindlight_muckdweller",
+        scale = 0.8,
+    },
+    ["bfd_blindlight_oracle"] = {
+        name = "Blindlight Oracle",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blindlight_oracle",
+        scale = 0.8,
+    },
 }
 
 local bosses = {
@@ -59,6 +77,12 @@ local bosses = {
         name = "Lady Sarevess",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\lady_sarevess",
+        scale = 1.25,
+    },
+    ["bfd_boss_gelihast"] = {
+        name = "Gelihast",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\gelihast",
         scale = 1.25,
     },
 }
@@ -719,6 +743,164 @@ local mapDefinition = {
                 ["bfd_blackfathom_myrmidon"] = 2,
             }
         },
+        {
+            id = 80,
+            x = 0.275,
+            y = 0.898,
+            mobs = {
+                ["bfd_fallenroot_shadowstalker"] = 2,
+            }
+        },
+        {
+            id = 81,
+            x = 0.319,
+            y = 0.929,
+            mobs = {
+                ["bfd_fallenroot_shadowstalker"] = 1,
+                ["bfd_blackfathom_sea_witch"] = 2,
+            }
+        },
+        {
+            id = 82,
+            x = 0.363,
+            y = 0.937,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 2,
+            }
+        },
+        {
+            id = 83,
+            x = 0.404,
+            y = 0.921,
+            mobs = {
+                ["bfd_fallenroot_shadowstalker"] = 1,
+            },
+            patrol = {
+                { x = 0.380, y = 0.930 },
+                { x = 0.425, y = 0.908 },
+                { x = 0.448, y = 0.882 },
+            }
+        },
+        {
+            id = 84,
+            x = 0.434,
+            y = 0.846,
+            mobs = {
+                ["bfd_blackfathom_myrmidon"] = 2,
+            }
+        },
+        {
+            id = 85,
+            x = 0.439,
+            y = 0.869,
+            mobs = {
+                ["bfd_fallenroot_shadowstalker"] = 1,
+            }
+        },
+        {
+            id = 86,
+            x = 0.464,
+            y = 0.901,
+            mobs = {
+                ["bfd_fallenroot_hellcaller"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 2,
+            }
+        },
+        {
+            id = 87,
+            x = 0.467,
+            y = 0.860,
+            mobs = {
+                ["bfd_fallenroot_hellcaller"] = 1,
+            },
+            patrol = {
+                { x = 0.450, y = 0.884 },
+                { x = 0.478, y = 0.845 },
+                { x = 0.498, y = 0.788 },
+            }
+        },
+        {
+            id = 88,
+            x = 0.494,
+            y = 0.822,
+            mobs = {
+                ["bfd_fallenroot_hellcaller"] = 1,
+                ["bfd_fallenroot_shadowstalker"] = 2,
+            }
+        },
+        {
+            id = 89,
+            x = 0.497,
+            y = 0.767,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+            }
+        },
+        {
+            id = 90,
+            x = 0.508,
+            y = 0.734,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 1,
+            }
+        },
+        {
+            id = 91,
+            x = 0.466,
+            y = 0.722,
+            mobs = {
+                ["bfd_blackfathom_sea_witch"] = 2,
+            }
+        },
+        {
+            id = 92,
+            x = 0.482,
+            y = 0.638,
+            mobs = {
+                ["bfd_blindlight_muckdweller"] = 2,
+            }
+        },
+        {
+            id = 93,
+            x = 0.493,
+            y = 0.585,
+            mobs = {
+                ["bfd_blindlight_oracle"] = 2,
+            }
+        },
+        {
+            id = 94,
+            x = 0.471,
+            y = 0.591,
+            mobs = {
+                ["bfd_blindlight_oracle"] = 1,
+            }
+        },
+        {
+            id = 95,
+            x = 0.446,
+            y = 0.597,
+            mobs = {
+                ["bfd_blindlight_oracle"] = 1,
+            }
+        },
+        {
+            id = 96,
+            x = 0.470,
+            y = 0.572,
+            mobs = {
+                ["bfd_blindlight_muckdweller"] = 1,
+            }
+        },
+        {
+            id = 97,
+            x = 0.479,
+            y = 0.543,
+            mobs = {
+                ["bfd_blindlight_muckdweller"] = 2,
+                ["bfd_blindlight_oracle"] = 1,
+            }
+        },
         -------------------------------- Bosses --------------------------------
         {
             id = 1000,
@@ -736,6 +918,14 @@ local mapDefinition = {
                 ["bfd_boss_lady_sarevess"] = 1,
             }
         },
+        {
+            id = 1002,
+            x = 0.462,
+            y = 0.531,
+            mobs = {
+                ["bfd_boss_gelihast"] = 1,
+            }
+        },
     },
     identifiers = {
         {
@@ -745,6 +935,15 @@ local mapDefinition = {
             y = 0.111,
             name = "Entrance Portal",
             description = "Main entrance",
+        },
+        {
+            id = 2,
+            type = "action",
+            x = 0.450,
+            y = 0.537,
+            name = "Shrine of Gelihast",
+            description = "Frost Resistance 5%, All Stats 5%",
+            scale = 0.5,
         },
     },
 }

@@ -384,22 +384,6 @@ local defaultIdentifierTypes = {
         texCoords = identifierAtlas.icons["action"],
         scale = 1.0,
     },
-
-    -- Legacy aliases
-    ["door"] = {
-        name = "Door",
-        description = "A door or gate",
-        icon = identifierAtlas.texture,
-        texCoords = identifierAtlas.icons["gate"],
-        scale = 1.0,
-    },
-    ["stairs"] = {
-        name = "Stairs",
-        description = "Stairs or ramp",
-        icon = identifierAtlas.texture,
-        texCoords = identifierAtlas.icons["stairs-down"],
-        scale = 1.0,
-    },
 }
 
 Data:RegisterIdentifierTypes(defaultIdentifierTypes)
