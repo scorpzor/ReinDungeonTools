@@ -15,13 +15,14 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
 local UIHelpers = RDT.UIHelpers
 local Colors = RDT.Colors
+local LibGraph = LibStub("LibGraph-2.0")
 
 -- Constants
 local IDENTIFIER_ICON_SIZE = 32  -- Base size for identifier icons
 
 -- Object pools for reusing frames/textures
 local identifierButtonPool = {}
-local lineTexturePool = {}
+local identifierLineFrame = nil
 
 --------------------------------------------------------------------------------
 -- Identifier Icon Rendering
@@ -69,16 +70,9 @@ function UI:ClearIdentifierIcons()
     end
     RDT.State.identifierButtons = {}
 
-    -- Return line textures to pool
-    if RDT.State.identifierLines then
-        for _, line in ipairs(RDT.State.identifierLines) do
-            line:Hide()
-            line:ClearAllPoints()
-            -- Return to pool for reuse
-            table.insert(lineTexturePool, line)
-        end
+    if identifierLineFrame then
+        LibGraph:HideLines(identifierLineFrame)
     end
-    RDT.State.identifierLines = {}
 end
 
 --- Create a single identifier icon
@@ -223,14 +217,9 @@ function UI:DrawIdentifierConnections(identifiers)
         return
     end
 
-    -- Clear existing lines
-    if RDT.State.identifierLines then
-        for _, line in ipairs(RDT.State.identifierLines) do
-            line:Hide()
-            line:SetParent(nil)
-        end
+    if identifierLineFrame then
+        LibGraph:HideLines(identifierLineFrame)
     end
-    RDT.State.identifierLines = {}
 
     -- Find all identifiers with links
     local linkedIdentifiers = {}
@@ -260,6 +249,12 @@ end
 -- @param identifier1 table First identifier data {x, y, type, ...}
 -- @param identifier2 table Second identifier data {x, y, type, ...}
 function UI:DrawConnectionLine(identifier1, identifier2)
+    if not identifierLineFrame then
+        identifierLineFrame = CreateFrame("Frame", nil, self.mapCanvas)
+        identifierLineFrame:SetParent(self.mapCanvas)
+        identifierLineFrame:SetAllPoints(self.mapCanvas)
+    end
+
     local mapWidth, mapHeight = self:GetMapDimensions()
 
     -- Convert normalized coordinates to screen space
@@ -268,17 +263,40 @@ function UI:DrawConnectionLine(identifier1, identifier2)
     local x2 = identifier2.x * mapWidth
     local y2 = identifier2.y * mapHeight
 
-    UIHelpers:DrawDottedLine({
-        mapCanvas = self.mapCanvas,
-        mapTexture = self.mapTexture,
-        x1 = x1,
-        y1 = y1,
-        x2 = x2,
-        y2 = y2,
-        texturePool = lineTexturePool,
-        outputTable = RDT.State.identifierLines,
-        dotSize = 4,
-        dotSpacing = 15,
-        color = Colors.Identifier
-    })
+    y1 = mapHeight - y1
+    y2 = mapHeight - y2
+
+    -- Calculate icon radius for both identifiers
+    local identifierType1 = RDT.Data:GetIdentifierType(identifier1.type)
+    local identifierType2 = RDT.Data:GetIdentifierType(identifier2.type)
+    local scale1 = identifier1.scale or (identifierType1 and identifierType1.scale) or 1.0
+    local scale2 = identifier2.scale or (identifierType2 and identifierType2.scale) or 1.0
+    local radius1 = (IDENTIFIER_ICON_SIZE * scale1) / 2
+    local radius2 = (IDENTIFIER_ICON_SIZE * scale2) / 2
+
+    -- Calculate direction vector from identifier1 to identifier2
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local distance = math.sqrt(dx * dx + dy * dy)
+
+    -- Normalize direction vector
+    if distance > 0 then
+        dx = dx / distance
+        dy = dy / distance
+
+        -- Offset endpoints by icon radius to start/end at icon edges
+        x1 = x1 + dx * radius1
+        y1 = y1 + dy * radius1
+        x2 = x2 - dx * radius2
+        y2 = y2 - dy * radius2
+    end
+
+    LibGraph:DrawLine(
+        identifierLineFrame,
+        x1, y1,
+        x2, y2,
+        20,
+        Colors.Identifier,
+        "ARTWORK"
+    )
 end

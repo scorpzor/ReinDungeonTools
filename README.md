@@ -8,8 +8,7 @@ A route planning addon for classic dungeons.
 
 - **Pull Planning**: Organize packs into pulls to find optimal route
 - **Full Scale Map**: Custom made maps to fit multi-floor dungeon into a single view
-- **Route Import/Export**: Share routes via encoded strings
-- **Party Sharing**: Send routes to party members in-game (WIP)
+- **Route Import/Export and In-game Sharing**: Share routes via encoded strings or directly to your party/guild members
 
 ## Installation
 
@@ -21,7 +20,7 @@ A route planning addon for classic dungeons.
 
 ### Basic Usage
 
-1. Open the planner: `/rdt` or click the minimap button
+1. Open the addon: `/rdt` or click the minimap button
 2. Select a dungeon from the dropdown menu
 3. **Left-click** a pack to add it to the current pull
 4. Click **New Pull** to start planning the next pull
@@ -49,7 +48,7 @@ For devs adding new dungeons/making changes:
 
 #### Tiled maps
 
-Default layout is 3x2 - 512px tiles. 1536x1024 source image.
+Default layout is 3x2/9x6 - 512/256px tiles.
 
 Tiles are arranged left-to-right, top-to-bottom in the grid.
 ```
