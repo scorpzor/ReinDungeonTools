@@ -64,233 +64,166 @@ local mapDefinition = {
     packData = {
         {
             id = 1,
-            x = 0.493,
-            y = 0.170,
+            x = 0.439,
+            y = 0.150,
             mobs = {
-                ["bfd_skittering_crustacean"] = 1,
+                ["bfd_murkshallow_snapclaw"] = 1,
             }
         },
         {
             id = 2,
-            x = 0.530,
-            y = 0.290,
+            x = 0.447,
+            y = 0.250,
             mobs = {
                 ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 3,
-            x = 0.507,
-            y = 0.288,
+            x = 0.460,
+            y = 0.264,
             mobs = {
-                ["bfd_skittering_crustacean"] = 2,
+                ["bfd_blindlight_murloc"] = 1,
             }
         },
         {
             id = 4,
-            x = 0.486,
-            y = 0.307,
+            x = 0.476,
+            y = 0.284,
             mobs = {
-                ["bfd_skittering_crustacean"] = 1,
+                ["bfd_blindlight_murloc"] = 1,
             }
         },
         {
             id = 5,
-            x = 0.538,
-            y = 0.248,
+            x = 0.458,
+            y = 0.299,
             mobs = {
-                ["bfd_murkshallow_snapclaw"] = 1,
                 ["bfd_blindlight_murloc"] = 1,
             }
         },
         {
             id = 6,
-            x = 0.519,
-            y = 0.319,
+            x = 0.430,
+            y = 0.287,
             mobs = {
-                ["bfd_skittering_crustacean"] = 1,
+                ["bfd_blindlight_murloc"] = 1,
+                ["bfd_murkshallow_snapclaw"] = 1,
             }
         },
         {
             id = 7,
-            x = 0.553,
-            y = 0.396,
+            x = 0.413,
+            y = 0.302,
             mobs = {
                 ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 8,
-            x = 0.571,
-            y = 0.420,
+            x = 0.480,
+            y = 0.335,
             mobs = {
                 ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 9,
-            x = 0.478,
-            y = 0.344,
+            x = 0.496,
+            y = 0.335,
             mobs = {
                 ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 10,
-            x = 0.552,
-            y = 0.318,
+            x = 0.446,
+            y = 0.329,
             mobs = {
-                ["bfd_murkshallow_snapclaw"] = 1,
                 ["bfd_blindlight_murloc"] = 1,
             }
         },
         {
             id = 11,
-            x = 0.568,
-            y = 0.339,
+            x = 0.511,
+            y = 0.388,
             mobs = {
-                ["bfd_blindlight_murloc"] = 1,
+                ["bfd_blindlight_murloc"] = 2,
             }
         },
         {
             id = 12,
-            x = 0.589,
-            y = 0.386,
+            x = 0.523,
+            y = 0.360,
             mobs = {
-                ["bfd_blindlight_murloc"] = 2,
                 ["bfd_murkshallow_snapclaw"] = 1,
             }
         },
         {
             id = 13,
-            x = 0.596,
-            y = 0.441,
+            x = 0.523,
+            y = 0.430,
             mobs = {
-                ["bfd_murkshallow_snapclaw"] = 1,
+                ["bfd_blindlight_murloc"] = 1,
             }
         },
         {
             id = 14,
-            x = 0.441,
-            y = 0.356,
+            x = 0.537,
+            y = 0.439,
             mobs = {
-                ["bfd_blindlight_murloc"] = 1,
+                ["bfd_murkshallow_snapclaw"] = 1,
             }
         },
         {
             id = 15,
-            x = 0.421,
-            y = 0.401,
+            x = 0.492,
+            y = 0.435,
             mobs = {
-                ["bfd_blindlight_murloc"] = 1,
-                ["bfd_murkshallow_snapclaw"] = 1,
+                ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 16,
-            x = 0.475,
-            y = 0.365,
+            x = 0.435,
+            y = 0.487,
             mobs = {
-                ["bfd_blindlight_murloc"] = 1,
+                ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 17,
-            x = 0.426,
-            y = 0.443,
+            x = 0.413,
+            y = 0.401,
             mobs = {
-                ["bfd_murkshallow_snapclaw"] = 1,
+                ["bfd_skittering_crustacean"] = 1,
             }
         },
         {
             id = 18,
-            x = 0.404,
-            y = 0.475,
+            x = 0.419,
+            y = 0.359,
+            mobs = {
+                ["bfd_skittering_crustacean"] = 1,
+            }
+        },
+        {
+            id = 19,
+            x = 0.380,
+            y = 0.395,
             mobs = {
                 ["bfd_skittering_crustacean"] = 1,
             }
         },
     },
     identifiers = {
-        -- Entrance and main doors
         {
             id = 1,
-            type = "door-in",
-            x = 0.49,
-            y = 0.12,
+            type = "dungeon-entrance",
+            x = 0.382,
+            y = 0.111,
             name = "Entrance Portal",
-            description = "Main entrance to Blackfathom Deeps",
-            linkedTo = 2,
-        },
-        {
-            id = 2,
-            type = "door-out",
-            x = 0.52,
-            y = 0.22,
-            name = "Iron Gate",
-            description = "Sealed iron gate to the depths",
-            linkedTo = 1,
-        },
-
-        -- Underwater passages
-        {
-            id = 3,
-            type = "stairs",
-            x = 0.46,
-            y = 0.28,
-            name = "Descent",
-            description = "Spiral ramp leading down",
-        },
-        {
-            id = 4,
-            type = "stairs",
-            x = 0.58,
-            y = 0.36,
-            name = "Cavern Steps",
-            description = "Steps carved into the rock",
-            scale = 0.95,
-        },
-
-        -- Teleportation shrines (Portal pair 1)
-        {
-            id = 5,
-            type = "portal",
-            x = 0.42,
-            y = 0.38,
-            name = "Shrine of Water",
-            description = "Ancient naga teleportation shrine",
-            linkedTo = 6,
-            scale = 1.15,
-        },
-        {
-            id = 6,
-            type = "portal",
-            x = 0.61,
-            y = 0.45,
-            name = "Shrine of Depths",
-            description = "Connected to the Shrine of Water",
-            linkedTo = 5,
-            scale = 1.15,
-        },
-
-        -- Special actions
-        {
-            id = 7,
-            type = "action",
-            x = 0.50,
-            y = 0.40,
-            name = "Altar of the Deeps",
-            description = "Summons the Guardian of the Deeps",
-            scale = 1.2,
-        },
-        {
-            id = 8,
-            type = "action",
-            x = 0.55,
-            y = 0.26,
-            name = "Twilight Flame",
-            description = "Corrupted flame brazier",
-            scale = 0.9,
+            description = "Main entrance",
         },
     },
 }
