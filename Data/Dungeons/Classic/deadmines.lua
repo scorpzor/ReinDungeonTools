@@ -3,16 +3,104 @@ if not RDT or not RDT.Data then
     error("RDT.Data not initialized! Dungeon modules must load after Data.lua")
 end
 
---local mobs = {
---    ["trash"] = {
---        name = "Trash",
---        count = 0.5,
---        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
---        scale = 0.7,
---    },
---}
---
---RDT.Data:RegisterMobs(mobs)
+local mobs = {
+    ["dmines_defias_miner"] = {
+        name = "Defias Miner",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_miner",
+        scale = 0.7,
+    },
+    ["dmines_defias_overseer"] = {
+        name = "Defias Overseer",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_overseer",
+        scale = 0.7,
+    },
+    ["dmines_defias_evoker"] = {
+        name = "Defias Evoker",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_evoker",
+        scale = 0.7,
+    },
+    ["dmines_defias_watchman"] = {
+        name = "Defias Watchman",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_watchman",
+        scale = 0.7,
+    },
+    ["dmines_goblin_miner"] = {
+        name = "Goblin Miner",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
+        scale = 0.7,
+    },
+    ["dmines_defias_strip_miner"] = {
+        name = "Defias Strip Miner",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_strip_miner",
+        scale = 0.7,
+    },
+    ["dmines_defias_taskmaster"] = {
+        name = "Defias Taskmaster",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_taskmaster",
+        scale = 0.7,
+    },
+    ["dmines_defias_wizard"] = {
+        name = "Defias Wizard",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_wizard",
+        scale = 0.7,
+    },
+    ["dmines_goblin_woodcarver"] = {
+        name = "Goblin Woodcarver",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_woodcarver",
+        scale = 0.7,
+    },
+    ["dmines_goblin_craftsman"] = {
+        name = "Goblin Craftsman",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_craftsman",
+        scale = 0.7,
+    },
+    ["dmines_goblin_engineer"] = {
+        name = "Goblin Engineer",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_engineer",
+        scale = 0.7,
+    },
+}
+
+local bosses = {
+    ["dmines_boss_rhahk_zor"] = {
+        name = "Rhahk'Zor",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\rhahk_zor",
+        scale = 1.25,
+    },
+    ["dmines_boss_miner_johnson"] = {
+        name = "Miner Johnson",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\miner_johnson",
+        scale = 1.25,
+    },
+    ["dmines_boss_sneed"] = {
+        name = "Sneed",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\sneed",
+        scale = 1.25,
+    },
+    ["dmines_boss_gilnid"] = {
+        name = "Gilnid",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\gilnid",
+        scale = 1.25,
+    },
+}
+
+RDT.Data:RegisterMobs(mobs)
+RDT.Data:RegisterMobs(bosses)
 
 local mapDefinition = {
     tiles = {
@@ -33,21 +121,745 @@ local mapDefinition = {
     packData = {
         {
             id = 1,
-            x = 0.5,
-            y = 0.15,
+            x = 0.085,
+            y = 0.209,
             mobs = {
-                ["generic_trash_mob"] = 2,
-                ["generic_elite_mob"] = 1,
+                ["dmines_defias_miner"] = 1,
             }
         },
         {
             id = 2,
-            x = 0.45,
-            y = 0.25,
+            x = 0.079,
+            y = 0.253,
             mobs = {
-                ["generic_trash_mob"] = 3,
-                ["generic_elite_mob"] = 1,
-                ["generic_big_mob"] = 1,
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 3,
+            x = 0.078,
+            y = 0.298,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 4,
+            x = 0.111,
+            y = 0.270,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.053, y = 0.284},
+                {x = 0.111, y = 0.270},
+                {x = 0.146, y = 0.295},
+            }
+        },
+        {
+            id = 5,
+            x = 0.084,
+            y = 0.313,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 6,
+            x = 0.135,
+            y = 0.232,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 7,
+            x = 0.150,
+            y = 0.262,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 8,
+            x = 0.154,
+            y = 0.304,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 9,
+            x = 0.138,
+            y = 0.308,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 10,
+            x = 0.113,
+            y = 0.323,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 11,
+            x = 0.095,
+            y = 0.339,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.095, y = 0.339},
+                {x = 0.106, y = 0.278},
+                {x = 0.142, y = 0.267},
+            }
+        },
+        {
+            id = 12,
+            x = 0.093,
+            y = 0.369,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 13,
+            x = 0.105,
+            y = 0.397,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.145, y = 0.378},
+                {x = 0.105, y = 0.397},
+                {x = 0.116, y = 0.444},
+            }
+        },
+        {
+            id = 14,
+            x = 0.097,
+            y = 0.444,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 15,
+            x = 0.137,
+            y = 0.439,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.137, y = 0.439},
+                {x = 0.140, y = 0.381},
+                {x = 0.111, y = 0.423},
+                {x = 0.137, y = 0.439},
+            }
+        },
+        {
+            id = 16,
+            x = 0.134,
+            y = 0.452,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.134, y = 0.452},
+                {x = 0.179, y = 0.461},
+            }
+        },
+        {
+            id = 17,
+            x = 0.131,
+            y = 0.346,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 18,
+            x = 0.148,
+            y = 0.406,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 19,
+            x = 0.118,
+            y = 0.482,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 20,
+            x = 0.192,
+            y = 0.393,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 21,
+            x = 0.226,
+            y = 0.439,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 22,
+            x = 0.154,
+            y = 0.463,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.150, y = 0.500},
+                {x = 0.154, y = 0.463},
+                {x = 0.149, y = 0.379},
+            }
+        },
+        {
+            id = 23,
+            x = 0.199,
+            y = 0.432,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.199, y = 0.432},
+                {x = 0.208, y = 0.410},
+                {x = 0.148, y = 0.434},
+                {x = 0.148, y = 0.383},
+            }
+        },
+        {
+            id = 24,
+            x = 0.160,
+            y = 0.498,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },        {
+            id = 25,
+            x = 0.134,
+            y = 0.508,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 26,
+            x = 0.127,
+            y = 0.556,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 27,
+            x = 0.148,
+            y = 0.579,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.141, y = 0.510},
+                {x = 0.148, y = 0.579},
+                {x = 0.163, y = 0.594},
+            }
+        },
+        {
+            id = 28,
+            x = 0.158,
+            y = 0.606,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 29,
+            x = 0.295,
+            y = 0.652,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 30,
+            x = 0.295,
+            y = 0.591,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 31,
+            x = 0.304,
+            y = 0.622,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.304, y = 0.622},
+                {x = 0.326, y = 0.631},
+            }
+        },
+        {
+            id = 32,
+            x = 0.321,
+            y = 0.609,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.321, y = 0.609},
+                {x = 0.339, y = 0.524},
+                {x = 0.370, y = 0.524},
+            }
+        },
+        {
+            id = 33,
+            x = 0.335,
+            y = 0.613,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 34,
+            x = 0.320,
+            y = 0.581,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 35,
+            x = 0.328,
+            y = 0.537,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 36,
+            x = 0.324,
+            y = 0.678,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.324, y = 0.678},
+                {x = 0.341, y = 0.695},
+            }
+        },
+        {
+            id = 37,
+            x = 0.352,
+            y = 0.507,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 38,
+            x = 0.371,
+            y = 0.548,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 39,
+            x = 0.340,
+            y = 0.656,
+            mobs = {
+                ["dmines_defias_miner"] = 2,
+            }
+        },
+        {
+            id = 40,
+            x = 0.350,
+            y = 0.690,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 41,
+            x = 0.312,
+            y = 0.705,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.329, y = 0.648},
+                {x = 0.312, y = 0.705},
+                {x = 0.288, y = 0.809},
+            }
+        },
+        {
+            id = 42,
+            x = 0.294,
+            y = 0.731,
+            mobs = {
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.329, y = 0.648},
+                {x = 0.294, y = 0.731},
+                {x = 0.288, y = 0.809},
+            }
+        },
+        {
+            id = 43,
+            x = 0.306,
+            y = 0.685,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 44,
+            x = 0.325,
+            y = 0.715,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 45,
+            x = 0.303,
+            y = 0.743,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 46,
+            x = 0.283,
+            y = 0.718,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 47,
+            x = 0.273,
+            y = 0.761,
+            mobs = {
+                ["dmines_defias_miner"] = 1,
+            }
+        },
+        {
+            id = 48,
+            x = 0.262,
+            y = 0.869,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            }
+        },
+        {
+            id = 49,
+            x = 0.306,
+            y = 0.844,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            }
+        },
+        {
+            id = 50,
+            x = 0.300,
+            y = 0.940,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            }
+        },
+        {
+            id = 51,
+            x = 0.294,
+            y = 0.876,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            },
+            patrol = {
+                {x = 0.294, y = 0.876},
+                {x = 0.362, y = 0.888},
+            }
+        },
+        {
+            id = 52,
+            x = 0.329,
+            y = 0.891,
+            mobs = {
+                ["dmines_goblin_miner"] = 2,
+            }
+        },
+        {
+            id = 53,
+            x = 0.358,
+            y = 0.835,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            }
+        },
+        {
+            id = 54,
+            x = 0.450,
+            y = 0.910,
+            mobs = {
+                ["dmines_defias_taskmaster"] = 1,
+                ["dmines_defias_overseer"] = 1,
+            },
+            patrol = {
+                {x = 0.399, y = 0.895},
+                {x = 0.484, y = 0.933},
+                {x = 0.506, y = 0.897},
+                {x = 0.460, y = 0.807},
+            }
+        },
+        {
+            id = 55,
+            x = 0.503,
+            y = 0.933,
+            mobs = {
+                ["dmines_defias_evoker"] = 1,
+            },
+            patrol = {
+                {x = 0.399, y = 0.895},
+                {x = 0.484, y = 0.933},
+                {x = 0.506, y = 0.897},
+                {x = 0.460, y = 0.807},
+            }
+        },
+        {
+            id = 56,
+            x = 0.408,
+            y = 0.871,
+            mobs = {
+                ["dmines_goblin_miner"] = 1,
+            }
+        },
+        {
+            id = 57,
+            x = 0.423,
+            y = 0.922,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 1,
+            }
+        },
+        {
+            id = 58,
+            x = 0.440,
+            y = 0.873,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 1,
+            }
+        },
+        {
+            id = 59,
+            x = 0.467,
+            y = 0.949,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 2,
+            }
+        },
+        {
+            id = 60,
+            x = 0.448,
+            y = 0.804,
+            mobs = {
+                ["dmines_defias_taskmaster"] = 1,
+                ["dmines_defias_wizard"] = 1,
+            },
+            patrol = {
+                {x = 0.484, y = 0.933},
+                {x = 0.506, y = 0.897},
+                {x = 0.460, y = 0.807},
+            }
+        },
+        {
+            id = 61,
+            x = 0.520,
+            y = 0.908,
+            mobs = {
+                ["dmines_goblin_woodcarver"] = 1,
+            }
+        },
+        {
+            id = 62,
+            x = 0.508,
+            y = 0.875,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 1,
+            }
+        },
+        {
+            id = 63,
+            x = 0.474,
+            y = 0.866,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 2,
+            }
+        },
+        {
+            id = 64,
+            x = 0.430,
+            y = 0.825,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 1,
+                ["dmines_goblin_woodcarver"] = 1,
+            }
+        },
+        {
+            id = 65,
+            x = 0.478,
+            y = 0.804,
+            mobs = {
+                ["dmines_defias_strip_miner"] = 1,
+            }
+        },
+        {
+            id = 66,
+            x = 0.437,
+            y = 0.730,
+            mobs = {
+                ["dmines_goblin_craftsman"] = 2,
+            },
+            patrol = {
+                {x = 0.437, y = 0.730},
+                {x = 0.413, y = 0.668},
+                {x = 0.438, y = 0.608},
+            }
+        },
+        {
+            id = 67,
+            x = 0.505,
+            y = 0.647,
+            mobs = {
+                ["dmines_goblin_craftsman"] = 3,
+            },
+            patrol = {
+                {x = 0.463, y = 0.597},
+                {x = 0.505, y = 0.647},
+                {x = 0.498, y = 0.715},
+            }
+        },
+        {
+            id = 68,
+            x = 0.516,
+            y = 0.443,
+            mobs = {
+                ["dmines_goblin_craftsman"] = 1,
+            }
+        },
+        {
+            id = 69,
+            x = 0.468,
+            y = 0.486,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+                ["dmines_goblin_craftsman"] = 1,
+            },
+            patrol = {
+                {x = 0.468, y = 0.486},
+                {x = 0.421, y = 0.452},
+                {x = 0.428, y = 0.370},
+            }
+        },
+        {
+            id = 70,
+            x = 0.410,
+            y = 0.476,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+                ["dmines_goblin_craftsman"] = 1,
+            }
+        },
+        {
+            id = 71,
+            x = 0.444,
+            y = 0.412,
+            mobs = {
+                ["dmines_goblin_craftsman"] = 1,
+            }
+        },
+        {
+            id = 72,
+            x = 0.464,
+            y = 0.429,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+            }
+        },
+        {
+            id = 73,
+            x = 0.464,
+            y = 0.392,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+            }
+        },
+        {
+            id = 74,
+            x = 0.392,
+            y = 0.405,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+                ["dmines_goblin_craftsman"] = 1,
+            }
+        },
+        {
+            id = 75,
+            x = 0.405,
+            y = 0.351,
+            mobs = {
+                ["dmines_goblin_engineer"] = 1,
+                ["dmines_goblin_craftsman"] = 1,
+            }
+        },
+
+        -------------------------------- Bosses --------------------------------
+        {
+            id = 1000,
+            x = 0.213,
+            y = 0.635,
+            mobs = {
+                ["dmines_boss_rhahk_zor"] = 1,
+                ["dmines_defias_watchman"] = 2,
+            }
+        },
+        {
+            id = 1001,
+            x = 0.387,
+            y = 0.523,
+            mobs = {
+                ["dmines_boss_miner_johnson"] = 1,
+            }
+        },
+        {
+            id = 1002,
+            x = 0.360,
+            y = 0.931,
+            mobs = {
+                ["dmines_boss_sneed"] = 1,
+            }
+        },
+        {
+            id = 1003,
+            x = 0.466,
+            y = 0.325,
+            mobs = {
+                ["dmines_boss_gilnid"] = 1,
             }
         },
     },
@@ -56,3 +868,4 @@ local mapDefinition = {
 RDT.Data:RegisterDungeon("Deadmines", mapDefinition)
 
 RDT:DebugPrint("Loaded dungeon module: Deadmines")
+
