@@ -46,6 +46,7 @@ Data\Dungeons\Classic\maraudon.lua
 Data\Dungeons\Classic\ragefire_chasm.lua
 Data\Dungeons\Classic\razorfen_downs.lua
 Data\Dungeons\Classic\razorfen_kraul.lua
+Data\Dungeons\Classic\road_to_de_other_side.lua
 Data\Dungeons\Classic\scarlet_monastery_armory.lua
 Data\Dungeons\Classic\scarlet_monastery_cathedral.lua
 Data\Dungeons\Classic\scarlet_monastery_graveyard.lua
@@ -58,6 +59,7 @@ Data\Dungeons\Classic\sunken_temple.lua
 Data\Dungeons\Classic\uldaman.lua
 Data\Dungeons\Classic\upper_blackrock_spire.lua
 # Data\Dungeons\Classic\upper_scholomance.lua
+Data\Dungeons\Classic\vaults_of_inquisition.lua
 Data\Dungeons\Classic\wailing_caverns.lua
 Data\Dungeons\Classic\zulfarrak.lua
 
