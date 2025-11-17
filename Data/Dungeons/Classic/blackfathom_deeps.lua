@@ -14,7 +14,7 @@ local mobs = {
         name = "Murkshallow Snapclaw",
         count = 0.5,
         displayIcon = "Interface\\Icons\\INV_Misc_Monsterhead_02",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_blindlight_murloc"] = {
         name = "Blindlight Murlock",
@@ -26,13 +26,13 @@ local mobs = {
         name = "Blackfathom Sea Witch",
         count = 1,
         displayIcon = "Interface\\Icons\\inv_misc_nagafemale",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_blackfathom_myrmidon"] = {
         name = "Blackfathom Myrmidon",
         count = 1,
         displayIcon = "Interface\\Icons\\inv_misc_nagamale",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_aku_mai_fisher"] = {
         name = "Aku'mai Fisher",
@@ -44,7 +44,7 @@ local mobs = {
         name = "Fallenroot Shadowstalker",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fallenroot_shadowstalker",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_fallenroot_hellcaller"] = {
         name = "Fallenroot Hellcaller",
@@ -56,43 +56,79 @@ local mobs = {
         name = "Blindlight Muckdweller",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blindlight_muckdweller",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_blindlight_oracle"] = {
         name = "Blindlight Oracle",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blindlight_oracle",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_twilight_reaver"] = {
         name = "Twilight Reaver",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_reaver",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_twilight_aquamancer"] = {
         name = "Twilight Aquamancer",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_aquamancer",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_twilight_loreseeker"] = {
         name = "Twilight Loreseeker",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_loreseeker",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_twilight_acolyte"] = {
         name = "Twilight Acolyte",
         count = 1,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_acolyte",
-        scale = 0.8,
+        scale = 0.7,
     },
     ["bfd_summoned_aqua_guardian"] = {
         name = "Summoned Aqua Guardian",
         count = 0,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\summoned_aqua_guardian",
         scale = 0.6,
+    },
+    ["bfd_deep_pool_threshfin"] = {
+        name = "Deep Pool Threshfin",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\deep_pool_threshfin",
+        scale = 0.8,
+    },
+    ["bfd_barbed_crustacean"] = {
+        name = "Barbed Crustacean",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\barbed_crustacean",
+        scale = 0.7,
+    },
+    ["bfd_twilight_shadowmage"] = {
+        name = "Twilight Shadowmage",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_shadowmage",
+        scale = 0.7,
+    },
+    ["bfd_twilight_elementalist"] = {
+        name = "Twilight Elementalist",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_elementalist",
+        scale = 0.7,
+    },
+    ["bfd_enslaved_void_guardian"] = {
+        name = "Enslaved Void Guardian",
+        count = 0,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\enslaved_void_guardian",
+        scale = 0.6,
+    },
+    ["bfd_aku_mai_snapjaw"] = {
+        name = "Aku'mai Snapjaw",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\aku_mai_snapjaw",
+        scale = 0.7,
     },
 }
 
@@ -113,6 +149,30 @@ local bosses = {
         name = "Gelihast",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\gelihast",
+        scale = 1.25,
+    },
+    ["bfd_boss_lorgus_jett"] = {
+        name = "Lorgus Jett",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\lorgus_jett",
+        scale = 1.25,
+    },
+    ["bfd_boss_baron_aquanis"] = {
+        name = "Baron Aquanis",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\baron_aquanis",
+        scale = 1.25,
+    },
+    ["bfd_boss_twilight_lord_kelris"] = {
+        name = "Twilight Lord Kelris",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_lord_kelris",
+        scale = 1.25,
+    },
+    ["bfd_boss_aku_mai"] = {
+        name = "Aku'mai",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\aku_mai",
         scale = 1.25,
     },
 }
@@ -1082,6 +1142,306 @@ local mapDefinition = {
                 { x = 0.825, y = 0.477 },
             }
         },
+        {
+            id = 113,
+            x = 0.767,
+            y = 0.428,
+            mobs = {
+                ["bfd_twilight_acolyte"] = 1,
+                ["bfd_twilight_loreseeker"] = 1,
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+            }
+        },
+        {
+            id = 114,
+            x = 0.829,
+            y = 0.478,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 1,
+            }
+        },
+        {
+            id = 115,
+            x = 0.850,
+            y = 0.475,
+            mobs = {
+                ["bfd_twilight_acolyte"] = 1,
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+            }
+        },
+        {
+            id = 116,
+            x = 0.816,
+            y = 0.438,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 117,
+            x = 0.868,
+            y = 0.489,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 118,
+            x = 0.827,
+            y = 0.520,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 119,
+            x = 0.760,
+            y = 0.524,
+            mobs = {
+                ["bfd_barbed_crustacean"] = 1,
+            }
+        },
+        {
+            id = 120,
+            x = 0.790,
+            y = 0.551,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 1,
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+            }
+        },
+        {
+            id = 121,
+            x = 0.844,
+            y = 0.573,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 122,
+            x = 0.834,
+            y = 0.608,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 123,
+            x = 0.875,
+            y = 0.562,
+            mobs = {
+                ["bfd_barbed_crustacean"] = 1,
+            }
+        },
+        {
+            id = 124,
+            x = 0.774,
+            y = 0.624,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 125,
+            x = 0.790,
+            y = 0.607,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 1,
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+                ["bfd_twilight_reaver"] = 1,
+            }
+        },
+        {
+            id = 126,
+            x = 0.788,
+            y = 0.646,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 1,
+                ["bfd_twilight_aquamancer"] = 1,
+                ["bfd_summoned_aqua_guardian"] = 1,
+                ["bfd_twilight_acolyte"] = 1,
+            }
+        },
+        {
+            id = 127,
+            x = 0.825,
+            y = 0.641,
+            mobs = {
+                ["bfd_twilight_loreseeker"] = 2,
+            }
+        },
+        {
+            id = 128,
+            x = 0.808,
+            y = 0.682,
+            mobs = {
+                ["bfd_barbed_crustacean"] = 1,
+            }
+        },
+        {
+            id = 129,
+            x = 0.839,
+            y = 0.687,
+            mobs = {
+                ["bfd_deep_pool_threshfin"] = 1,
+            }
+        },
+        {
+            id = 130,
+            x = 0.861,
+            y = 0.644,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 2,
+                ["bfd_twilight_elementalist"] = 1,
+                ["bfd_enslaved_void_guardian"] = 2,
+            }
+        },
+        {
+            id = 131,
+            x = 0.858,
+            y = 0.677,
+            mobs = {
+                ["bfd_twilight_elementalist"] = 1,
+            }
+        },
+        {
+            id = 132,
+            x = 0.858,
+            y = 0.603,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 1,
+                ["bfd_enslaved_void_guardian"] = 1,
+            }
+        },
+        {
+            id = 133,
+            x = 0.872,
+            y = 0.584,
+            mobs = {
+                ["bfd_twilight_elementalist"] = 2,
+            }
+        },
+        {
+            id = 134,
+            x = 0.875,
+            y = 0.706,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 2,
+                ["bfd_enslaved_void_guardian"] = 2,
+            }
+        },
+        {
+            id = 135,
+            x = 0.904,
+            y = 0.712,
+            mobs = {
+                ["bfd_twilight_elementalist"] = 1,
+            }
+        },
+        {
+            id = 136,
+            x = 0.914,
+            y = 0.690,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 1,
+                ["bfd_enslaved_void_guardian"] = 1,
+            },
+            patrol = {
+                { x = 0.895, y = 0.690 },
+                { x = 0.936, y = 0.690 },
+            }
+        },
+        {
+            id = 138,
+            x = 0.885,
+            y = 0.656,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 1,
+                ["bfd_enslaved_void_guardian"] = 1,
+            }
+        },
+        {
+            id = 139,
+            x = 0.896,
+            y = 0.570,
+            mobs = {
+                ["bfd_twilight_elementalist"] = 1,
+            }
+        },
+        {
+            id = 140,
+            x = 0.914,
+            y = 0.585,
+            mobs = {
+                ["bfd_twilight_shadowmage"] = 1,
+                ["bfd_enslaved_void_guardian"] = 1,
+            },
+            patrol = {
+                { x = 0.895, y = 0.585 },
+                { x = 0.936, y = 0.585 },
+            }
+        },
+        {
+            id = 141,
+            x = 0.623,
+            y = 0.877,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 142,
+            x = 0.623,
+            y = 0.807,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 143,
+            x = 0.661,
+            y = 0.804,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 144,
+            x = 0.659,
+            y = 0.858,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 145,
+            x = 0.773,
+            y = 0.881,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 146,
+            x = 0.862,
+            y = 0.921,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
+        {
+            id = 147,
+            x = 0.844,
+            y = 0.828,
+            mobs = {
+                ["bfd_aku_mai_snapjaw"] = 1,
+            }
+        },
         -------------------------------- Bosses --------------------------------
         {
             id = 1000,
@@ -1107,6 +1467,42 @@ local mapDefinition = {
                 ["bfd_boss_gelihast"] = 1,
             }
         },
+        {
+            id = 1003,
+            x = 0.850,
+            y = 0.516,
+            mobs = {
+                ["bfd_boss_lorgus_jett"] = 1,
+            }
+        },
+        {
+            id = 1004,
+            x = 0.750,
+            y = 0.590,
+            mobs = {
+                ["bfd_boss_baron_aquanis"] = 1,
+            }
+        },
+        {
+            id = 1005,
+            x = 0.916,
+            y = 0.643,
+            mobs = {
+                ["bfd_boss_twilight_lord_kelris"] = 1,
+            }
+        },
+        {
+            id = 1006,
+            x = 0.895,
+            y = 0.891,
+            mobs = {
+                ["bfd_boss_aku_mai"] = 1,
+            },
+            patrol = {
+                { x = 0.913, y = 0.891 },
+                { x = 0.826, y = 0.891 },
+            }
+        },
     },
     identifiers = {
         {
@@ -1120,7 +1516,7 @@ local mapDefinition = {
         {
             id = 2,
             type = "action",
-            x = 0.450,
+            x = 0.445,
             y = 0.537,
             name = "Shrine of Gelihast",
             description = "Frost Resistance 5%, All Stats 5%",
