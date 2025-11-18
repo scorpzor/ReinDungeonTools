@@ -90,8 +90,14 @@ local mobs = {
     },
     ["dmines_tamed_parrot"] = {
         name = "Tamed Parrot",
-        count = 0.5,
+        count = 0,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\tamed_parrot",
+        scale = 0.5,
+    },
+    ["dmines_defias_blackguard"] = {
+        name = "Defias Blackguard",
+        count = 0,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defias_blackguard",
         scale = 0.5,
     },
 }
@@ -119,6 +125,30 @@ local bosses = {
         name = "Gilnid",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\gilnid",
+        scale = 1.25,
+    },
+    ["dmines_boss_mr_smite"] = {
+        name = "Mr. Smite",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\mr_smite",
+        scale = 1.25,
+    },
+    ["dmines_boss_cookie"] = {
+        name = "Cookie",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\cookie",
+        scale = 1.25,
+    },
+    ["dmines_boss_captain_greenskin"] = {
+        name = "Captain Greenskin",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\captain_greenskin",
+        scale = 1.25,
+    },
+    ["dmines_boss_edwin_vancleef"] = {
+        name = "Edwin VanCleef",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\edwin_vancleef",
         scale = 1.25,
     },
 }
@@ -1113,9 +1143,324 @@ local mapDefinition = {
             },
             patrol = {
                 {x = 0.670, y = 0.538},
-                {x = 0.676, y = 0.507},
+                {x = 0.685, y = 0.514},
                 {x = 0.698, y = 0.521},
                 {x = 0.726, y = 0.485},
+            }
+        },
+        {
+            id = 102,
+            x = 0.733,
+            y = 0.516,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            },
+            patrol = {
+                {x = 0.733, y = 0.516},
+                {x = 0.700, y = 0.562},
+            }
+        },
+        {
+            id = 103,
+            x = 0.787,
+            y = 0.475,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.787, y = 0.475},
+                {x = 0.715, y = 0.533},
+            }
+        },
+        {
+            id = 104,
+            x = 0.845,
+            y = 0.554,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            }
+        },
+        {
+            id = 105,
+            x = 0.829,
+            y = 0.571,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.829, y = 0.571},
+                {x = 0.807, y = 0.601},
+                {x = 0.795, y = 0.638},
+            }
+        },
+        {
+            id = 106,
+            x = 0.807,
+            y = 0.601,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            }
+        },
+        {
+            id = 107,
+            x = 0.864,
+            y = 0.559,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            }
+        },
+        {
+            id = 108,
+            x = 0.864,
+            y = 0.533,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            }
+        },
+        {
+            id = 109,
+            x = 0.798,
+            y = 0.625,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 110,
+            x = 0.898,
+            y = 0.558,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.862, y = 0.543},
+                {x = 0.898, y = 0.558},
+                {x = 0.943, y = 0.655},
+            }
+        },
+        {
+            id = 111,
+            x = 0.927,
+            y = 0.598,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            },
+            patrol = {
+                {x = 0.886, y = 0.548},
+                {x = 0.927, y = 0.598},
+                {x = 0.942, y = 0.697},
+            }
+        },
+        {
+            id = 112,
+            x = 0.923,
+            y = 0.635,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 113,
+            x = 0.939,
+            y = 0.739,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.939, y = 0.739},
+                {x = 0.934, y = 0.697},
+                {x = 0.943, y = 0.661},
+            }
+        },
+        {
+            id = 114,
+            x = 0.921,
+            y = 0.791,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 2,
+            },
+            patrol = {
+                {x = 0.900, y = 0.853},
+                {x = 0.921, y = 0.791},
+                {x = 0.939, y = 0.746},
+            }
+        },
+        {
+            id = 115,
+            x = 0.886,
+            y = 0.866,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 116,
+            x = 0.792,
+            y = 0.650,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            },
+            patrol = {
+                {x = 0.814, y = 0.591},
+                {x = 0.792, y = 0.650},
+                {x = 0.788, y = 0.715},
+            }
+        },
+        {
+            id = 117,
+            x = 0.839,
+            y = 0.862,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.839, y = 0.862},
+                {x = 0.805, y = 0.799},
+                {x = 0.788, y = 0.710},
+            }
+        },
+        {
+            id = 118,
+            x = 0.816,
+            y = 0.832,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 119,
+            x = 0.837,
+            y = 0.875,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 120,
+            x = 0.794,
+            y = 0.877,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 121,
+            x = 0.816,
+            y = 0.877,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            },
+            patrol = {
+                {x = 0.816, y = 0.877},
+                {x = 0.778, y = 0.749},
+            }
+        },
+        {
+            id = 122,
+            x = 0.784,
+            y = 0.790,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            }
+        },
+        {
+            id = 123,
+            x = 0.787,
+            y = 0.714,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 124,
+            x = 0.784,
+            y = 0.754,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 2,
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
+            }
+        },
+        {
+            id = 125,
+            x = 0.826,
+            y = 0.797,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 126,
+            x = 0.828,
+            y = 0.765,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            },
+            patrol = {
+                {x = 0.819, y = 0.695},
+                {x = 0.828, y = 0.765},
+                {x = 0.815, y = 0.792},
+            }
+        },
+        {
+            id = 127,
+            x = 0.812,
+            y = 0.750,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 1,
+            }
+        },
+        {
+            id = 128,
+            x = 0.803,
+            y = 0.687,
+            mobs = {
+                ["dmines_defias_pirate"] = 2,
+                ["dmines_tamed_parrot"] = 2,
+            }
+        },
+        {
+            id = 129,
+            x = 0.817,
+            y = 0.619,
+            mobs = {
+                ["dmines_defias_squallshaper"] = 1,
+            }
+        },
+        {
+            id = 130,
+            x = 0.594,
+            y = 0.872,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 2,
+            }
+        },
+        {
+            id = 131,
+            x = 0.594,
+            y = 0.669,
+            mobs = {
+                ["dmines_goblin_shipbuilder"] = 2,
+            }
+        },
+        {
+            id = 132,
+            x = 0.968,
+            y = 0.692,
+            mobs = {
+                ["dmines_defias_pirate"] = 1,
+                ["dmines_tamed_parrot"] = 1,
             }
         },
 
@@ -1151,6 +1496,50 @@ local mapDefinition = {
             y = 0.325,
             mobs = {
                 ["dmines_boss_gilnid"] = 1,
+            }
+        },
+        {
+            id = 1004,
+            x = 0.803,
+            y = 0.522,
+            mobs = {
+                ["dmines_boss_mr_smite"] = 1,
+                ["dmines_defias_blackguard"] = 2,
+            }
+        },
+        {
+            id = 1005,
+            x = 0.929,
+            y = 0.696,
+            mobs = {
+                ["dmines_boss_cookie"] = 1,
+            }
+        },
+        {
+            id = 1006,
+            x = 0.867,
+            y = 0.671,
+            mobs = {
+                ["dmines_boss_captain_greenskin"] = 1,
+                ["dmines_defias_squallshaper"] = 1,
+                ["dmines_defias_watchman"] = 1,
+            },
+            patrol = {
+                {x = 0.867, y = 0.671},
+                {x = 0.898, y = 0.689},
+                {x = 0.882, y = 0.797},
+                {x = 0.855, y = 0.797},
+                {x = 0.833, y = 0.689},
+                {x = 0.867, y = 0.671},
+            }
+        },
+        {
+            id = 1007,
+            x = 0.866,
+            y = 0.746,
+            mobs = {
+                ["dmines_boss_edwin_vancleef"] = 1,
+                ["dmines_defias_blackguard"] = 4,
             }
         },
     },
