@@ -4,15 +4,25 @@ if not RDT or not RDT.Data then
 end
 
 --local mobs = {
---    ["trash"] = {
---        name = "Trash",
+--    ["brd_"] = {
+--        name = "",
 --        count = 0.5,
---        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
+--        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\",
 --        scale = 0.7,
 --    },
 --}
---
+
+--local bosses = {
+--    ["brd_boss_"] = {
+--        name = "",
+--        count = 2,
+--        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\",
+--        scale = 1.25,
+--    },
+--}
+
 --RDT.Data:RegisterMobs(mobs)
+--RDT.Data:RegisterMobs(bosses)
 
 local tilesDefinition = {
     tileWidth = 512,
@@ -51,22 +61,58 @@ local packDefinition = {
     },
 }
 
+local prisonIdentifiers = {
+    {
+        id = 1,
+        type = "dungeon-entrance",
+        x = 0.175,
+        y = 0.779,
+        name = "Entrance Portal",
+        description = "Main entrance",
+    }
+}
+
+local upperCityIdentifiers = {
+    {
+        id = 1,
+        type = "dungeon-entrance",
+        x = 0.709,
+        y = 0.604,
+        name = "Entrance Portal",
+        description = "Main entrance",
+    }
+}
+
+local manufactoryIdentifiers = {
+    {
+        id = 1,
+        type = "dungeon-entrance",
+        x = 0.2,
+        y = 0.1,
+        name = "Entrance Portal",
+        description = "Main entrance",
+    }
+}
+
 local mapPrisonDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
     packData = packDefinition
+    identifiers = prisonIdentifiers,
 }
 
 local mapUpperCityDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
     packData = packDefinition
+    identifiers = upperCityIdentifiers,
 }
 
 local mapManufactoryDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
     packData = packDefinition
+    identifiers = manufactoryIdentifiers,
 }
 
 RDT.Data:RegisterDungeon("Blackrock Depths Prison", mapPrisonDefinition)

@@ -1543,6 +1543,16 @@ local mapDefinition = {
             }
         },
     },
+    identifiers = {
+        {
+            id = 1,
+            type = "dungeon-entrance",
+            x = 0.148,
+            y = 0.153,
+            name = "Entrance Portal",
+            description = "Main entrance",
+        },
+    },
 }
 
 RDT.Data:RegisterDungeon("Deadmines", mapDefinition)
