@@ -3,14 +3,26 @@ if not RDT or not RDT.Data then
     error("RDT.Data not initialized! Dungeon modules must load after Data.lua")
 end
 
---local mobs = {
---    ["brd_"] = {
---        name = "",
---        count = 0.5,
---        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\",
---        scale = 0.7,
---    },
---}
+local mobs = {
+    ["brd_blazing_fireguard"] = {
+        name = "Blazing Fireguard",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blazing_fireguard",
+        scale = 0.7,
+    },
+    ["brd_anvilrage_footman"] = {
+        name = "Anvilrage Footman",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_footman",
+        scale = 0.7,
+    },
+    ["brd_anvilrage_warden"] = {
+        name = "Anvilrage Warden",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_warden",
+        scale = 0.7,
+    },
+}
 
 --local bosses = {
 --    ["brd_boss_"] = {
@@ -21,7 +33,7 @@ end
 --    },
 --}
 
---RDT.Data:RegisterMobs(mobs)
+RDT.Data:RegisterMobs(mobs)
 --RDT.Data:RegisterMobs(bosses)
 
 local tilesDefinition = {
@@ -42,21 +54,19 @@ local tilesDefinition = {
 local packDefinition = {
     {
         id = 1,
-        x = 0.5,
-        y = 0.15,
+        x = 0.190,
+        y = 0.673,
         mobs = {
-            ["generic_trash_mob"] = 2,
-            ["generic_elite_mob"] = 1,
+            ["brd_blazing_fireguard"] = 1,
         }
     },
     {
         id = 2,
-        x = 0.45,
-        y = 0.25,
+        x = 0.232,
+        y = 0.734,
         mobs = {
-            ["generic_trash_mob"] = 3,
-            ["generic_elite_mob"] = 1,
-            ["generic_big_mob"] = 1,
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_anvilrage_warden"] = 1,
         }
     },
 }
