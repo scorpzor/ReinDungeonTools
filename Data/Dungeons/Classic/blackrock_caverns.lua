@@ -55,6 +55,12 @@ local bosses = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\romogg_bonecrusher",
         scale = 1.25,
     },
+    ["brc_boss_corla_herald_of_twilight"] = {
+        name = "Corla, Herald of Twilight",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\corla_herald_of_twilight",
+        scale = 1.25,
+    },
 }
 
 RDT.Data:RegisterMobs(mobs)
@@ -285,6 +291,54 @@ local mapDefinition = {
                 {x = 0.529, y = 0.173},
             }
         },
+        {
+            id = 21,
+            x = 0.516,
+            y = 0.135,
+            mobs = {
+                ["brc_twilight_zealot"] = 2,
+            }
+        },
+        {
+            id = 22,
+            x = 0.507,
+            y = 0.198,
+            mobs = {
+                ["brc_twilight_zealot"] = 5,
+            }
+        },
+        {
+            id = 23,
+            x = 0.550,
+            y = 0.147,
+            mobs = {
+                ["brc_twilight_zealot"] = 4,
+            }
+        },
+        {
+            id = 24,
+            x = 0.552,
+            y = 0.253,
+            mobs = {
+                ["brc_evolved_twilight_zealot"] = 1,
+            },
+        },
+        {
+            id = 25,
+            x = 0.601,
+            y = 0.352,
+            mobs = {
+                ["brc_evolved_twilight_zealot"] = 1,
+            }
+        },
+        {
+            id = 26,
+            x = 0.601,
+            y = 0.465,
+            mobs = {
+                ["brc_evolved_twilight_zealot"] = 9,
+            }
+        },
 
         -------------------------------- Bosses --------------------------------
         {
@@ -298,6 +352,14 @@ local mapDefinition = {
                 {x = 0.260, y = 0.686},
                 {x = 0.279, y = 0.707},
                 {x = 0.297, y = 0.645},
+            }
+        },
+        {
+            id = 1001,
+            x = 0.430,
+            y = 0.160,
+            mobs = {
+                ["brc_boss_corla_herald_of_twilight"] = 1,
             }
         },
     },
