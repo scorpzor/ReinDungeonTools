@@ -22,7 +22,7 @@ Import maps:
 - [x] /script SetMapByID(680) - Ragefire Chasm
 - [x] /script SetMapByID(760) - Razorfen Downs
 - [x] /script SetMapByID(761) - Razorfen Kraul
-- [ ] /script SetMapByID(2033) - Road to De Other Side
+- [x] /script SetMapByID(2033) - Road to De Other Side
 - [x] /script SetMapByID(762) - Scarlet Monastery - Armory
 - [x] /script SetMapByID(762) - Scarlet Monastery - Cathedral
 - [x] /script SetMapByID(762) - Scarlet Monastery - Graveyard
@@ -35,7 +35,7 @@ Import maps:
 - [x] /script SetMapByID(692) - Uldaman
 - [x] /script SetMapByID(721) - Upper Blackrock Spire
 - [ ] /script SetMapByID(763) - Upper Scholomance
-- [ ] /script SetMapByID(2032) - Vaults of Inquisition
+- [x] /script SetMapByID(2032) - Vaults of Inquisition
 - [x] /script SetMapByID(749) - Wailing Caverns
 - [x] /script SetMapByID(686) - Zul'Farrak
 
