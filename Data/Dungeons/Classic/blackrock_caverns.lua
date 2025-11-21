@@ -3,16 +3,56 @@ if not RDT or not RDT.Data then
     error("RDT.Data not initialized! Dungeon modules must load after Data.lua")
 end
 
---local mobs = {
---    ["trash"] = {
---        name = "Trash",
---        count = 0.5,
---        displayIcon = "Interface\\Icons\\Achievement_Character_Undead_Male",
---        scale = 0.7,
---    },
---}
---
---RDT.Data:RegisterMobs(mobs)
+local mobs = {
+    ["brc_twilight_flame_caller"] = {
+        name = "Twilight Flame Caller",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_flame_caller",
+        scale = 0.7,
+    },
+    ["brc_twilight_torturer"] = {
+        name = "Twilight Torturer",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_torturer",
+        scale = 0.7,
+    },
+    ["brc_twilight_sadist"] = {
+        name = "Twilight Sadist",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_sadist",
+        scale = 0.7,
+    },
+    ["brc_mad_prisoner"] = {
+        name = "Mad Prisoner",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\mad_prisoner",
+        scale = 0.7,
+    },
+    ["brc_crazed_mage"] = {
+        name = "Crazed Mage",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\crazed_mage",
+        scale = 0.7,
+    },
+    ["brc_evolved_twilight_zealot"] = {
+        name = "Evolved Twilight Zealot",
+        count = 0.5,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\evolved_twilight_zealot",
+        scale = 0.7,
+    },
+}
+
+local bosses = {
+    ["brc_boss_romogg_bonecrusher"] = {
+        name = "Rom'ogg Bonecrusher",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\romogg_bonecrusher",
+        scale = 1.25,
+    },
+}
+
+RDT.Data:RegisterMobs(mobs)
+RDT.Data:RegisterMobs(bosses)
 
 local mapDefinition = {
     tiles = {
@@ -33,21 +73,56 @@ local mapDefinition = {
     packData = {
         {
             id = 1,
-            x = 0.5,
-            y = 0.15,
+            x = 0.127,
+            y = 0.664,
             mobs = {
-                ["generic_trash_mob"] = 2,
-                ["generic_elite_mob"] = 1,
+                ["brc_twilight_flame_caller"] = 1,
             }
         },
         {
             id = 2,
-            x = 0.45,
-            y = 0.25,
+            x = 0.127,
+            y = 0.752,
             mobs = {
-                ["generic_trash_mob"] = 3,
-                ["generic_elite_mob"] = 1,
-                ["generic_big_mob"] = 1,
+                ["brc_twilight_flame_caller"] = 1,
+            }
+        },
+        {
+            id = 3,
+            x = 0.181,
+            y = 0.719,
+            mobs = {
+                ["brc_twilight_flame_caller"] = 2,
+            },
+            patrol = {
+                {x = 0.149, y = 0.707},
+                {x = 0.181, y = 0.719},
+                {x = 0.222, y = 0.725},
+            }
+        },
+        {
+            id = 4,
+            x = 0.211,
+            y = 0.659,
+            mobs = {
+                ["brc_twilight_torturer"] = 1,
+                ["brc_twilight_sadist"] = 1,
+                ["brc_crazed_mage"] = 1,
+            }
+        },
+
+        -------------------------------- Bosses --------------------------------
+        {
+            id = 1000,
+            x = 0.260,
+            y = 0.686,
+            mobs = {
+                ["brc_boss_romogg_bonecrusher"] = 1,
+            },
+            patrol = {
+                {x = 0.260, y = 0.686},
+                {x = 0.279, y = 0.707},
+                {x = 0.297, y = 0.645},
             }
         },
     },
