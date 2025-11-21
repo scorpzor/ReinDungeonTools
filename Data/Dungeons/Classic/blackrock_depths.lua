@@ -107,21 +107,21 @@ local manufactoryIdentifiers = {
 local mapPrisonDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
-    packData = packDefinition
+    packData = packDefinition,
     identifiers = prisonIdentifiers,
 }
 
 local mapUpperCityDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
-    packData = packDefinition
+    packData = packDefinition,
     identifiers = upperCityIdentifiers,
 }
 
 local mapManufactoryDefinition = {
     tiles = tilesDefinition,
     totalCount = 110,
-    packData = packDefinition
+    packData = packDefinition,
     identifiers = manufactoryIdentifiers,
 }
 
