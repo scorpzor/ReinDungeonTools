@@ -90,6 +90,14 @@ db.ascension classifications:
 
 Maybe summoned creatures like "Tamed Parrot"?
 
+    classification
+        string - the unit's classification: "worldboss", "rareelite", "elite", "rare", "normal", "trivial", or "minus"
+
+Note that "trivial" is for low-level targets that would not reward experience or honor (UnitIsTrivial() would return '1'), whereas "minus" is for mobs that show a miniature version of the v-key health plates.
+Mists of Pandaria Patch 5.0.4 (2012-08-28): "minus" classification added; used for minion mobs that typically have less health than normal mobs of their level, but engage the player in larger numbers.
+
+So we are not showing "minus", but what is its count? 0.5?
+
 I should be able to just go into +2 key and run C_MythicPlus.GetActiveKeystoneTrash() to get trashRequired and reverse calculate the count the mobs give by looking at individual kill %
 
 pretty sure this always returns 120? well it at least suggests that normal mobs are worth 1 and elite/champions/boss are 2 count
