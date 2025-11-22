@@ -71,3 +71,111 @@ Populate maps:
 - [ ] Upper Scholomance
 - [ ] Wailing Caverns
 - [ ] Zul'Farrak
+
+- C_MythicPlus.GetMapEncounters()
+- C_MythicPlus.GetActiveKeystoneTrash()
+- C_MythicPlus.GetActiveKeystoneChampions()
+- C_MythicPlus.GetKeystoneInfo()
+- C_MythicPlus.GetActiveKeystoneInfo()
+
+
+I'm unable to verify if there are any trivial mobs or minus?
+
+db.ascension classifications:
+- Normal
+- Elite
+- Rare
+- Rare Elite
+- Boss
+
+Maybe summoned creatures like "Tamed Parrot"?
+
+I should be able to just go into +2 key and run C_MythicPlus.GetActiveKeystoneTrash() to get trashRequired and reverse calculate the count the mobs give by looking at individual kill %
+
+pretty sure this always returns 120? well it at least suggests that normal mobs are worth 1 and elite/champions/boss are 2 count
+
+function MythicPlusObjectiveTrackerMixin:OnTooltipSetUnit(tooltip)
+	if not C_MythicPlus.IsKeystoneActive() then return end
+	if not self:IsShown() then return end
+	
+	local _, unit = tooltip:GetUnit()
+	if not unit then return end
+
+	if UnitReaction(unit, "player") > 4 then return end
+	
+	local classification = UnitClassification(unit)
+
+	if classification == "trivial" or classification == "minus" then return end
+	local unitCount = math.max(classification == "normal" and 1 or 2, (math.max(60, (UnitLevel(unit) % 10)) * 2))
+	local trash = C_MythicPlus.GetActiveKeystoneTrash()
+	local percent =  unitCount / trash.trashRequired
+	tooltip:AddLine(format("Enemy Forces: %.2f%% (count: %d)", percent * 100, unitCount), 1, 0.82, 0)
+end
+
+local KeystoneDungeons = {
+	[Enum.Expansion.Vanilla] = {
+		2694, -- Ragefire Chasm
+		2696, -- Deadmines
+		2691, -- Wailing Caverns
+		2008, -- Shadowfang Keep
+		2700, -- Blackfathom Deeps
+		2702, -- Stormwind Stockades
+		2708, -- Scarlet Monastery: Graveyard
+		2706, -- Razorfen Kraul
+		2710, -- Razorfen Downs
+		2855, -- Scarlet Monastery: Library
+		2704, -- Gnomeregan
+		2853, -- Sarelet Monastery: Armory
+		2712, -- Uldaman
+		2854, -- Scarlet Monastery: Cathedral
+		2716, -- Maraudon Orange Cyrstal
+		2962, -- Maraudon Purple Cyrstal
+		2714, -- Zul'Farrak
+		2963, -- Maraudon Pristine Waters
+		2718, -- Sunken Temple
+		53, -- Lower Scholomance
+		56, -- Upper Scholomance
+		2030, -- Blackrock Depths: Prison
+		2032, -- Lower Blackrock Spire
+		2040, -- Stratholme - Main Gate
+		2034, -- Dire Maul - East
+		2044, -- Upper Blackrock Spire
+		2036, -- Dire Maul - West
+		2276, -- Blackrock Depths - Upper City
+		2274, -- Stratholme - Service Entrance
+		2038, -- Dire Maul - North
+	},
+	[Enum.Expansion.TBC]     = {
+		--263, -- The Black Morass
+		270, -- The Shattered Halls
+		262, -- Shadow Labrynth
+		309, -- The Mechanar
+		266, -- Steamvault
+		269, -- Hellfire Ramparts
+		259, -- Auchenai Crypts 
+		267, -- The Underbog
+		308, -- The Botanica
+		261, -- Sethekk Halls
+		268, -- Blood Furnace
+		265, -- The Slave Pens
+		271, -- The Arcatraz
+		260, -- Mana Tombs
+		--264, -- The Escape from Durnholde
+	},
+	[Enum.Expansion.WoTLK] = {
+		3289, -- Utgarde Pinnacle
+		3290, -- The Culling of Stratholme
+		3291, -- The Oculus
+		3292, -- Halls of Lightning
+		3293, -- Halls of Stone
+		3294, -- Drak'Tharon Keep
+		3295, -- Gundrak
+		3296, -- Ahn'kahet: The Old Kingdom
+		3297, -- Violet Hold
+		3298, -- The Nexus
+		3299, -- Azjol-Nerub
+		3300, -- Utgarde Keep
+		3301, -- Pit of Saron
+		3302, -- Halls of Reflection
+	}
+}
