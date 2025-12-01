@@ -179,7 +179,7 @@ local mapDefinition = {
         {
             id = 10,
             x = 0.312,
-            y = 0.707,
+            y = 0.700,
             mobs = {
                 ["brc_twilight_torturer"] = 1,
             },

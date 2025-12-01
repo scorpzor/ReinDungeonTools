@@ -3,6 +3,17 @@ It appears there is the same number of mythic dungeons as heroic, they share the
 - /script print(GetCurrentMapAreaID()) - 1
 - /script WorldMapButtonFilters:Hide() smile
 
+Font colors:
+v1
+- inner - 633e10
+- glow - d9bc4c
+v2
+- inner - 5a4518
+- glow - d6c273
+v3 (full)
+- inner - 633e10
+- glow - d6bf69
+
 Import maps:
 - [x] /script SetMapByID(688) - Blackfathom Deeps
 - [x] /script SetMapByID(753) - Blackrock Caverns
