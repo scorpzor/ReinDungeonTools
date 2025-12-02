@@ -55,6 +55,12 @@ local bosses = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\high_interrogator_gerstahn",
         scale = 1.25,
     },
+    ["brd_boss_lord_roccor"] = {
+        name = "Lord Roccor",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\lord_roccor",
+        scale = 1.25,
+    },
 }
 
 RDT.Data:RegisterMobs(mobs)
@@ -518,7 +524,23 @@ local packDefinition = {
             ["brd_boss_high_interrogator_gerstahn"] = 1,
             ["brd_twilights_hammer_torturer"] = 1,
         },
-    }
+    },
+        {
+        id = 1001,
+        x = 0.885,
+        y = 0.635,
+        mobs = {
+            ["brd_boss_lord_roccor"] = 1,
+        },
+        patrol = {
+            { x = 0.880, y = 0.648 },
+            { x = 0.938, y = 0.604 },
+            { x = 0.946, y = 0.533 },
+            { x = 0.893, y = 0.462 },
+            { x = 0.823, y = 0.507 },
+            { x = 0.811, y = 0.591 },
+        },
+    },
 }
 
 local prisonIdentifiers = {
