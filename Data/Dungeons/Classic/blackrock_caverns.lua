@@ -46,6 +46,36 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_zealot",
         scale = 0.7,
     },
+    ["brc_conflagration"] = {
+        name = "Conflagration",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\conflagration",
+        scale = 0.7,
+    },
+    ["brc_twilight_obsidian_borer"] = {
+        name = "Twilight Obsidian Borer",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_obsidian_borer",
+        scale = 0.7,
+    },
+    ["brc_twilight_element_warden"] = {
+        name = "Twilight Element Warden",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_element_warden",
+        scale = 0.7,
+    },
+    ["brc_incendiary_spark"] = {
+        name = "Incendiary Spark",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\incendiary_spark",
+        scale = 0.7,
+    },
+    ["brc_defiled_earth_ravager"] = {
+        name = "Defiled Earth Ravager",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defiled_earth_ravager",
+        scale = 0.7,
+    },
 }
 
 local bosses = {
@@ -59,6 +89,12 @@ local bosses = {
         name = "Corla, Herald of Twilight",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\corla_herald_of_twilight",
+        scale = 1.25,
+    },
+    ["brc_boss_karsh_steelbender"] = {
+        name = "Karsh Steelbender",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\karsh_steelbender",
         scale = 1.25,
     },
 }
@@ -339,6 +375,40 @@ local mapDefinition = {
                 ["brc_evolved_twilight_zealot"] = 9,
             }
         },
+        {
+            id = 27,
+            x = 0.610,
+            y = 0.699,
+            mobs = {
+                ["brc_conflagration"] = 1,
+            }
+        },
+        {
+            id = 28,
+            x = 0.657,
+            y = 0.629,
+            mobs = {
+                ["brc_conflagration"] = 1,
+            }
+        },
+        {
+            id = 29,
+            x = 0.713,
+            y = 0.680,
+            mobs = {
+                ["brc_twilight_obsidian_borer"] = 2,
+                ["brc_twilight_element_warden"] = 1,
+                ["brc_incendiary_spark"] = 1,
+            }
+        },
+        {
+            id = 30,
+            x = 0.762,
+            y = 0.691,
+            mobs = {
+                ["brc_defiled_earth_ravager"] = 1,
+            }
+        },
 
         -------------------------------- Bosses --------------------------------
         {
@@ -360,6 +430,14 @@ local mapDefinition = {
             y = 0.160,
             mobs = {
                 ["brc_boss_corla_herald_of_twilight"] = 1,
+            }
+        },
+        {
+            id = 1002,
+            x = 0.633,
+            y = 0.664,
+            mobs = {
+                ["brc_boss_karsh_steelbender"] = 1,
             }
         },
     },
