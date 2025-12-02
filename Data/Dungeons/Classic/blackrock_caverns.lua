@@ -76,6 +76,12 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\defiled_earth_ravager",
         scale = 0.7,
     },
+    ["brc_bellows_slave"] = {
+        name = "Bellows Slave",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\bellows_slave",
+        scale = 0.7,
+    },
 }
 
 local bosses = {
@@ -95,6 +101,18 @@ local bosses = {
         name = "Karsh Steelbender",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\karsh_steelbender",
+        scale = 1.25,
+    },
+    ["brc_boss_beauty"] = {
+        name = "Beauty",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\beauty",
+        scale = 1.25,
+    },
+    ["brc_boss_ascendant_lord_obsidius"] = {
+        name = "Ascendant Lord Obsidius",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ascendant_lord_obsidius",
         scale = 1.25,
     },
 }
@@ -358,6 +376,10 @@ local mapDefinition = {
             mobs = {
                 ["brc_evolved_twilight_zealot"] = 1,
             },
+            patrol = {
+                {x = 0.552, y = 0.196},
+                {x = 0.552, y = 0.307},
+            }
         },
         {
             id = 25,
@@ -381,6 +403,13 @@ local mapDefinition = {
             y = 0.699,
             mobs = {
                 ["brc_conflagration"] = 1,
+            },
+            patrol = {
+                {x = 0.610, y = 0.699},
+                {x = 0.609, y = 0.628},
+                {x = 0.657, y = 0.629},
+                {x = 0.656, y = 0.696},
+                {x = 0.610, y = 0.699},
             }
         },
         {
@@ -389,10 +418,86 @@ local mapDefinition = {
             y = 0.629,
             mobs = {
                 ["brc_conflagration"] = 1,
+            },
+            patrol = {
+                {x = 0.610, y = 0.699},
+                {x = 0.609, y = 0.628},
+                {x = 0.657, y = 0.629},
+                {x = 0.656, y = 0.696},
+                {x = 0.610, y = 0.699},
             }
         },
         {
             id = 29,
+            x = 0.633,
+            y = 0.580,
+            mobs = {
+                ["brc_bellows_slave"] = 3,
+            }
+        },
+        {
+            id = 30,
+            x = 0.663,
+            y = 0.593,
+            mobs = {
+                ["brc_bellows_slave"] = 2,
+            }
+        },
+        {
+            id = 31,
+            x = 0.680,
+            y = 0.628,
+            mobs = {
+                ["brc_bellows_slave"] = 4,
+            }
+        },
+        {
+            id = 32,
+            x = 0.652,
+            y = 0.752,
+            mobs = {
+                ["brc_bellows_slave"] = 3,
+            }
+        },
+        {
+            id = 33,
+            x = 0.617,
+            y = 0.738,
+            mobs = {
+                ["brc_bellows_slave"] = 1,
+            }
+        },
+        {
+            id = 34,
+            x = 0.576,
+            y = 0.709,
+            mobs = {
+                ["brc_bellows_slave"] = 3,
+            }
+        },
+        {
+            id = 35,
+            x = 0.566,
+            y = 0.634,
+            mobs = {
+                ["brc_bellows_slave"] = 2,
+            }
+        },
+        {
+            id = 36,
+            x = 0.762,
+            y = 0.691,
+            mobs = {
+                ["brc_defiled_earth_ravager"] = 2,
+            },
+            patrol = {
+                {x = 0.736, y = 0.707},
+                {x = 0.762, y = 0.691},
+                {x = 0.841, y = 0.716},
+            }
+        },
+        {
+            id = 37,
             x = 0.713,
             y = 0.680,
             mobs = {
@@ -402,11 +507,56 @@ local mapDefinition = {
             }
         },
         {
-            id = 30,
-            x = 0.762,
-            y = 0.691,
+            id = 38,
+            x = 0.709,
+            y = 0.740,
             mobs = {
-                ["brc_defiled_earth_ravager"] = 1,
+                ["brc_twilight_obsidian_borer"] = 2,
+                ["brc_twilight_element_warden"] = 1,
+                ["brc_incendiary_spark"] = 1,
+            }
+        },
+        {
+            id = 39,
+            x = 0.786,
+            y = 0.736,
+            mobs = {
+                ["brc_twilight_obsidian_borer"] = 2,
+                ["brc_twilight_element_warden"] = 1,
+                ["brc_incendiary_spark"] = 1,
+            }
+        },
+        {
+            id = 40,
+            x = 0.838,
+            y = 0.687,
+            mobs = {
+                ["brc_defiled_earth_ravager"] = 2,
+            },
+            patrol = {
+                {x = 0.844, y = 0.720},
+                {x = 0.838, y = 0.687},
+                {x = 0.859, y = 0.582},
+            }
+        },
+        {
+            id = 41,
+            x = 0.807,
+            y = 0.663,
+            mobs = {
+                ["brc_twilight_obsidian_borer"] = 2,
+                ["brc_twilight_element_warden"] = 2,
+                ["brc_incendiary_spark"] = 1,
+            }
+        },
+        {
+            id = 42,
+            x = 0.868,
+            y = 0.652,
+            mobs = {
+                ["brc_twilight_obsidian_borer"] = 2,
+                ["brc_twilight_element_warden"] = 2,
+                ["brc_incendiary_spark"] = 1,
             }
         },
 
@@ -438,6 +588,22 @@ local mapDefinition = {
             y = 0.664,
             mobs = {
                 ["brc_boss_karsh_steelbender"] = 1,
+            }
+        },
+        {
+            id = 1003,
+            x = 0.832,
+            y = 0.848,
+            mobs = {
+                ["brc_boss_beauty"] = 1,
+            }
+        },
+        {
+            id = 1004,
+            x = 0.853,
+            y = 0.512,
+            mobs = {
+                ["brc_boss_ascendant_lord_obsidius"] = 1,
             }
         },
     },
