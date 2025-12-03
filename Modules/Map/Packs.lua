@@ -92,8 +92,9 @@ end
 --- Calculate hexagonal grid positions for mob icons
 -- Arranges mobs in concentric hexagonal rings: center, then rings of 6, 12, 18, etc.
 -- @param count number Number of mobs to position
+-- @param spacing number Optional spacing between icons (defaults to MOB_ICON_SPACING)
 -- @return table Array of {x, y} positions
-function UI:CalculateHexPositions(count)
+function UI:CalculateHexPositions(count, spacing)
     local positions = {}
 
     if count == 0 then
@@ -105,7 +106,7 @@ function UI:CalculateHexPositions(count)
         return positions
     end
 
-    local spacing = MOB_ICON_SPACING
+    spacing = spacing or MOB_ICON_SPACING
     local currentRing = 0
     local mobsPlaced = 0
 
@@ -210,7 +211,13 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
 
     local totalMobs = #mobList
 
-    local positions = self:CalculateHexPositions(totalMobs)
+    local centerMobScale = 1.0
+    if totalMobs > 0 then
+        centerMobScale = mobList[1].scale or 1.0
+    end
+    local spacing = (MOB_ICON_SIZE * centerMobScale) * 0.9
+
+    local positions = self:CalculateHexPositions(totalMobs, spacing)
 
     local maxDist = 0
     for _, pos in ipairs(positions) do
