@@ -45,6 +45,24 @@ function UI:CreatePacks(packData)
     end
     
     local mapWidth, mapHeight = UI:GetMapDimensions()
+
+    if not UI.packContainer then
+        UI.packContainer = CreateFrame("Frame", "RDT_PackContainer", UI.mapCanvas)
+        UI.packContainer:SetAllPoints(UI.mapCanvas)
+        UI.packContainer:SetFrameLevel(1000)
+    end
+
+    if not UI.patrolContainer then
+        UI.patrolContainer = CreateFrame("Frame", "RDT_PatrolContainer", UI.mapCanvas)
+        UI.patrolContainer:SetAllPoints(UI.mapCanvas)
+        UI.patrolContainer:SetFrameLevel(1500)
+    end
+
+    if not UI.overlayContainer then
+        UI.overlayContainer = CreateFrame("Frame", "RDT_OverlayContainer", UI.mapCanvas)
+        UI.overlayContainer:SetAllPoints(UI.mapCanvas)
+        UI.overlayContainer:SetFrameLevel(2000)
+    end
     
     RDT:DebugPrint("Creating " .. #packData .. " packs with mob icons")
     
@@ -140,9 +158,9 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     local packGroup = table.remove(packGroupPool)
     if not packGroup then
         -- No pooled frame available, create a new one
-        packGroup = CreateFrame("Frame", nil, UI.mapCanvas)
+        packGroup = CreateFrame("Frame", nil, UI.packContainer)
 
-        local labelFrame = CreateFrame("Frame", nil, UI.mapCanvas)
+        local labelFrame = CreateFrame("Frame", nil, UI.overlayContainer)
         labelFrame:SetFrameStrata("HIGH")
         labelFrame:SetFrameLevel(1000)
         labelFrame:SetSize(40, 40)
@@ -162,7 +180,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     end
 
     -- Reset/set pack group properties
-    packGroup:SetParent(UI.mapCanvas)
+    packGroup:SetParent(UI.packContainer)
     packGroup:ClearAllPoints()
     packGroup:Show()
     packGroup.packId = data.id
@@ -619,9 +637,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
 
                     if mobX and mobY then
                         local absX = packX + mobX
-                        -- TODO: I have no idea where I messed up but the Y coordinate is shifted 2px down.
-                        -- Temp(yeah sure) +2 offset added to center everything
-                        local absY = packY + mobY + 2
+                        local absY = packY + mobY
                         local mobScale = mobBtn.iconScale or 1.0
 
                         tinsert(points, {x = absX, y = absY, scale = mobScale})
@@ -657,11 +673,11 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     if not pullBorders[pullNum] then
         local borderFrame = table.remove(borderFramePool)
         if not borderFrame then
-            borderFrame = CreateFrame("Frame", nil, UI.mapCanvas)
+            borderFrame = CreateFrame("Frame", nil, UI.overlayContainer)
         end
-        borderFrame:SetParent(UI.mapCanvas)
-        borderFrame:SetFrameLevel(UI.mapCanvas:GetFrameLevel() + 1)
-        borderFrame:SetAllPoints(UI.mapCanvas)
+        borderFrame:SetParent(UI.overlayContainer)
+        borderFrame:SetFrameLevel(UI.overlayContainer:GetFrameLevel() + 1)
+        borderFrame:SetAllPoints(UI.overlayContainer)
         pullBorders[pullNum] = borderFrame
     end
 
@@ -673,16 +689,22 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
 
     local mapWidth = UI.mapTexture:GetWidth()
     local mapHeight = UI.mapTexture:GetHeight()
+    
+    local point, relativeTo, relativePoint, mapOffsetX, mapOffsetY = UI.mapTexture:GetPoint(1)
+    mapOffsetX = mapOffsetX or 0
+    mapOffsetY = mapOffsetY or 0
+    
+    local canvasHeight = borderFrame:GetHeight()
 
     for i = 1, #hull do
         local p1 = hull[i]
         local p2 = hull[(i % #hull) + 1]  -- Wrap around to first point
 
         -- Hull coordinates are TOPLEFT-relative offsets from GetPoint() (X positive, Y negative)
-        local x1 = p1.x
-        local y1 = mapHeight + p1.y
-        local x2 = p2.x
-        local y2 = mapHeight + p2.y
+        local x1 = p1.x + mapOffsetX
+        local y1 = canvasHeight + (p1.y + mapOffsetY)
+        local x2 = p2.x + mapOffsetX
+        local y2 = canvasHeight + (p2.y + mapOffsetY)
 
         LibGraph:DrawLine(
             borderFrame,
@@ -824,10 +846,10 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
     end
 
     if not patrolOverlayFrame then
-        patrolOverlayFrame = CreateFrame("Frame", nil, self.mapCanvas)
+        patrolOverlayFrame = CreateFrame("Frame", nil, UI.patrolContainer)
         patrolOverlayFrame:SetFrameStrata("HIGH")
-        patrolOverlayFrame:SetFrameLevel(999)
-        patrolOverlayFrame:SetAllPoints(self.mapCanvas)
+        patrolOverlayFrame:SetFrameLevel(UI.patrolContainer:GetFrameLevel() + 1)
+        patrolOverlayFrame:SetAllPoints(UI.patrolContainer)
     end
 
     -- Create a larger dot to mark the waypoint
@@ -853,6 +875,12 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         table.insert(packPatrolMarkers, marker)
     end
 
+    local point, relativeTo, relativePoint, mapOffsetX, mapOffsetY = self.mapTexture:GetPoint(1)
+    mapOffsetX = mapOffsetX or 0
+    mapOffsetY = mapOffsetY or 0
+    
+    local canvasHeight = patrolOverlayFrame:GetHeight()
+
     for i = 1, #patrolPoints - 1 do
         local point1 = patrolPoints[i]
         local point2 = patrolPoints[i + 1]
@@ -863,8 +891,11 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
         local x2 = point2.x * mapWidth
         local y2 = point2.y * mapHeight
 
-        y1 = mapHeight - y1
-        y2 = mapHeight - y2
+        x1 = x1 + mapOffsetX
+        y1 = canvasHeight + mapOffsetY - y1
+        
+        x2 = x2 + mapOffsetX
+        y2 = canvasHeight + mapOffsetY - y2
 
         local lineTexture = LibGraph:DrawLine(
             patrolOverlayFrame,  -- Canvas frame
@@ -880,6 +911,8 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
             table.insert(packPatrolLines, lineTexture)
         end
     end
+
+    patrolOverlayFrame:Show()
 
     patrolLinesByPack[packId] = {
         markers = packPatrolMarkers,
@@ -938,6 +971,7 @@ function UI:ClearPacks()
 
     if patrolOverlayFrame then
         LibGraph:HideLines(patrolOverlayFrame)
+        patrolOverlayFrame:Hide()
     end
 
     for _, border in pairs(pullBorders) do
@@ -955,6 +989,11 @@ function UI:ClearPacks()
                 for _, mobBtn in ipairs(packGroup.mobButtons) do
                     mobBtn:Hide()
                     mobBtn:ClearAllPoints()
+                    
+                    if mobBtn.icon then
+                        mobBtn.icon:SetTexture(nil)
+                    end
+
                     -- Clear mob button references
                     mobBtn.packId = nil
                     mobBtn.mobInfo = nil
