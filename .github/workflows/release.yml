@@ -1,0 +1,28 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v\d+.\d+.\d+'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up environment
+        run: |
+          echo "ADDON_NAME=$(basename *.toc .toc)" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=$ADDON_NAME_$GITHUB_REF_NAME.zip" >> $GITHUB_ENV
+
+      - name: Package
+        run: |
+          rsync -a --exclude-from='.releaseignore' . "$ADDON_NAME"/
+          zip -r "$ARCHIVE_NAME" "$ADDON_NAME"
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ARCHIVE_NAME }}
+
