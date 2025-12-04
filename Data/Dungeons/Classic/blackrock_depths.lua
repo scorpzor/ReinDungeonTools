@@ -46,6 +46,12 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\bloodhound",
         scale = 0.5,
     },
+    ["brd_fireguard"] = {
+        name = "Fireguard",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fireguard",
+        scale = 0.6,
+    },
 }
 
 local bosses = {
@@ -514,6 +520,133 @@ local packDefinition = {
             ["brd_bloodhound"] = 2,
         }
     },
+    {
+        id = 42,
+        x = 0.877,
+        y = 0.676,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_bloodhound"] = 2,
+        }
+    },
+    {
+        id = 43,
+        x = 0.912,
+        y = 0.659,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_anvilrage_footman"] = 1,
+        }
+    },
+    {
+        id = 44,
+        x = 0.912,
+        y = 0.659,
+        mobs = {
+            ["brd_fireguard"] = 1,
+            ["brd_anvilrage_footman"] = 2,
+        }
+    },
+    {
+        id = 45,
+        x = 0.926,
+        y = 0.628,
+        mobs = {
+            ["brd_bloodhound"] = 3,
+        },
+        patrol = {
+            { x = 0.861, y = 0.655 },
+            { x = 0.926, y = 0.628 },
+            { x = 0.950, y = 0.555 },
+            { x = 0.899, y = 0.464 },
+        },
+    },
+    {
+        id = 46,
+        x = 0.944,
+        y = 0.607,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_anvilrage_footman"] = 3,
+        }
+    },
+    {
+        id = 47,
+        x = 0.956,
+        y = 0.562,
+        mobs = {
+            ["brd_anvilrage_footman"] = 4,
+        }
+    },
+    {
+        id = 48,
+        x = 0.930,
+        y = 0.546,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_anvilrage_footman"] = 2,
+        }
+    },
+    {
+        id = 49,
+        x = 0.947,
+        y = 0.512,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_bloodhound"] = 2,
+            ["brd_fireguard"] = 1,
+        }
+    },
+    {
+        id = 50,
+        x = 0.910,
+        y = 0.514,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_bloodhound"] = 2,
+        }
+    },
+    {
+        id = 51,
+        x = 0.910,
+        y = 0.484,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_anvilrage_footman"] = 2,
+        }
+    },
+    {
+        id = 52,
+        x = 0.783,
+        y = 0.528,
+        mobs = {
+            ["brd_bloodhound"] = 3,
+        },
+        patrol = {
+            { x = 0.811, y = 0.577 },
+            { x = 0.843, y = 0.473 },
+            { x = 0.887, y = 0.460 },
+            { x = 0.913, y = 0.479 },
+        },
+    },
+    {
+        id = 53,
+        x = 0.874,
+        y = 0.448,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_anvilrage_footman"] = 3,
+        }
+    },
+    {
+        id = 54,
+        x = 0.867,
+        y = 0.488,
+        mobs = {
+            ["brd_anvilrage_footman"] = 3,
+        }
+    },
 
     -------------------------------- Bosses --------------------------------
     {
@@ -525,7 +658,7 @@ local packDefinition = {
             ["brd_twilights_hammer_torturer"] = 1,
         },
     },
-        {
+    {
         id = 1001,
         x = 0.885,
         y = 0.635,
@@ -539,6 +672,15 @@ local packDefinition = {
             { x = 0.893, y = 0.462 },
             { x = 0.823, y = 0.507 },
             { x = 0.811, y = 0.591 },
+        },
+    },
+    {
+        id = 1002,
+        x = 0.947,
+        y = 0.466,
+        mobs = {
+            ["brd_boss_houndmaster_grebmar"] = 1,
+            ["brd_bloodhound"] = 19,
         },
     },
 }
