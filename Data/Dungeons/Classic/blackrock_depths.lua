@@ -647,6 +647,43 @@ local packDefinition = {
             ["brd_anvilrage_footman"] = 3,
         }
     },
+    {
+        id = 55,
+        x = 0.831,
+        y = 0.464,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_fireguard"] = 2,
+        }
+    },
+    {
+        id = 56,
+        x = 0.837,
+        y = 0.498,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 4,
+            ["brd_anvilrage_footman"] = 1,
+        }
+    },
+    {
+        id = 57,
+        x = 0.804,
+        y = 0.525,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_fireguard"] = 2,
+        }
+    },
+    {
+        id = 58,
+        x = 0.822,
+        y = 0.560,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_bloodhound"] = 2,
+        }
+    },
 
     -------------------------------- Bosses --------------------------------
     {
