@@ -37,7 +37,7 @@ function UIHelpers:StyleSquareButton(button)
     -- Set backdrop for square gray appearance
     button:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
         tile = false,
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
@@ -45,7 +45,7 @@ function UIHelpers:StyleSquareButton(button)
     
     -- Normal state: lighter gray for better visibility
     button:SetBackdropColor(0.25, 0.25, 0.25, 1)
-    button:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    button:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     
     -- Hover effect
     button:SetScript("OnEnter", function(self)
@@ -66,15 +66,63 @@ function UIHelpers:StyleSquareButton(button)
     end)
 end
 
---- Create a modern styled close button
+--- Create a square styled button
+-- @param config table Configuration with:
+--   - parent: Frame - Parent frame
+--   - name: string - Unique name for the button
+--   - text: string - Button text
+--   - width: number - Button width
+--   - height: number - Button height (default 24)
+--   - fontSize: number - Font size (default 10)
+--   - tooltip: string - Tooltip text (optional)
+--   - onClick: function(button) - Click callback
+-- @return Button The created button
+function UIHelpers:CreateSquareButton(config)
+    local button = CreateFrame("Button", config.name, config.parent)
+    button:SetSize(config.width or 100, config.height or 24)
+    button:SetText(config.text or "")
+    button:RegisterForClicks("LeftButtonUp")
+    
+    self:StyleSquareButton(button)
+    
+    local fontString = button:GetFontString()
+    if fontString then
+        fontString:SetFont("Fonts\\FRIZQT__.TTF", config.fontSize or 10, "")
+    end
+    
+    if config.onClick then
+        button:SetScript("OnClick", function(self, btn, ...)
+            config.onClick(self, btn, ...)
+        end)
+    end
+    
+    if config.tooltip then
+        button:SetScript("OnEnter", function(self)
+            self:SetBackdropColor(0.35, 0.35, 0.35, 1)
+            
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(config.text, 1, 1, 1)
+            GameTooltip:AddLine(config.tooltip, nil, nil, nil, true)
+            GameTooltip:Show()
+        end)
+        button:SetScript("OnLeave", function(self)
+            self:SetBackdropColor(0.25, 0.25, 0.25, 1)
+            
+            GameTooltip:Hide()
+        end)
+    end
+    
+    return button
+end
+
+--- Create a square styled close button
 -- @param parent Frame Parent frame
 -- @return Button The created close button
-function UIHelpers:CreateModernCloseButton(parent)
+function UIHelpers:CreateSquareCloseButton(parent)
     local closeBtn = CreateFrame("Button", nil, parent)
     closeBtn:SetSize(20, 20)
     closeBtn:SetPoint("TOPRIGHT", -8, -8)
-    
-    -- Style as modern button
+
     self:StyleSquareButton(closeBtn)
     
     -- X text
@@ -98,7 +146,7 @@ end
 -- ScrollBar Styling
 --------------------------------------------------------------------------------
 
---- Style a scrollbar with modern square gray appearance
+--- Style a scrollbar
 -- @param scrollFrame ScrollFrame The scroll frame to style
 function UIHelpers:StyleScrollBar(scrollFrame)
     local scrollbarAtlas = GetScrollbarAtlas()
@@ -204,7 +252,7 @@ end
 -- StaticPopup Styling
 --------------------------------------------------------------------------------
 
---- Style a StaticPopup dialog with modern appearance
+--- Style a StaticPopup dialog with square appearance
 -- @param dialog Frame The StaticPopup dialog to style
 function UIHelpers:StyleStaticPopup(dialog)
     if not dialog or dialog.rdtStyled then return end
@@ -215,13 +263,13 @@ function UIHelpers:StyleStaticPopup(dialog)
     -- Restyle backdrop
     dialog:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
         tile = false,
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     dialog:SetBackdropColor(0.05, 0.05, 0.05, 0.98)
-    dialog:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    dialog:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     
     -- Style buttons
     for i = 1, 4 do
@@ -250,13 +298,13 @@ end
 -- Frame Styling
 --------------------------------------------------------------------------------
 
---- Create a modern backdrop for a frame
+--- Create a square backdrop for a frame
 -- @param frame Frame The frame to apply backdrop to
 -- @param options table Optional settings { bgAlpha, borderColor }
-function UIHelpers:ApplyModernBackdrop(frame, options)
+function UIHelpers:ApplySquareBackdrop(frame, options)
     options = options or {}
     local bgAlpha = options.bgAlpha or 0.98
-    local borderR, borderG, borderB = 0.5, 0.5, 0.5
+    local borderR, borderG, borderB = 0.2, 0.2, 0.2
 
     if options.borderColor then
         borderR, borderG, borderB = unpack(options.borderColor)
@@ -264,7 +312,7 @@ function UIHelpers:ApplyModernBackdrop(frame, options)
 
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
         tile = false,
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
@@ -273,7 +321,7 @@ function UIHelpers:ApplyModernBackdrop(frame, options)
     frame:SetBackdropBorderColor(borderR, borderG, borderB, 1)
 end
 
---- Create a simple dialog frame with modern styling
+--- Create a simple dialog frame with square styling
 -- @param config table Configuration with:
 --   - name: string - Unique frame name
 --   - title: string - Dialog title
@@ -303,14 +351,14 @@ function UIHelpers:CreateSimpleDialog(config)
     frame:SetClampedToScreen(true)
     frame:Hide()
 
-    self:ApplyModernBackdrop(frame)
+    self:ApplySquareBackdrop(frame)
 
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText(config.title or "Dialog")
     frame.titleText = title
 
-    local closeBtn = self:CreateModernCloseButton(frame)
+    local closeBtn = self:CreateSquareCloseButton(frame)
     closeBtn:SetScript("OnClick", function() frame:Hide() end)
 
     if config.message then
@@ -374,7 +422,7 @@ end
 -- Dropdown Component
 --------------------------------------------------------------------------------
 
---- Create a modern dropdown menu component
+--- Create a square dropdown menu component
 -- @param config table Configuration with:
 --   - parent: Frame - Parent frame
 --   - name: string - Unique name for the dropdown
@@ -391,7 +439,7 @@ end
 --   - SetText(text): Update button text
 --   - GetButton(): Get the main button frame
 --   - Show/Hide(): Control visibility
-function UIHelpers:CreateModernDropdown(config)
+function UIHelpers:CreateSquareDropdown(config)
     local dropdownAtlas = GetDropdownAtlas()
     local dropdown = {}
 
@@ -424,13 +472,13 @@ function UIHelpers:CreateModernDropdown(config)
     menuFrame:SetFrameStrata("DIALOG")
     menuFrame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
         tile = false,
         edgeSize = 1,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
     menuFrame:SetBackdropColor(0.2, 0.2, 0.2, 0.98)
-    menuFrame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+    menuFrame:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     menuFrame:Hide()
     
     -- Scroll frame for menu items
@@ -585,6 +633,67 @@ function UIHelpers:CreateModernDropdown(config)
     end
     
     return dropdown
+end
+
+--- Create a square styled checkbox
+-- @param config table Configuration with:
+--   - parent: Frame - Parent frame
+--   - name: string - Unique name for the checkbox
+--   - label: string - Label text
+--   - tooltip: string - Tooltip text (optional)
+--   - initialValue: boolean - Initial checked state (default false)
+--   - fontSize: number - Font size (default 10)
+--   - onClick: function(checked) - Click callback
+-- @return CheckButton The created checkbox
+function UIHelpers:CreateSquareCheckbox(config)
+    local checkButton = CreateFrame("CheckButton", config.name, config.parent, "ChatConfigCheckButtonTemplate")
+    checkButton:SetSize(24, 24)
+    
+    if config.label then
+        checkButton.text = checkButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        checkButton.text:SetPoint("LEFT", checkButton, "RIGHT", 5, 0)
+        checkButton.text:SetText(config.label)
+        checkButton.text:SetTextColor(1, 1, 1)
+        checkButton.text:SetFont("Fonts\\FRIZQT__.TTF", config.fontSize or 10, "")
+    end
+    
+    checkButton:SetNormalTexture(nil)
+    checkButton:SetPushedTexture(nil)
+    checkButton:SetHighlightTexture(nil)
+    checkButton:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check")
+    
+    checkButton:SetBackdrop({
+        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        tile = false,
+        edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 }
+    })
+    checkButton:SetBackdropColor(0, 0, 0, 1)
+    checkButton:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
+    
+    checkButton:SetChecked(config.initialValue or false)
+    
+    checkButton:SetScript("OnClick", function(self)
+        local isChecked = self:GetChecked()
+        if config.onClick then
+            config.onClick(isChecked)
+        end
+    end)
+    
+    if config.tooltip then
+        checkButton:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(config.label, 1, 1, 1)
+            GameTooltip:AddLine(config.tooltip, nil, nil, nil, true)
+            GameTooltip:Show()
+        end)
+        checkButton:SetScript("OnLeave", function(self)
+            GameTooltip:Hide()
+        end)
+    end
+    
+    return checkButton
 end
 
 --------------------------------------------------------------------------------

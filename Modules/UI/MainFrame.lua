@@ -12,10 +12,10 @@ local UI = RDT.UI
 local UIHelpers = RDT.UIHelpers
 
 -- UI Constants
-local FRAME_WIDTH, FRAME_HEIGHT = 1440, 820
-local MAP_WIDTH, MAP_HEIGHT = 1140, 760
-local PULLS_PANEL_WIDTH, PULLS_PANEL_HEIGHT = 260, 580
+local FRAME_WIDTH, FRAME_HEIGHT = 1454, 820
+local SIDEBAR_WIDTH = 300
 local BUTTON_PANEL_HEIGHT = 140
+local FONT_SIZE = 12
 
 -- Local frame references
 local mainFrame
@@ -27,11 +27,6 @@ local versionText
 local dungeonDropdown
 local routeDropdown
 local buttonContainer
-
--- Local convenience wrapper for button styling
-local function StyleSquareButton(button)
-    UIHelpers:StyleSquareButton(button)
-end
 
 --------------------------------------------------------------------------------
 -- Main Frame Creation
@@ -81,13 +76,14 @@ function UI:CreateMainFrame()
     titleText:SetJustifyH("CENTER")
     titleText:SetTextColor(1, 1, 1, 1)
 
-    local closeButton = UIHelpers:CreateModernCloseButton(mainFrame)
+    local closeButton = UIHelpers:CreateSquareCloseButton(mainFrame)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
     self:CreateDungeonDropdown(mainFrame)
+    self:CreateSidebar(mainFrame)
     self:CreateMapContainer(mainFrame)
-    self:CreateButtonContainer(mainFrame)
-    self:CreatePullsPanel(mainFrame)
+    self:CreateButtonContainer(UI.sidebar)
+    self:CreatePullsPanel(UI.sidebar)
     
     -- Bottom bar background (matches main window)
     local bottomBg = mainFrame:CreateTexture(nil, "ARTWORK")
@@ -120,7 +116,7 @@ end
 function UI:CreateDungeonDropdown(parent)
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
 
-    dungeonDropdown = UIHelpers:CreateModernDropdown({
+    dungeonDropdown = UIHelpers:CreateSquareDropdown({
         parent = parent,
         name = "RDT_DungeonDropdown",
         point = "TOPLEFT",
@@ -187,13 +183,13 @@ end
 --------------------------------------------------------------------------------
 
 function UI:CreateRouteDropdown(container)
-    routeDropdown = UIHelpers:CreateModernDropdown({
+    routeDropdown = UIHelpers:CreateSquareDropdown({
         parent = container,
         name = "RDT_RouteDropdown",
         point = "TOPLEFT",
         x = 0,
-        y = -8,
-        width = 290,
+        y = 0,
+        width = container:GetWidth(),
         height = 26,
         menuHeight = 150,
         defaultText = "Route 1",
@@ -209,8 +205,8 @@ function UI:CreateRouteDropdown(container)
     })
 
     routeDropdown.button:ClearAllPoints()
-    routeDropdown.button:SetPoint("TOPLEFT", container, "TOPLEFT", 0, -8)
-    routeDropdown.button:SetPoint("TOPRIGHT", container, "TOPRIGHT", 0, -8)
+    routeDropdown.button:SetPoint("TOPLEFT", container, "TOPLEFT", 0, 0)
+    routeDropdown.button:SetPoint("TOPRIGHT", container, "TOPRIGHT", 0, 0)
     routeDropdown.button:SetHeight(26)
 
     local originalButton = routeDropdown.button
@@ -234,62 +230,59 @@ function UI:CreateRouteDropdown(container)
     local containerWidth = container:GetWidth() or 290
     local buttonWidth = (containerWidth - totalSpacing) / 3
     
-    local newRouteBtn = CreateFrame("Button", "RDT_NewRouteButton", container)
-    newRouteBtn:SetPoint("TOPLEFT", routeDropdown.button, "BOTTOMLEFT", 0, -5)
-    newRouteBtn:SetSize(buttonWidth, 24)
-    StyleSquareButton(newRouteBtn)
-    newRouteBtn.text = newRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    newRouteBtn.text:SetAllPoints()
-    newRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    newRouteBtn.text:SetText("New")
-    newRouteBtn.text:SetTextColor(1, 1, 1, 1)
-    
-    newRouteBtn:SetScript("OnClick", function()
-        if RDT.Dialogs and RDT.Dialogs.ShowNewRoute then
-            RDT.Dialogs:ShowNewRoute()
-        else
-            local dungeonName = RDT.db.profile.currentDungeon
-            if dungeonName and RDT.RouteManager then
-                local newRouteName = RDT.RouteManager:CreateRoute(dungeonName)
-                if newRouteName then
-                    UI:UpdateRouteDropdown()
-                    UI:RefreshUI()
+    local newRouteBtn = UIHelpers:CreateSquareButton({
+        parent = container,
+        name = "RDT_NewRouteButton",
+        text = "New",
+        width = buttonWidth,
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            if RDT.Dialogs and RDT.Dialogs.ShowNewRoute then
+                RDT.Dialogs:ShowNewRoute()
+            else
+                local dungeonName = RDT.db.profile.currentDungeon
+                if dungeonName and RDT.RouteManager then
+                    local newRouteName = RDT.RouteManager:CreateRoute(dungeonName)
+                    if newRouteName then
+                        UI:UpdateRouteDropdown()
+                        UI:RefreshUI()
+                    end
                 end
             end
         end
-    end)
+    })
+    newRouteBtn:SetPoint("TOPLEFT", routeDropdown.button, "BOTTOMLEFT", 0, -5)
     
-    local renameRouteBtn = CreateFrame("Button", "RDT_RenameRouteButton", container)
+    local renameRouteBtn = UIHelpers:CreateSquareButton({
+        parent = container,
+        name = "RDT_RenameRouteButton",
+        text = "Rename",
+        width = buttonWidth,
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            if RDT.Dialogs and RDT.Dialogs.ShowRenameRoute then
+                RDT.Dialogs:ShowRenameRoute()
+            end
+        end
+    })
     renameRouteBtn:SetPoint("LEFT", newRouteBtn, "RIGHT", spacing, 0)
-    renameRouteBtn:SetSize(buttonWidth, 24)
-    StyleSquareButton(renameRouteBtn)
-    renameRouteBtn.text = renameRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    renameRouteBtn.text:SetAllPoints()
-    renameRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    renameRouteBtn.text:SetText("Rename")
-    renameRouteBtn.text:SetTextColor(1, 1, 1, 1)
     
-    renameRouteBtn:SetScript("OnClick", function()
-        if RDT.Dialogs and RDT.Dialogs.ShowRenameRoute then
-            RDT.Dialogs:ShowRenameRoute()
+    local deleteRouteBtn = UIHelpers:CreateSquareButton({
+        parent = container,
+        name = "RDT_DeleteRouteButton",
+        text = "Delete",
+        width = buttonWidth,
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            if RDT.Dialogs and RDT.Dialogs.ShowDeleteRoute then
+                RDT.Dialogs:ShowDeleteRoute()
+            end
         end
-    end)
-    
-    local deleteRouteBtn = CreateFrame("Button", "RDT_DeleteRouteButton", container)
+    })
     deleteRouteBtn:SetPoint("LEFT", renameRouteBtn, "RIGHT", spacing, 0)
-    deleteRouteBtn:SetSize(buttonWidth, 24)
-    StyleSquareButton(deleteRouteBtn)
-    deleteRouteBtn.text = deleteRouteBtn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    deleteRouteBtn.text:SetAllPoints()
-    deleteRouteBtn.text:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    deleteRouteBtn.text:SetText("Delete")
-    deleteRouteBtn.text:SetTextColor(1, 1, 1, 1)
-    
-    deleteRouteBtn:SetScript("OnClick", function()
-        if RDT.Dialogs and RDT.Dialogs.ShowDeleteRoute then
-            RDT.Dialogs:ShowDeleteRoute()
-        end
-    end)
     
     local function UpdateRouteButtonWidths()
         local width = container:GetWidth()
@@ -297,6 +290,11 @@ function UI:CreateRouteDropdown(container)
         newRouteBtn:SetWidth(btnWidth)
         renameRouteBtn:SetWidth(btnWidth)
         deleteRouteBtn:SetWidth(btnWidth)
+        
+        if routeDropdown then
+            routeDropdown:SetWidth(width)
+            routeDropdown.button:SetWidth(width)
+        end
     end
     
     container:HookScript("OnSizeChanged", UpdateRouteButtonWidths)
@@ -346,6 +344,15 @@ function UI:RefreshUI()
     end
 end
 
+function UI:CreateSidebar(parent)
+    local sidebar = CreateFrame("Frame", "RDT_Sidebar", parent)
+    sidebar:SetPoint("TOPRIGHT", -5, -42)
+    sidebar:SetPoint("BOTTOMRIGHT", -5, 18)
+    sidebar:SetWidth(SIDEBAR_WIDTH)
+    
+    UI.sidebar = sidebar
+end
+
 --------------------------------------------------------------------------------
 -- Map Container
 --------------------------------------------------------------------------------
@@ -353,21 +360,12 @@ end
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
     mapContainer:SetPoint("TOPLEFT", 5, -42)
-    mapContainer:SetSize(MAP_WIDTH, MAP_HEIGHT)
-    mapContainer:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
-    })
-    mapContainer:SetBackdropColor(0, 0, 0, 1)
-    mapContainer:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+    mapContainer:SetPoint("BOTTOMRIGHT", UI.sidebar, "BOTTOMLEFT", -4, 0)
+    mapContainer:SetBackdrop(nil)
 
     mapTexture = mapContainer:CreateTexture(nil, "ARTWORK")
     mapTexture:SetPoint("TOPLEFT", 1, -1)
-    mapTexture:SetPoint("TOPRIGHT", -1, -1)
-    mapTexture:SetHeight(MAP_HEIGHT - 2)
+    mapTexture:SetPoint("BOTTOMRIGHT", -1, 1)
     mapTexture:SetTexture("Interface\\WorldMap\\UI-WorldMap-Background")
     mapTexture:SetVertexColor(0.9, 0.9, 0.9)
     mapTexture:SetTexCoord(0, 1, 0, 0.67)
@@ -415,8 +413,9 @@ function UI:LoadTiledMap(tileData)
     local cols = tileData.cols or 2
     local rows = tileData.rows or 2
     
-    local displayTileWidth = MAP_WIDTH / cols
-    local displayTileHeight = MAP_HEIGHT / rows
+    local mapWidth, mapHeight = UI:GetMapDimensions()
+    local displayTileWidth = mapWidth / cols
+    local displayTileHeight = mapHeight / rows
     
     for i, tileInfo in ipairs(tiles) do
         local tile = mapTiles[i]
@@ -513,7 +512,10 @@ end
 --- Get map dimensions for pack button positioning
 -- @return number width, number height
 function UI:GetMapDimensions()
-    return MAP_WIDTH, MAP_HEIGHT
+    if mapContainer then
+        return mapContainer:GetWidth(), mapContainer:GetHeight()
+    end
+    return 1140, 760
 end
 
 --- Get map container frame
@@ -529,9 +531,10 @@ end
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
     pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -4)
-    pullsPanel:SetPoint("BOTTOMLEFT", mapContainer, "BOTTOMRIGHT", 4, 0)
-    pullsPanel:SetPoint("BOTTOMRIGHT", -5, 22)
-    pullsPanel:SetWidth(PULLS_PANEL_WIDTH)
+    pullsPanel:SetPoint("BOTTOMRIGHT", 0, 0)
+    
+    UI.pullsPanel = pullsPanel
+    
     pullsPanel:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -555,95 +558,95 @@ end
 
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
-    buttonContainer:SetPoint("TOPLEFT", mapContainer, "TOPRIGHT", 4, 0)
-    buttonContainer:SetPoint("TOPRIGHT", -5, -42)
+    buttonContainer:SetPoint("TOPLEFT", 0, 0)
+    buttonContainer:SetPoint("TOPRIGHT", 0, 0)
     buttonContainer:SetHeight(BUTTON_PANEL_HEIGHT)
 
     local firstRouteBtn = UI:CreateRouteDropdown(buttonContainer)
     
     local spacing = 3
     
-    local newPullButton = CreateFrame("Button", "RDT_NewPullButton", buttonContainer)
-    newPullButton:SetPoint("TOPLEFT", firstRouteBtn, "BOTTOMLEFT", 0, -5)
-    newPullButton:SetHeight(26)
-    newPullButton:SetText("New Pull")
-    newPullButton:RegisterForClicks("LeftButtonUp")
-    StyleSquareButton(newPullButton)
-    local origOnClick = newPullButton:GetScript("OnClick")
-    newPullButton:SetScript("OnClick", function(self, button, ...)
-        if origOnClick then origOnClick(self, button, ...) end
-        if RDT.RouteManager then
-            RDT.RouteManager:NewPull()
+    local newPullButton = UIHelpers:CreateSquareButton({
+        parent = buttonContainer,
+        name = "RDT_NewPullButton",
+        text = "New Pull",
+        height = 26,
+        fontSize = FONT_SIZE,
+        onClick = function(self, button, ...)
+            if RDT.RouteManager then
+                RDT.RouteManager:NewPull()
+            end
         end
-    end)
+    })
+    newPullButton:SetPoint("TOPLEFT", firstRouteBtn, "BOTTOMLEFT", 0, -5)
     UI.newPullButton = newPullButton
 
-    local resetButton = CreateFrame("Button", "RDT_ResetButton", buttonContainer)
+    local resetButton = UIHelpers:CreateSquareButton({
+        parent = buttonContainer,
+        name = "RDT_ResetButton",
+        text = L["RESET_ALL"],
+        height = 26,
+        fontSize = FONT_SIZE,
+        onClick = function(self, button, ...)
+            if RDT.RouteManager then
+                RDT.RouteManager:ResetPulls()
+            end
+        end
+    })
     resetButton:SetPoint("LEFT", newPullButton, "RIGHT", spacing, 0)
-    resetButton:SetHeight(26)
-    resetButton:SetText(L["RESET_ALL"])
-    resetButton:RegisterForClicks("LeftButtonUp")
-    StyleSquareButton(resetButton)
-    local origResetClick = resetButton:GetScript("OnClick")
-    resetButton:SetScript("OnClick", function(self, button, ...)
-        if origResetClick then origResetClick(self, button, ...) end
-        if RDT.RouteManager then
-            RDT.RouteManager:ResetPulls()
-        end
-    end)
 
-    local shareButton = CreateFrame("Button", "RDT_ShareButton", buttonContainer)
+    local shareButton = UIHelpers:CreateSquareButton({
+        parent = buttonContainer,
+        name = "RDT_ShareButton",
+        text = "Share",
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function(self, button, ...)
+            if not RDT.RouteSharing then
+                RDT:PrintError("RouteSharing module not loaded")
+                return
+            end
+    
+            RDT.RouteSharing:ShareToChat("PARTY")
+        end
+    })
     shareButton:SetPoint("TOPLEFT", newPullButton, "BOTTOMLEFT", 0, -5)
-    shareButton:SetHeight(24)
-    shareButton:SetText("Share")
-    shareButton:RegisterForClicks("LeftButtonUp")
-    StyleSquareButton(shareButton)
-    local origShareClick = shareButton:GetScript("OnClick")
-    shareButton:SetScript("OnClick", function(self, button, ...)
-        if origShareClick then origShareClick(self, button, ...) end
-        if not RDT.RouteSharing then
-            RDT:PrintError("RouteSharing module not loaded")
-            return
+
+    local exportButton = UIHelpers:CreateSquareButton({
+        parent = buttonContainer,
+        name = "RDT_ExportButton",
+        text = "Export",
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function(self, button, ...)
+            if not RDT.ImportExport then
+                RDT:PrintError("ImportExport module not loaded")
+                return
+            end
+    
+            local exportString = RDT.ImportExport:Export()
+            if exportString and RDT.Dialogs and RDT.Dialogs.ShowExport then
+                RDT.Dialogs:ShowExport(exportString)
+            end
         end
-
-        RDT.RouteSharing:ShareToChat("PARTY")
-    end)
-
-    local exportButton = CreateFrame("Button", "RDT_ExportButton", buttonContainer)
+    })
     exportButton:SetPoint("LEFT", shareButton, "RIGHT", spacing, 0)
-    exportButton:SetHeight(24)
-    exportButton:SetText("Export")
-    exportButton:RegisterForClicks("LeftButtonUp")
-    StyleSquareButton(exportButton)
-    local origExportClick = exportButton:GetScript("OnClick")
-    exportButton:SetScript("OnClick", function(self, button, ...)
-        if origExportClick then origExportClick(self, button, ...) end
-        if not RDT.ImportExport then
-            RDT:PrintError("ImportExport module not loaded")
-            return
-        end
 
-        local exportString = RDT.ImportExport:Export()
-        if exportString and RDT.Dialogs and RDT.Dialogs.ShowExport then
-            RDT.Dialogs:ShowExport(exportString)
+    local importButton = UIHelpers:CreateSquareButton({
+        parent = buttonContainer,
+        name = "RDT_ImportButton",
+        text = "Import",
+        height = 24,
+        fontSize = FONT_SIZE,
+        onClick = function(self, button, ...)
+            if RDT.Dialogs and RDT.Dialogs.ShowImport then
+                RDT.Dialogs:ShowImport()
+            else
+                RDT:PrintError("Import dialog not available")
+            end
         end
-    end)
-
-    local importButton = CreateFrame("Button", "RDT_ImportButton", buttonContainer)
+    })
     importButton:SetPoint("LEFT", exportButton, "RIGHT", spacing, 0)
-    importButton:SetHeight(24)
-    importButton:SetText("Import")
-    importButton:RegisterForClicks("LeftButtonUp")
-    StyleSquareButton(importButton)
-    local origImportClick = importButton:GetScript("OnClick")
-    importButton:SetScript("OnClick", function(self, button, ...)
-        if origImportClick then origImportClick(self, button, ...) end
-        if RDT.Dialogs and RDT.Dialogs.ShowImport then
-            RDT.Dialogs:ShowImport()
-        else
-            RDT:PrintError("Import dialog not available")
-        end
-    end)
 
     local containerWidth = buttonContainer:GetWidth() or 290
     local halfWidth = (containerWidth - spacing) / 2
@@ -669,6 +672,19 @@ function UI:CreateButtonContainer(parent)
     end
     
     buttonContainer:HookScript("OnSizeChanged", UpdatePullExportButtonWidths)
+    local showChampionsCheck = UIHelpers:CreateSquareCheckbox({
+        parent = buttonContainer,
+        name = "RDT_ShowChampionsCheckbox",
+        label = "Show champions",
+        initialValue = false,
+        fontSize = FONT_SIZE,
+        onClick = function(isChecked)
+            RDT:DebugPrint("Show champions: " .. tostring(isChecked))
+        end
+    })
+    showChampionsCheck:SetPoint("TOPLEFT", shareButton, "BOTTOMLEFT", 0, -5)
+    
+    UI.showChampionsCheck = showChampionsCheck
 end
 
 --------------------------------------------------------------------------------

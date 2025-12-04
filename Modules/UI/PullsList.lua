@@ -83,61 +83,51 @@ end
 function UI:InitializePullsList(panel)
     pullsPanel = panel
 
-    -- Total forces progress bar (at top)
     local progressBarFrame = CreateFrame("Frame", "RDT_ForcesProgressBar", pullsPanel)
     progressBarFrame:SetPoint("TOP", 0, -8)
     progressBarFrame:SetSize(240, 24)
-    
-    -- Background
+
     progressBarFrame.bg = progressBarFrame:CreateTexture(nil, "BACKGROUND")
     progressBarFrame.bg:SetAllPoints()
     progressBarFrame.bg:SetColorTexture(0.1, 0.1, 0.1, 0.8)
-    
-    -- Border
+
     progressBarFrame.border = progressBarFrame:CreateTexture(nil, "BORDER")
     progressBarFrame.border:SetAllPoints()
     progressBarFrame.border:SetColorTexture(0.3, 0.3, 0.3, 1)
     progressBarFrame.bg:SetPoint("TOPLEFT", 1, -1)
     progressBarFrame.bg:SetPoint("BOTTOMRIGHT", -1, 1)
-    
-    -- Progress fill bar (starts at 0 width)
+
     progressBarFrame.fill = progressBarFrame:CreateTexture(nil, "ARTWORK")
     progressBarFrame.fill:SetPoint("LEFT", 1, 0)
     progressBarFrame.fill:SetHeight(22)
     progressBarFrame.fill:SetWidth(0)
     progressBarFrame.fill:SetColorTexture(0.3, 1.0, 0.3, 0.6)
-    
-    -- Text overlay
+
     progressBarFrame.text = progressBarFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     progressBarFrame.text:SetPoint("CENTER")
     progressBarFrame.text:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
     progressBarFrame.text:SetText("0/100 (0.0%)")
     progressBarFrame.text:SetTextColor(1.0, 1.0, 1.0)
-    
-    -- Store reference for compatibility
+
     totalForcesLabel = progressBarFrame
-    
-    -- Initialize the bar to 0
+
     progressBarFrame.fill:SetWidth(0)
     progressBarFrame.fill:SetColorTexture(1.0, 0.3, 0.3, 0.7)
 
-    -- ScrollFrame for pulls list
     pullsScrollFrame = CreateFrame("ScrollFrame", "RDT_PullsScroll", pullsPanel, "UIPanelScrollFrameTemplate")
     pullsScrollFrame:SetPoint("TOPLEFT", 2, -40)
     pullsScrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
 
     pullsScrollChild = CreateFrame("Frame", "RDT_PullsScrollChild", pullsScrollFrame)
-    -- Use width of scroll frame viewport
+
     local scrollWidth = pullsScrollFrame:GetWidth() or (PULLS_PANEL_WIDTH - 28)
     pullsScrollChild:SetSize(scrollWidth, 1)
     pullsScrollFrame:SetScrollChild(pullsScrollChild)
-    
-    -- Style the scrollbar with modern appearance
+
     if RDT.UIHelpers and RDT.UIHelpers.StyleScrollBar then
         RDT.UIHelpers:StyleScrollBar(pullsScrollFrame)
     end
 
-    -- Initialize FontString pool
     fontStringPool = CreateFontStringPool(pullsScrollChild)
     
     RDT:DebugPrint("Pulls list panel initialized")

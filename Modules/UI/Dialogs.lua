@@ -24,17 +24,14 @@ local DIALOG_HEIGHT = 300
 local IMPORT_DIALOG_HEIGHT = 350
 local SIMPLE_DIALOG_WIDTH = 400
 local SIMPLE_DIALOG_HEIGHT = 150
+local FONT_SIZE = 12
 
 --------------------------------------------------------------------------------
 -- Styling Helper Functions (Use UIHelpers)
 --------------------------------------------------------------------------------
 
-local function StyleModernButton(button)
-    UIHelpers:StyleSquareButton(button)
-end
-
-local function CreateModernCloseButton(parent)
-    return UIHelpers:CreateModernCloseButton(parent)
+local function CreateSquareCloseButton(parent)
+    return UIHelpers:CreateSquareCloseButton(parent)
 end
 
 local function CreateSimpleDialog(config)
@@ -51,7 +48,7 @@ function Dialogs:CreateExportDialog()
     if exportFrame then
         return exportFrame
     end
-    
+
     local frame = CreateFrame("Frame", "RDT_ExportDialog", UIParent)
     frame:SetSize(DIALOG_WIDTH, DIALOG_HEIGHT)
     frame:SetPoint("CENTER")
@@ -63,8 +60,7 @@ function Dialogs:CreateExportDialog()
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
     frame:SetClampedToScreen(true)
     frame:Hide()
-    
-    -- Modern backdrop
+
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -74,33 +70,27 @@ function Dialogs:CreateExportDialog()
     })
     frame:SetBackdropColor(0.05, 0.05, 0.05, 0.98)
     frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-    
-    -- Title
+
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText("Export Route")
-    
-    -- Modern close button (X)
-    local closeBtn = CreateModernCloseButton(frame)
+
+    local closeBtn = CreateSquareCloseButton(frame)
     closeBtn:SetScript("OnClick", function() frame:Hide() end)
-    
-    -- Instructions
+
     local instructions = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     instructions:SetPoint("TOP", 0, -40)
     instructions:SetText("Copy this string and share it:")
-    
-    -- Scroll frame for the export string (with proper insets for scrollbar)
+
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -70)
-    scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)  -- Extra space for scrollbar
+    scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)
     scrollFrame:SetHeight(150)
-    
-    -- Style the scrollbar with modern appearance
+
     if UIHelpers and UIHelpers.StyleScrollBar then
         UIHelpers:StyleScrollBar(scrollFrame)
     end
-    
-    -- Edit box (multiline) - width will be set by scrollFrame's width
+
     local editBox = CreateFrame("EditBox", nil, scrollFrame)
     editBox:SetMultiLine(true)
     editBox:SetWidth(scrollFrame:GetWidth() or 540)
@@ -110,10 +100,8 @@ function Dialogs:CreateExportDialog()
     editBox:SetTextColor(1, 1, 1)
     editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
     editBox:SetScript("OnTextChanged", function(self)
-        -- Auto-select text when content changes
         self:HighlightText()
     end)
-    -- Dark background for editbox
     editBox:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = nil,
@@ -123,33 +111,39 @@ function Dialogs:CreateExportDialog()
     editBox:SetBackdropColor(0, 0, 0, 0.8)
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
-    
-    -- Copy hint text (Ctrl+C) - positioned above buttons
+
     local copyHint = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     copyHint:SetPoint("BOTTOM", frame, "BOTTOM", 0, 45)
     copyHint:SetText("Press Ctrl+C to copy")
     copyHint:SetTextColor(0.7, 0.7, 0.7)
-    
-    -- Buttons horizontally aligned at the bottom
-    -- Select All button (left side)
-    local selectAllButton = CreateFrame("Button", nil, frame)
-    selectAllButton:SetSize(120, 30)
+
+    local selectAllButton = UIHelpers:CreateSquareButton({
+        parent = frame,
+        name = nil,
+        text = "Select All",
+        width = 120,
+        height = 30,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            editBox:HighlightText()
+            editBox:SetFocus()
+        end
+    })
     selectAllButton:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
-    selectAllButton:SetText("Select All")
-    StyleModernButton(selectAllButton)
-    selectAllButton:SetScript("OnClick", function()
-        editBox:HighlightText()
-        editBox:SetFocus()
-    end)
-    
-    -- Close button (right side)
-    local closeButton = CreateFrame("Button", nil, frame)
-    closeButton:SetSize(120, 30)
+
+    local closeButton = UIHelpers:CreateSquareButton({
+        parent = frame,
+        name = nil,
+        text = "Close",
+        width = 120,
+        height = 30,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            frame:Hide()
+        end
+    })
     closeButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
-    closeButton:SetText("Close")
-    StyleModernButton(closeButton)
-    closeButton:SetScript("OnClick", function() frame:Hide() end)
-    
+
     exportFrame = frame
     return frame
 end
@@ -201,7 +195,6 @@ function Dialogs:CreateImportDialog()
     frame:SetClampedToScreen(true)
     frame:Hide()
     
-    -- Modern backdrop
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -212,38 +205,32 @@ function Dialogs:CreateImportDialog()
     frame:SetBackdropColor(0.05, 0.05, 0.05, 0.98)
     frame:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     
-    -- Title
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -15)
     title:SetText("Import Route")
     frame.titleText = title
     
-    -- Modern close button (X)
-    local closeBtn = CreateModernCloseButton(frame)
+    local closeBtn = CreateSquareCloseButton(frame)
     closeBtn:SetScript("OnClick", function() 
         frame:Hide()
         frame.editBox:SetText("") -- Clear on close
     end)
     
-    -- Instructions
     local instructions = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     instructions:SetPoint("TOP", 0, -40)
     instructions:SetText("Paste the import string below:")
     frame.instructions = instructions
     
-    -- Scroll frame for the import string (with proper insets for scrollbar)
     local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, -70)
     scrollFrame:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -35, -70)  -- Extra space for scrollbar
     scrollFrame:SetHeight(200)
     frame.scrollFrame = scrollFrame
     
-    -- Style the scrollbar with modern appearance
     if UIHelpers and UIHelpers.StyleScrollBar then
         UIHelpers:StyleScrollBar(scrollFrame)
     end
     
-    -- Edit box (multiline) - width will be set by scrollFrame's width
     local editBox = CreateFrame("EditBox", nil, scrollFrame)
     editBox:SetMultiLine(true)
     editBox:SetWidth(scrollFrame:GetWidth() or 540)
@@ -255,7 +242,6 @@ function Dialogs:CreateImportDialog()
         frame:Hide()
         editBox:SetText("")
     end)
-    -- Dark background for editbox
     editBox:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = nil,
@@ -266,50 +252,53 @@ function Dialogs:CreateImportDialog()
     scrollFrame:SetScrollChild(editBox)
     frame.editBox = editBox
     
-    -- Warning text - positioned above buttons
     local warning = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     warning:SetPoint("BOTTOM", frame, "BOTTOM", 0, 50)
     warning:SetText("This will create a new route with the imported data.\nIf the name matches an existing route, an incremental number will be added.")
     warning:SetTextColor(1, 0.8, 0)
-    
-    -- Buttons horizontally aligned at the bottom
-    -- Import button (left side)
-    local importButton = CreateFrame("Button", nil, frame)
-    importButton:SetSize(120, 30)
-    importButton:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
-    importButton:SetText("Import")
-    StyleModernButton(importButton)
-    importButton:SetScript("OnClick", function()
-        local importString = editBox:GetText()
+
+    local importButton = UIHelpers:CreateSquareButton({
+        parent = frame,
+        name = nil,
+        text = "Import",
+        width = 120,
+        height = 30,
+        fontSize = FONT_SIZE,
+        onClick = function()
+            local importString = editBox:GetText()
         
-        if not importString or importString == "" then
+            if not importString or importString == "" then
             RDT:PrintError("Please paste an import string first")
             return
-        end
+            end
         
-        if not RDT.ImportExport then
+            if not RDT.ImportExport then
             RDT:PrintError("ImportExport module not loaded")
             return
-        end
+            end
         
-        -- Attempt import
-        if RDT.ImportExport:Import(importString) then
+            -- Attempt import
+            if RDT.ImportExport:Import(importString) then
+                frame:Hide()
+                editBox:SetText("")
+            end
+        end
+    })
+    importButton:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 5, 10)
+
+    local cancelButton = UIHelpers:CreateSquareButton({
+        parent = frame,
+        name = nil,
+        text = "Cancel",
+        width = 120,
+        height = 30,
+        fontSize = FONT_SIZE,
+        onClick = function() 
             frame:Hide()
             editBox:SetText("")
         end
-        -- Errors are printed by ImportExport module
-    end)
-    
-    -- Cancel button (right side)
-    local cancelButton = CreateFrame("Button", nil, frame)
-    cancelButton:SetSize(120, 30)
+    })
     cancelButton:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -5, 10)
-    cancelButton:SetText("Cancel")
-    StyleModernButton(cancelButton)
-    cancelButton:SetScript("OnClick", function() 
-        frame:Hide()
-        editBox:SetText("")
-    end)
     
     importFrame = frame
     return frame
