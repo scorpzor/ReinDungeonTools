@@ -14,11 +14,11 @@ jobs:
       - name: Set up environment
         run: |
           export ADDON_NAME=$(basename *.toc .toc)
-          export ARCHIVE_NAME=$ADDON_NAME_$GITHUB_REF_NAME.zip
+          export ARCHIVE_NAME=${ADDON_NAME}_${GITHUB_REF_NAME}.zip
 
           echo "ADDON_NAME=$ADDON_NAME" >> $GITHUB_ENV
           echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
-          
+
           echo "ARCHIVE_NAME: $ARCHIVE_NAME"
 
       - name: Package
