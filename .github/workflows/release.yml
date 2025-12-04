@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*'
+
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up environment variables
+        run: |
+          PRIMARY_DIR=$(head -n 1 .releaseinfo/base)
+          TOC_FILE=$(find "$PRIMARY_DIR" -maxdepth 1 -name "*.toc" | head -n 1)
+
+          ADDON_NAME=$(basename "$TOC_FILE" .toc)
+          ARCHIVE_NAME="${ADDON_NAME}_${GITHUB_REF_NAME}.zip"
+
+          echo "ADDON_NAME=$ADDON_NAME" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=$ARCHIVE_NAME" >> $GITHUB_ENV
+          echo "PRIMARY_DIR=$PRIMARY_DIR" >> $GITHUB_ENV
+
+      - name: Package addons
+        run: |
+          mkdir -p artifacts/${ADDON_NAME}
+          rsync -a --exclude-from='.releaseinfo/ignore' --exclude='artifacts/' . artifacts/${ADDON_NAME}/
+          cd artifacts/${PRIMARY_DIR}
+          zip -r "${GITHUB_WORKSPACE}/${ARCHIVE_NAME}" .
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ARCHIVE_NAME }}
+          prerelease: ${{ startsWith(github.ref_name, 'v') && contains(github.ref_name, '-') }}
+
