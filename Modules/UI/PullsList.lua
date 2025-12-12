@@ -385,7 +385,14 @@ function UI:UpdateTotalForces()
 
     local maxBarWidth = 238
     local barWidth = math.min(maxBarWidth, (percentage / 100) * maxBarWidth)
-    totalForcesLabel.fill:SetWidth(barWidth)
+    
+    if barWidth < 1 then
+        totalForcesLabel.fill:Hide()
+        totalForcesLabel.fill:SetWidth(1)
+    else
+        totalForcesLabel.fill:Show()
+        totalForcesLabel.fill:SetWidth(barWidth)
+    end
     
     -- Update text: "50.5/100 (50.5%)"
     totalForcesLabel.text:SetText(string.format("%.1f/%.0f (%.1f%%)", currentCount, requiredCount, percentage))
