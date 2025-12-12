@@ -200,10 +200,10 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         scrollUpButton:SetPushedTexture(pushedTex)
 
         local disabledTex = scrollUpButton:CreateTexture(nil, "ARTWORK")
-        disabledTex:SetSize(unpack(scrollbarAtlas.sizeEnd))
-        disabledTex:SetPoint("BOTTOM")
+        disabledTex:SetAllPoints()
         disabledTex:SetTexture(scrollbarAtlas.texture)
-        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up-end"]))
+        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-up"]))
+        disabledTex:SetVertexColor(0.3, 0.3, 0.3, 1)        
         scrollUpButton:SetDisabledTexture(disabledTex)
     end
     
@@ -229,10 +229,10 @@ function UIHelpers:StyleScrollBar(scrollFrame)
         scrollDownButton:SetPushedTexture(pushedTex)
 
         local disabledTex = scrollDownButton:CreateTexture(nil, "ARTWORK")
-        disabledTex:SetSize(unpack(scrollbarAtlas.sizeEnd))
-        disabledTex:SetPoint("TOP")
+        disabledTex:SetAllPoints()
         disabledTex:SetTexture(scrollbarAtlas.texture)
-        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down-end"]))
+        disabledTex:SetTexCoord(unpack(scrollbarAtlas.arrows["arrow-down"]))
+        disabledTex:SetVertexColor(0.3, 0.3, 0.3, 1)
         scrollDownButton:SetDisabledTexture(disabledTex)
     end
     

@@ -270,7 +270,6 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
         self:SetupMobIconHandlers(button)
     end
 
-    -- Reset parent and position
     button:SetParent(parent)
     button:ClearAllPoints()
 
@@ -283,15 +282,14 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     button.mobInfo = mobInfo
     button.iconScale = scale
 
-    -- Update icon texture and size
     local icon = button.icon
     local scaledIconSize = MOB_ICON_SIZE * scale
     icon:SetSize(scaledIconSize, scaledIconSize)
 
     local iconSet = false
-    
+
     if mobInfo.displayIcon == "portrait" and mobInfo.creatureId then
-        -- Portrait support not available: SetPortraitTexture requires unit tokens, not creature IDs
+        -- Portraits not available. Need SetPortraitTextureFromCreatureDisplayID backport
         iconSet = false
     elseif mobInfo.displayIcon and mobInfo.displayIcon ~= "portrait" and mobInfo.displayIcon ~= "" then
         SetPortraitToTexture(icon, mobInfo.displayIcon)
@@ -304,22 +302,18 @@ function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
         SetPortraitToTexture(icon, FALLBACK_ICON)
     end
 
-    -- Update background size
     local bg = button.bg
     local bgSize = scaledSize * 1.20
     bg:SetSize(bgSize, bgSize)
 
-    -- Update highlight size
     local highlight = button.highlight
     local scaledHighlightSize = MOB_HIGHLIGHT_SIZE * scale
     highlight:SetSize(scaledHighlightSize, scaledHighlightSize)
 
-    -- Update glow border size
     local glowBorder = button.glowBorder
     local scaledGlowSize = MOB_PACK_HIGHLIGHT_SIZE * scale
     glowBorder:SetSize(scaledGlowSize, scaledGlowSize)
 
-    -- Show the button
     button:Show()
 
     return button
@@ -484,7 +478,6 @@ local function CalculateConvexHull(points)
         end
     end
 
-    -- Jarvis march: wrap around the points
     local hull = {}
     local currentIdx = lowerLeft
     local finalIdx = 1
@@ -596,7 +589,6 @@ local function ExpandPolygonCircular(poly, numCirclePoints)
         local y = poly[i].y
         local scale = poly[i].scale or 1.0
 
-        -- Radius scales with the mob icon scale
         local r = scale * 12
 
         -- Adjust number of circle points based on scale (larger mobs = more points for smoothness)
@@ -620,7 +612,6 @@ local function ExpandPolygonCircular(poly, numCirclePoints)
 end
 
 local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
-    -- Hide and clear existing border textures for this pull
     if pullBorders[pullNum] then
         LibGraph:HideLines(pullBorders[pullNum])
     end
@@ -663,10 +654,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         return
     end
 
-    -- Two-pass approach:
-    -- 1. Expand each point into a circle of points (higher value = smoother but more expensive)
-    -- 2. Calculate convex hull of all expanded points
-    -- 3. Calculate convex hull again for final smoothing
     local expanded = ExpandPolygonCircular(points, 30)
     if not expanded then
         return
@@ -707,7 +694,6 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
         local p1 = hull[i]
         local p2 = hull[(i % #hull) + 1]  -- Wrap around to first point
 
-        -- Hull coordinates are TOPLEFT-relative offsets from GetPoint() (X positive, Y negative)
         local x1 = p1.x + mapOffsetX
         local y1 = canvasHeight + (p1.y + mapOffsetY)
         local x2 = p2.x + mapOffsetX

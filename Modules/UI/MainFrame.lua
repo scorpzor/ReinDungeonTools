@@ -1,23 +1,19 @@
 -- Modules/UI/MainFrame.lua
--- Main addon window creation and management
+-- Main addon window creation
 
 local RDT = _G.RDT
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
--- UI namespace
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
--- Local references to modules
 local UIHelpers = RDT.UIHelpers
 
--- UI Constants
-local FRAME_WIDTH, FRAME_HEIGHT = 1454, 820
+local FRAME_WIDTH, FRAME_HEIGHT = 1454, 812
 local SIDEBAR_WIDTH = 300
 local BUTTON_PANEL_HEIGHT = 140
 local FONT_SIZE = 12
 
--- Local frame references
 local mainFrame
 local mapContainer
 local mapTexture
@@ -27,10 +23,6 @@ local versionText
 local dungeonDropdown
 local routeDropdown
 local buttonContainer
-
---------------------------------------------------------------------------------
--- Main Frame Creation
---------------------------------------------------------------------------------
 
 function UI:CreateMainFrame()
     if mainFrame then
@@ -65,18 +57,26 @@ function UI:CreateMainFrame()
     local titleBg = mainFrame:CreateTexture(nil, "ARTWORK")
     titleBg:SetPoint("TOPLEFT", 2, -2)
     titleBg:SetPoint("TOPRIGHT", -2, -2)
-    titleBg:SetHeight(36)
+    titleBg:SetHeight(30)
     titleBg:SetColorTexture(0.05, 0.05, 0.05, 0.95)
     mainFrame.titleBg = titleBg
 
     titleText = mainFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     titleText:SetPoint("CENTER", titleBg, "CENTER", 0, 0)
-    titleText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+    titleText:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
     titleText:SetText(L["TITLE"])
     titleText:SetJustifyH("CENTER")
     titleText:SetTextColor(1, 1, 1, 1)
 
+    --local logo = mainFrame:CreateTexture(nil, "OVERLAY")
+    --logo:SetSize(18, 18)
+    --logo:SetPoint("RIGHT", titleText, "LEFT", -5, 0)
+    --logo:SetTexture("")
+    --mainFrame.logo = logo
+
     local closeButton = UIHelpers:CreateSquareCloseButton(mainFrame)
+    closeButton:ClearAllPoints()
+    closeButton:SetPoint("TOPRIGHT", -5, -5)
     closeButton:SetScript("OnClick", function() mainFrame:Hide() end)
 
     self:CreateDungeonDropdown(mainFrame)
@@ -84,8 +84,7 @@ function UI:CreateMainFrame()
     self:CreateMapContainer(mainFrame)
     self:CreateButtonContainer(UI.sidebar)
     self:CreatePullsPanel(UI.sidebar)
-    
-    -- Bottom bar background (matches main window)
+
     local bottomBg = mainFrame:CreateTexture(nil, "ARTWORK")
     bottomBg:SetPoint("BOTTOMLEFT", 2, 2)
     bottomBg:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -109,10 +108,6 @@ function UI:CreateMainFrame()
     return mainFrame
 end
 
---------------------------------------------------------------------------------
--- Dungeon Dropdown
---------------------------------------------------------------------------------
-
 function UI:CreateDungeonDropdown(parent)
     local currentDungeon = RDT.db and RDT.db.profile.currentDungeon or "Test Dungeon"
 
@@ -120,8 +115,8 @@ function UI:CreateDungeonDropdown(parent)
         parent = parent,
         name = "RDT_DungeonDropdown",
         point = "TOPLEFT",
-        x = 5,
-        y = -8,
+        x = 6,
+        y = -5,
         width = 220,
         height = 24,
         menuHeight = 200,
@@ -149,7 +144,6 @@ function UI:CreateDungeonDropdown(parent)
     end)
 end
 
---- Populate the dungeon dropdown with current dungeons
 function UI:PopulateDungeonDropdown()
     if not dungeonDropdown or not RDT.Data then return end
     
@@ -169,7 +163,6 @@ function UI:PopulateDungeonDropdown()
     dungeonDropdown:SetItems(items)
 end
 
---- Update the dungeon dropdown
 function UI:UpdateDungeonDropdown()
     if not dungeonDropdown or not RDT.db or not RDT.db.profile then return end
     local activeDungeon = RDT.db.profile.currentDungeon
@@ -177,10 +170,6 @@ function UI:UpdateDungeonDropdown()
         dungeonDropdown:SetText(activeDungeon)
     end
 end
-
---------------------------------------------------------------------------------
--- Route Dropdown
---------------------------------------------------------------------------------
 
 function UI:CreateRouteDropdown(container)
     routeDropdown = UIHelpers:CreateSquareDropdown({
@@ -302,7 +291,6 @@ function UI:CreateRouteDropdown(container)
     return newRouteBtn
 end
 
---- Populate the route dropdown with current routes
 function UI:PopulateRouteDropdown()
     if not routeDropdown or not RDT.RouteManager then return end
     
@@ -324,7 +312,6 @@ function UI:PopulateRouteDropdown()
     routeDropdown:SetItems(items)
 end
 
---- Update the route dropdown text to show current route
 function UI:UpdateRouteDropdown()
     if not routeDropdown or not RDT.RouteManager then return end
     
@@ -337,7 +324,6 @@ function UI:UpdateRouteDropdown()
     end
 end
 
---- Refresh all UI elements after route change
 function UI:RefreshUI()
     if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.LoadDungeon then
         RDT:LoadDungeon(RDT.db.profile.currentDungeon)
@@ -346,7 +332,7 @@ end
 
 function UI:CreateSidebar(parent)
     local sidebar = CreateFrame("Frame", "RDT_Sidebar", parent)
-    sidebar:SetPoint("TOPRIGHT", -5, -42)
+    sidebar:SetPoint("TOPRIGHT", -5, -34)
     sidebar:SetPoint("BOTTOMRIGHT", -5, 18)
     sidebar:SetWidth(SIDEBAR_WIDTH)
     
@@ -359,7 +345,7 @@ end
 
 function UI:CreateMapContainer(parent)
     mapContainer = CreateFrame("Frame", "RDT_MapContainer", parent)
-    mapContainer:SetPoint("TOPLEFT", 5, -42)
+    mapContainer:SetPoint("TOPLEFT", 5, -34)
     mapContainer:SetPoint("BOTTOMRIGHT", UI.sidebar, "BOTTOMLEFT", -4, 0)
     mapContainer:SetBackdrop(nil)
 
@@ -373,7 +359,6 @@ function UI:CreateMapContainer(parent)
     UI.mapContainer = mapContainer
     UI.mapTexture = mapTexture
 
-    -- Create map viewport for zoom/pan support (access RDT.MapViewport directly)
     if RDT.MapViewport then
         UI.mapViewport = RDT.MapViewport:Create(mapContainer, mapTexture)
         UI.mapCanvas = RDT.MapViewport:GetCanvas(UI.mapViewport)
@@ -381,10 +366,6 @@ function UI:CreateMapContainer(parent)
         RDT:PrintError("MapViewport module not loaded")
     end
 end
-
---------------------------------------------------------------------------------
--- Tile-based Map Rendering
---------------------------------------------------------------------------------
 
 function UI:ClearMapTiles()
     for _, tile in pairs(mapTiles) do
@@ -465,7 +446,6 @@ function UI:LoadSingleTextureMap(texturePath)
 
     self:ClearMapTiles()
 
-    -- Anchor texture to canvas (for zoom support) or container (fallback)
     local anchorFrame = self.mapCanvas or mapContainer
     mapTexture:ClearAllPoints()
     mapTexture:SetPoint("TOPLEFT", anchorFrame, "TOPLEFT", 1, -1)
@@ -524,10 +504,6 @@ function UI:GetMapContainer()
     return mapContainer
 end
 
---------------------------------------------------------------------------------
--- Pulls Panel (created by PullsList.lua)
---------------------------------------------------------------------------------
-
 function UI:CreatePullsPanel(parent)
     local pullsPanel = CreateFrame("Frame", "RDT_PullsPanel", parent)
     pullsPanel:SetPoint("TOPLEFT", buttonContainer, "BOTTOMLEFT", 0, -4)
@@ -535,26 +511,12 @@ function UI:CreatePullsPanel(parent)
     
     UI.pullsPanel = pullsPanel
     
-    pullsPanel:SetBackdrop({
-        bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = false,
-        edgeSize = 1,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 }
-    })
-    pullsPanel:SetBackdropColor(0.0, 0.0, 0.0, 0.9)
-    pullsPanel:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
-
     UI.pullsPanel = pullsPanel
     
     if UI.InitializePullsList then
         UI:InitializePullsList(pullsPanel)
     end
 end
-
---------------------------------------------------------------------------------
--- Button Container
---------------------------------------------------------------------------------
 
 function UI:CreateButtonContainer(parent)
     buttonContainer = CreateFrame("Frame", "RDT_ButtonContainer", parent)
@@ -687,10 +649,6 @@ function UI:CreateButtonContainer(parent)
     UI.showChampionsCheck = showChampionsCheck
 end
 
---------------------------------------------------------------------------------
--- Title and Display Updates
---------------------------------------------------------------------------------
-
 function UI:UpdateTitle(dungeonName)
     if not titleText then return end
     
@@ -701,7 +659,6 @@ end
 -- Frame Visibility
 --------------------------------------------------------------------------------
 
---- Show the main frame
 function UI:Show()
     if mainFrame then
         mainFrame:Show()
@@ -710,7 +667,6 @@ function UI:Show()
     end
 end
 
---- Hide the main frame
 function UI:Hide()
     if mainFrame then
         mainFrame:Hide()
@@ -736,7 +692,6 @@ end
 -- Frame Position Management
 --------------------------------------------------------------------------------
 
---- Save current frame position to database
 function UI:SavePosition()
     if not mainFrame or not RDT.db then return end
     
@@ -751,7 +706,6 @@ function UI:SavePosition()
     RDT:DebugPrint(string.format("Saved window position: %s, %d, %d", point, xOfs, yOfs))
 end
 
---- Restore frame position from database
 function UI:RestorePosition()
     if not mainFrame or not RDT.db then return end
     
@@ -763,7 +717,6 @@ function UI:RestorePosition()
     end
 end
 
---- Reset frame to center of screen
 function UI:ResetPosition()
     if not mainFrame then return end
     

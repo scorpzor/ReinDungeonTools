@@ -4,74 +4,122 @@
 local RDT = _G.RDT
 local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 
--- UI namespace
 RDT.UI = RDT.UI or {}
 local UI = RDT.UI
 
 local UIHelpers = RDT.UIHelpers
 
--- Local references
 local pullsPanel
 local pullsScrollFrame
 local pullsScrollChild
 local totalForcesLabel
-local fontStringPool
-local pullButtons = {} -- Store pull entry buttons
 
--- Constants
 local PULLS_PANEL_WIDTH = 250
 local PULLS_PANEL_HEIGHT = 600
 
---------------------------------------------------------------------------------
--- FontString Pool for Efficient Rendering
---------------------------------------------------------------------------------
+local pullEntryPool = {}
+local activePullEntries = {}
 
---- Create a pool of reusable FontStrings
--- @param parent Frame Parent frame for the FontStrings
--- @return table Pool object with Acquire/Release methods
-local function CreateFontStringPool(parent)
-    local pool = {
-        strings = {},           -- Available FontStrings
-        activeStrings = {},     -- Currently in-use FontStrings
-        parent = parent,
-        layer = "OVERLAY",
-        fontObject = "GameFontHighlightSmall",
-    }
+--- Get a pull entry frame from the pool or create a new one
+-- @param parent Frame Parent frame
+-- @return Frame The pull entry frame
+function UI:GetPullEntry(parent)
+    local entry = table.remove(pullEntryPool)
     
-    function pool:Acquire()
-        local fs = tremove(self.strings)
-        if not fs then
-            fs = self.parent:CreateFontString(nil, self.layer, self.fontObject)
-            fs.pool = self
-        end
-        fs:Show()
-        tinsert(self.activeStrings, fs)
-        return fs
-    end
-    
-    function pool:Release(fs)
-        if not fs then return end
-        fs:Hide()
-        fs:ClearAllPoints()
-        fs:SetText("")
+    if not entry then
+        entry = CreateFrame("Button", nil, parent)
+        entry:SetHeight(34)
         
-        for i, f in ipairs(self.activeStrings) do
-            if f == fs then
-                tremove(self.activeStrings, i)
-                break
+        local bgTexture = entry:CreateTexture(nil, "BACKGROUND")
+        bgTexture:SetAllPoints(entry)
+        bgTexture:SetColorTexture(0, 0, 0, 0)
+        entry.bgTexture = bgTexture
+
+        local leftGradient = entry:CreateTexture(nil, "BORDER")
+        leftGradient:SetPoint("TOPLEFT", entry, "TOPLEFT", 0, 0)
+        leftGradient:SetPoint("BOTTOMLEFT", entry, "BOTTOMLEFT", 0, 0)
+        leftGradient:SetWidth(20)
+        leftGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
+        leftGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0.5, 0, 0, 0, 0)
+        entry.leftGradient = leftGradient
+
+        local rightGradient = entry:CreateTexture(nil, "BORDER")
+        rightGradient:SetPoint("TOPRIGHT", entry, "TOPRIGHT", 0, 0)
+        rightGradient:SetPoint("BOTTOMRIGHT", entry, "BOTTOMRIGHT", 0, 0)
+        rightGradient:SetWidth(20)
+        rightGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
+        rightGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0, 0, 0, 0, 0.5)
+        entry.rightGradient = rightGradient
+
+        local selectionOverlay = entry:CreateTexture(nil, "OVERLAY")
+        selectionOverlay:SetAllPoints(entry)
+        selectionOverlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+        selectionOverlay:SetBlendMode("ADD")
+        selectionOverlay:SetAlpha(0)
+        entry.selectionOverlay = selectionOverlay
+
+        local pullLabel = entry:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        pullLabel:SetPoint("LEFT", entry, "LEFT", 8, 0)
+        pullLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+        pullLabel:SetJustifyH("LEFT")
+        entry.pullLabel = pullLabel
+
+        local packList = entry:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        packList:SetPoint("CENTER", entry, "CENTER", 0, 0)
+        packList:SetWidth(120)
+        packList:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
+        packList:SetJustifyH("CENTER")
+        entry.packList = packList
+        
+        local percentLabel = entry:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        percentLabel:SetPoint("RIGHT", entry, "RIGHT", -8, 0)
+        percentLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+        percentLabel:SetJustifyH("RIGHT")
+        entry.percentLabel = percentLabel
+
+        entry:SetScript("OnEnter", function(self)
+            if UI.HighlightPull then
+                UI:HighlightPull(self.pullNum, true)
             end
-        end
+        end)
         
-        tinsert(self.strings, fs)
+        entry:SetScript("OnLeave", function(self)
+            if UI.HighlightPull then
+                UI:HighlightPull(self.pullNum, false)
+            end
+        end)
+        
+        entry:SetScript("OnClick", function(self, button)
+            if button == "LeftButton" then
+                RDT.State.currentPull = self.pullNum
+                if RDT.UI and RDT.UI.UpdatePullList then
+                    RDT.UI:UpdatePullList()
+                end
+                if RDT.UI and RDT.UI.UpdateLabels then
+                    RDT.UI:UpdateLabels()
+                end
+                RDT:Print(string.format("Switched to pull #%d", self.pullNum))
+            end
+        end)
+        entry:RegisterForClicks("LeftButtonUp")
     end
     
-    function pool:ReleaseAll()
-        for i = #self.activeStrings, 1, -1 do
-            self:Release(self.activeStrings[i])
-        end
-    end
+    entry:SetParent(parent)
+    entry:Show()
+    tinsert(activePullEntries, entry)
     
-    return pool
+    return entry
+end
+
+--- Release all active pull entries back to the pool
+function UI:ReleasePullEntries()
+    for _, entry in ipairs(activePullEntries) do
+        entry:Hide()
+        entry:ClearAllPoints()
+        entry:SetParent(nil)
+        table.insert(pullEntryPool, entry)
+    end
+    wipe(activePullEntries)
 end
 
 --------------------------------------------------------------------------------
@@ -87,15 +135,12 @@ function UI:InitializePullsList(panel)
     progressBarFrame:SetPoint("TOP", 0, -8)
     progressBarFrame:SetSize(240, 24)
 
-    progressBarFrame.bg = progressBarFrame:CreateTexture(nil, "BACKGROUND")
-    progressBarFrame.bg:SetAllPoints()
-    progressBarFrame.bg:SetColorTexture(0.1, 0.1, 0.1, 0.8)
-
-    progressBarFrame.border = progressBarFrame:CreateTexture(nil, "BORDER")
-    progressBarFrame.border:SetAllPoints()
-    progressBarFrame.border:SetColorTexture(0.3, 0.3, 0.3, 1)
-    progressBarFrame.bg:SetPoint("TOPLEFT", 1, -1)
-    progressBarFrame.bg:SetPoint("BOTTOMRIGHT", -1, 1)
+    progressBarFrame:SetBackdrop({
+        edgeFile = "Interface\\Buttons\\WHITE8X8",
+        edgeSize = 1,
+        bgFile = "Interface\\Buttons\\WHITE8X8", 
+    })
+    progressBarFrame:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
 
     progressBarFrame.fill = progressBarFrame:CreateTexture(nil, "ARTWORK")
     progressBarFrame.fill:SetPoint("LEFT", 1, 0)
@@ -128,7 +173,18 @@ function UI:InitializePullsList(panel)
         RDT.UIHelpers:StyleScrollBar(pullsScrollFrame)
     end
 
-    fontStringPool = CreateFontStringPool(pullsScrollChild)
+    --local pullsBg = pullsPanel:CreateTexture(nil, "BACKGROUND")
+    --pullsBg:SetPoint("TOPLEFT", pullsScrollFrame, "TOPLEFT", 0, 0)
+    --pullsBg:SetPoint("BOTTOMRIGHT", pullsPanel, "BOTTOMRIGHT", 0, 0)
+    --pullsBg:SetColorTexture(0, 0, 0, 0.5)
+
+    local emptyLabel = pullsScrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    emptyLabel:SetPoint("TOP", 0, -20)
+    emptyLabel:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
+    emptyLabel:SetText(L["NO_PULLS"])
+    emptyLabel:SetTextColor(0.5, 0.5, 0.5)
+    emptyLabel:Hide()
+    UI.emptyPullsLabel = emptyLabel
     
     RDT:DebugPrint("Pulls list panel initialized")
 end
@@ -139,18 +195,16 @@ end
 
 --- Update the entire pull list display
 function UI:UpdatePullList()
-    if not RDT.State.currentRoute or not pullsScrollChild or not fontStringPool then 
+    if not RDT.State.currentRoute or not pullsScrollChild then 
         return 
     end
     
     RDT:DebugPrint("Updating pull list")
+
+    self:ReleasePullEntries()
     
-    -- Release all FontStrings back to pool
-    fontStringPool:ReleaseAll()
-    
-    -- Hide all pull buttons
-    for _, btn in pairs(pullButtons) do
-        btn:Hide()
+    if UI.emptyPullsLabel then
+        UI.emptyPullsLabel:Hide()
     end
     
     pullsScrollChild:SetHeight(1)
@@ -161,11 +215,9 @@ function UI:UpdatePullList()
         self:ShowEmptyMessage()
         return
     end
-    
-    -- Get all pulls in use
+
     local pulls = RDT.RouteManager:GetUsedPulls(RDT.State.currentRoute.pulls)
-    
-    -- Always include the current pull if it's not already in the list
+
     local currentPullExists = false
     for _, pullNum in ipairs(pulls) do
         if pullNum == RDT.State.currentPull then
@@ -188,15 +240,11 @@ function UI:UpdatePullList()
         return
     end
     
-    -- Build pull entries
     for _, pullNum in ipairs(pulls) do
-        yOffset = self:RenderPullEntry(pullNum, yOffset)
+        yOffset = self:ConfigurePullEntry(pullNum, yOffset)
     end
-
-    -- Set scroll child height
     pullsScrollChild:SetHeight(math.max(math.abs(yOffset) + 10, PULLS_PANEL_HEIGHT - 50))
 
-    -- Update total forces display
     self:UpdateTotalForces()
 
     if self.UpdateLabels then
@@ -204,21 +252,18 @@ function UI:UpdatePullList()
     end
 end
 
---- Render a single pull entry
+--- Configure a single pull entry from the pool
 -- @param pullNum number Pull number to render
 -- @param yOffset number Current Y offset for positioning
 -- @return number New Y offset after rendering
-function UI:RenderPullEntry(pullNum, yOffset)
-    -- Get packs in this pull
+function UI:ConfigurePullEntry(pullNum, yOffset)
     local packs = RDT.RouteManager:GetPacksInPull(pullNum)
-    
-    -- Show empty pulls if it's the current pull (for better UX)
+
     local isCurrentPull = (pullNum == RDT.State.currentPull)
     if #packs == 0 and not isCurrentPull then
         return yOffset
     end
-    
-    -- Calculate total forces for this pull
+
     local totalCount = 0
     local packDetails = {}
     
@@ -232,138 +277,43 @@ function UI:RenderPullEntry(pullNum, yOffset)
             })
         end
     end
-    
-    -- Sort by pack ID
+
     table.sort(packDetails, function(a, b) return a.id < b.id end)
-    
-    local startYOffset = yOffset
-    local entryHeight = 34  -- Fixed height for each pull entry
-    
-    -- Get pull color
+
+    local entryHeight = 34
     local r, g, b = unpack(UIHelpers:GetPullColor(pullNum))
     if isCurrentPull then
-        -- Brighten the text color for selected pull
         r, g, b = math.min(1, r * 1.3), math.min(1, g * 1.3), math.min(1, b * 1.3)
     end
     
-    -- Create/get the button first (so we can anchor text to it)
-    local pullButton = pullButtons[pullNum]
+    local entry = self:GetPullEntry(pullsScrollChild)
+    entry.pullNum = pullNum
     
-    if not pullButton then
-        pullButton = CreateFrame("Button", "RDT_PullEntry" .. pullNum, pullsScrollChild)
-        pullButtons[pullNum] = pullButton
-        
-        -- Create background texture for this pull
-        local bgTexture = pullButton:CreateTexture(nil, "BACKGROUND")
-        bgTexture:SetAllPoints(pullButton)
-        bgTexture:SetColorTexture(0, 0, 0, 0)
-        pullButton.bgTexture = bgTexture
-
-        -- Create edge gradient overlays (vignette effect)
-        -- Left edge gradient
-        local leftGradient = pullButton:CreateTexture(nil, "BORDER")
-        leftGradient:SetPoint("TOPLEFT", pullButton, "TOPLEFT", 0, 0)
-        leftGradient:SetPoint("BOTTOMLEFT", pullButton, "BOTTOMLEFT", 0, 0)
-        leftGradient:SetWidth(20)
-        leftGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
-        leftGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0.5, 0, 0, 0, 0)
-        pullButton.leftGradient = leftGradient
-
-        -- Right edge gradient
-        local rightGradient = pullButton:CreateTexture(nil, "BORDER")
-        rightGradient:SetPoint("TOPRIGHT", pullButton, "TOPRIGHT", 0, 0)
-        rightGradient:SetPoint("BOTTOMRIGHT", pullButton, "BOTTOMRIGHT", 0, 0)
-        rightGradient:SetWidth(20)
-        rightGradient:SetTexture("Interface\\Buttons\\WHITE8X8")
-        rightGradient:SetGradientAlpha("HORIZONTAL", 0, 0, 0, 0, 0, 0, 0, 0.5)
-        pullButton.rightGradient = rightGradient
-
-        -- Selection overlay (for currently selected pull)
-        local selectionOverlay = pullButton:CreateTexture(nil, "OVERLAY")
-        selectionOverlay:SetAllPoints(pullButton)
-        selectionOverlay:SetTexture("Interface\\Buttons\\WHITE8X8")
-        selectionOverlay:SetBlendMode("ADD")  -- Additive blending for glow effect
-        selectionOverlay:SetAlpha(0)  -- Start hidden
-        pullButton.selectionOverlay = selectionOverlay
-
-        -- Set up hover handlers with tooltip
-        pullButton:SetScript("OnEnter", function(self)
-            if UI.HighlightPull then
-                UI:HighlightPull(self.pullNum, true)
-            end
-            
-            -- Show tooltip
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText("Pull #" .. self.pullNum, 1, 1, 1)
-            GameTooltip:AddLine("Click to switch to this pull", 0.7, 0.7, 0.7)
-            if self.pullNum == RDT.State.currentPull then
-                GameTooltip:AddLine("|cFF00FF00Currently active|r", 0, 1, 0)
-            end
-            GameTooltip:Show()
-        end)
-        
-        pullButton:SetScript("OnLeave", function(self)
-            if UI.HighlightPull then
-                UI:HighlightPull(self.pullNum, false)
-            end
-            GameTooltip:Hide()
-        end)
-        
-        -- Click to switch to this pull
-        pullButton:SetScript("OnClick", function(self, button)
-            if button == "LeftButton" then
-                RDT.State.currentPull = self.pullNum
-                if RDT.UI and RDT.UI.UpdatePullList then
-                    RDT.UI:UpdatePullList()
-                end
-                if RDT.UI and RDT.UI.UpdateLabels then
-                    RDT.UI:UpdateLabels()
-                end
-                RDT:Print(string.format("Switched to pull #%d", self.pullNum))
-            end
-        end)
-        pullButton:RegisterForClicks("LeftButtonUp")
-    end
+    entry:ClearAllPoints()
+    entry:SetPoint("TOPLEFT", pullsScrollChild, "TOPLEFT", 0, yOffset)
+    entry:SetPoint("TOPRIGHT", pullsScrollChild, "TOPRIGHT", 0, yOffset)
     
-    -- Position and size the button (full width - anchor to both sides)
-    pullButton.pullNum = pullNum
-    pullButton:SetHeight(entryHeight)
-    pullButton:ClearAllPoints()
-    pullButton:SetPoint("TOPLEFT", pullsScrollChild, "TOPLEFT", 0, startYOffset)
-    pullButton:SetPoint("TOPRIGHT", pullsScrollChild, "TOPRIGHT", 0, startYOffset)
-    
-    -- Update background color
-    if pullButton.bgTexture then
+    if entry.bgTexture then
         local bgR, bgG, bgB = unpack(UIHelpers:GetPullColor(pullNum))
-        -- Selected pull: bright full background; Non-selected: medium fade
         local fadeAlpha = isCurrentPull and 0.55 or 0.25
-        pullButton.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
+        entry.bgTexture:SetColorTexture(bgR, bgG, bgB, fadeAlpha)
     end
-
-    -- Update selection overlay
-    if pullButton.selectionOverlay then
+    
+    if entry.selectionOverlay then
         if isCurrentPull then
             local overlayR, overlayG, overlayB = unpack(UIHelpers:GetPullColor(pullNum))
-            pullButton.selectionOverlay:SetVertexColor(overlayR, overlayG, overlayB)
-            pullButton.selectionOverlay:SetAlpha(0.25)  -- Subtle additive glow
+            entry.selectionOverlay:SetVertexColor(overlayR, overlayG, overlayB)
+            entry.selectionOverlay:SetAlpha(0.25)
         else
-            pullButton.selectionOverlay:SetAlpha(0)  -- Hidden
+            entry.selectionOverlay:SetAlpha(0)
         end
     end
-
-    pullButton:Show()
     
-    -- Now add text elements anchored to the button
-    -- Left: Pull number
-    local pullLabel = fontStringPool:Acquire()
-    pullLabel:SetParent(pullButton)
-    pullLabel:SetPoint("LEFT", pullButton, "LEFT", 8, 0)
-    pullLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
-    pullLabel:SetJustifyH("LEFT")
-    pullLabel:SetText(string.format("|cFFFFFFFF%s %d|r", L["PULL"], pullNum))
-    pullLabel:SetTextColor(r, g, b)
+    if entry.pullLabel then
+        entry.pullLabel:SetText(string.format("|cFFFFFFFF%s %d|r", L["PULL"], pullNum))
+        entry.pullLabel:SetTextColor(r, g, b)
+    end
     
-    -- Center: Pack list or "empty"
     local centerText
     if #packs == 0 then
         centerText = "|cFF888888empty|r"
@@ -375,22 +325,16 @@ function UI:RenderPullEntry(pullNum, yOffset)
         centerText = "(" .. table.concat(packIds, ", ") .. ")"
     end
     
-    local packList = fontStringPool:Acquire()
-    packList:SetParent(pullButton)
-    packList:SetPoint("CENTER", pullButton, "CENTER", 0, 0)
-    packList:SetWidth(120)  -- Fixed width for center section
-    packList:SetFont("Fonts\\FRIZQT__.TTF", 10, "")
-    packList:SetJustifyH("CENTER")
-    packList:SetText(centerText)
-    packList:SetTextColor(0.8, 0.8, 0.8)
+    if entry.packList then
+        entry.packList:SetText(centerText)
+        entry.packList:SetTextColor(0.8, 0.8, 0.8)
+    end
     
-    -- Right: Percentage (calculated based on dungeon's required count)
     local percentText
     if #packs == 0 then
         percentText = "(0%)"
     else
-        -- Get required count for this dungeon
-        local requiredCount = 100  -- Default
+        local requiredCount = 100
         if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.Data then
             requiredCount = RDT.Data:GetDungeonRequiredCount(RDT.db.profile.currentDungeon)
         end
@@ -399,29 +343,22 @@ function UI:RenderPullEntry(pullNum, yOffset)
         percentText = string.format("(%.1f%%)", percentage)
     end
     
-    local percentLabel = fontStringPool:Acquire()
-    percentLabel:SetParent(pullButton)
-    percentLabel:SetPoint("RIGHT", pullButton, "RIGHT", -8, 0)
-    percentLabel:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
-    percentLabel:SetJustifyH("RIGHT")
-    percentLabel:SetText(percentText)
-    percentLabel:SetTextColor(r, g, b)
+    if entry.percentLabel then
+        entry.percentLabel:SetText(percentText)
+        entry.percentLabel:SetTextColor(r, g, b)
+    end
     
-    -- Update yOffset for next entry
-    yOffset = yOffset - entryHeight - 2  -- 1px spacing
+    yOffset = yOffset - entryHeight - 2
     
     return yOffset
 end
 
---- Show "No pulls defined" message
 function UI:ShowEmptyMessage()
     pullsScrollChild:SetHeight(1)
     
-    local noPullsText = fontStringPool:Acquire()
-    noPullsText:SetPoint("TOP", 0, -20)
-    noPullsText:SetFont("Fonts\\FRIZQT__.TTF", 12, "")
-    noPullsText:SetText(L["NO_PULLS"])
-    noPullsText:SetTextColor(0.5, 0.5, 0.5)
+    if UI.emptyPullsLabel then
+        UI.emptyPullsLabel:Show()
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -430,27 +367,22 @@ end
 
 --- Update the total forces counter
 function UI:UpdateTotalForces()
-    -- Safety check: ensure progress bar is initialized
     if not totalForcesLabel or not totalForcesLabel.fill or not totalForcesLabel.text then 
         return 
     end
-    
-    -- Get current count
+
     local currentCount = 0
     if RDT.RouteManager then
         currentCount = RDT.RouteManager:CalculateTotalForces()
     end
-    
-    -- Get required count for this dungeon
-    local requiredCount = 100  -- Default
+
+    local requiredCount = 100
     if RDT.db and RDT.db.profile and RDT.db.profile.currentDungeon and RDT.Data then
         requiredCount = RDT.Data:GetDungeonRequiredCount(RDT.db.profile.currentDungeon)
     end
-    
-    -- Calculate percentage
+
     local percentage = (currentCount / requiredCount) * 100
-    
-    -- Calculate bar width (max 238 pixels to account for 1px border on each side)
+
     local maxBarWidth = 238
     local barWidth = math.min(maxBarWidth, (percentage / 100) * maxBarWidth)
     totalForcesLabel.fill:SetWidth(barWidth)
@@ -458,7 +390,6 @@ function UI:UpdateTotalForces()
     -- Update text: "50.5/100 (50.5%)"
     totalForcesLabel.text:SetText(string.format("%.1f/%.0f (%.1f%%)", currentCount, requiredCount, percentage))
     
-    -- Color the fill bar based on completion (100% is the goal)
     local r, g, b
     if percentage < 100 then
         r, g, b = 1.0, 0.3, 0.3  -- Red - under 100%
@@ -469,7 +400,8 @@ function UI:UpdateTotalForces()
     end
     totalForcesLabel.fill:SetColorTexture(r, g, b, 0.7)
     
-    -- Text color (always white with outline for readability)
+    totalForcesLabel:SetBackdropColor(r * 0.15, g * 0.15, b * 0.15, 0.6)
+
     totalForcesLabel.text:SetTextColor(1.0, 1.0, 1.0)
 end
 
@@ -482,44 +414,6 @@ function UI:GetTotalForces()
     return 0
 end
 
---------------------------------------------------------------------------------
--- Text Formatting Helpers
---------------------------------------------------------------------------------
-
---- Wrap text to fit within character limit
--- @param text string Text to wrap
--- @param maxChars number Maximum characters per line
--- @return string Wrapped text with newlines
-function UI:WrapText(text, maxChars)
-    local lines = {}
-    local currentLine = ""
-    
-    -- Split by commas (pack separators)
-    for segment in text:gmatch("[^,]+") do
-        segment = segment:gsub("^%s+", "") -- Trim leading space
-        
-        if #currentLine + #segment + 2 > maxChars then
-            if currentLine ~= "" then
-                tinsert(lines, currentLine)
-                currentLine = segment
-            else
-                tinsert(lines, segment)
-            end
-        else
-            if currentLine == "" then
-                currentLine = segment
-            else
-                currentLine = currentLine .. ", " .. segment
-            end
-        end
-    end
-    
-    if currentLine ~= "" then
-        tinsert(lines, currentLine)
-    end
-    
-    return table.concat(lines, "\n")
-end
 
 --------------------------------------------------------------------------------
 -- Statistics Display (Optional Enhancement)
@@ -556,16 +450,12 @@ end
 
 --- Cleanup pulls list resources
 function UI:CleanupPullsList()
-    if fontStringPool then
-        fontStringPool:ReleaseAll()
-    end
+    self:ReleasePullEntries()
     
-    -- Clean up pull buttons
-    for _, btn in pairs(pullButtons) do
-        btn:Hide()
-        btn:SetParent(nil)
+    for _, frame in ipairs(pullEntryPool) do
+        frame:Hide()
+        frame:SetParent(nil)
     end
-    wipe(pullButtons)
     
     RDT:DebugPrint("Pulls list cleaned up")
 end
