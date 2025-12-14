@@ -1,17 +1,14 @@
 -- DevTools.lua
--- Development and debugging tools for ReinDungeonTools
--- Provides utilities for easier content creation and debugging
+-- Development and debugging tools
 
 local RDT = _G.RDT
 if not RDT then
     error("RDT object not found! DevTools.lua must load after Core/Init.lua")
 end
 
--- DevTools namespace
 RDT.DevTools = {}
 local DevTools = RDT.DevTools
 
--- State
 local coordPickerEnabled = false
 local coordPickerFrame = nil
 local coordPickerLabel = nil
@@ -21,7 +18,6 @@ local crosshair = nil
 -- Coordinate Picker
 --------------------------------------------------------------------------------
 
---- Create visual indicator for coordinate picker mode
 local function CreateCoordPickerUI()
     if coordPickerFrame then return end
     
@@ -30,41 +26,37 @@ local function CreateCoordPickerUI()
         RDT:PrintError("Cannot create coordinate picker - UI not initialized")
         return
     end
-    
-    -- Status label (top-right corner of map)
+
     coordPickerLabel = UI.mapContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     coordPickerLabel:SetPoint("TOPRIGHT", UI.mapContainer, "TOPRIGHT", -10, -10)
     coordPickerLabel:SetText("|cFF00FF00Coordinate Picker Active|r\nClick map for coordinates")
     coordPickerLabel:SetJustifyH("RIGHT")
     coordPickerLabel:Hide()
-    
-    -- Crosshair indicator (follows mouse)
+
     crosshair = CreateFrame("Frame", "RDT_CoordPickerCrosshair", UI.mapContainer)
     crosshair:SetSize(32, 32)
     crosshair:SetFrameLevel(UI.mapContainer:GetFrameLevel() + 100)
-    
-    -- Create crosshair texture
+
     local hLine = crosshair:CreateTexture(nil, "OVERLAY")
     hLine:SetColorTexture(0, 1, 0, 0.8)
     hLine:SetSize(24, 2)
     hLine:SetPoint("CENTER")
-    
+
     local vLine = crosshair:CreateTexture(nil, "OVERLAY")
     vLine:SetColorTexture(0, 1, 0, 0.8)
     vLine:SetSize(2, 24)
     vLine:SetPoint("CENTER")
-    
+
     local center = crosshair:CreateTexture(nil, "OVERLAY")
     center:SetColorTexture(1, 1, 0, 1)
     center:SetSize(4, 4)
     center:SetPoint("CENTER")
-    
+
     crosshair:Hide()
-    
+
     coordPickerFrame = crosshair
 end
 
---- Update crosshair position to follow mouse
 local function UpdateCrosshairPosition(mapTexture)
     if not crosshair or not crosshair:IsShown() then return end
     
@@ -83,25 +75,20 @@ local function UpdateCrosshairPosition(mapTexture)
     cursorX = cursorX / scale
     cursorY = cursorY / scale
     
-    -- Check if cursor is over the map container
     local right = left + width
     local bottom = top - height
     
     if cursorX >= left and cursorX <= right and cursorY >= bottom and cursorY <= top then
-        -- Position crosshair at cursor (relative to container TOPLEFT)
         local relX = cursorX - left
         local relY = top - cursorY
-        -- Clear previous point to avoid anchoring issues
         crosshair:ClearAllPoints()
         crosshair:SetPoint("CENTER", container, "TOPLEFT", relX, -relY)
         crosshair:SetAlpha(1)
     else
-        -- Fade out when not over map
         crosshair:SetAlpha(0.3)
     end
 end
 
---- Enable coordinate picker mode
 function DevTools:EnableCoordinatePicker()
     local UI = RDT.UI
     if not UI or not UI.mapTexture then
@@ -109,7 +96,6 @@ function DevTools:EnableCoordinatePicker()
         return false
     end
     
-    -- Create UI if needed
     CreateCoordPickerUI()
     
     if coordPickerEnabled then
@@ -119,34 +105,24 @@ function DevTools:EnableCoordinatePicker()
     
     coordPickerEnabled = true
     
-    -- Show indicators
     if coordPickerLabel then coordPickerLabel:Show() end
     if crosshair then crosshair:Show() end
 
-    -- Disable drag detection while coord picker is active
     if UI.mapViewport and UI.mapViewport.DisableDragDetection then
         UI.mapViewport.DisableDragDetection()
     end
 
-    -- Enable mouse interaction on map container (textures don't support mouse events)
     UI.mapContainer:EnableMouse(true)
 
-    -- Click handler (on container, but calculate relative to texture)
     UI.mapContainer:SetScript("OnMouseDown", function(frame, button)
         if not coordPickerEnabled then return end
         
         if button == "LeftButton" then
-            -- Calculate coordinates to match pack positioning system
-            -- The texture is STRETCHED to fill the container (SetPoint to both TOPLEFT and TOPRIGHT)
-            -- So we use CONTAINER dimensions for calculations, with border offsets
-            -- Packs use: SetPoint("CENTER", UI.mapTexture, "TOPLEFT", data.x * mapWidth, -(data.y * mapHeight))
-            
             local container = UI.mapContainer
             local mapTex = UI.mapTexture
             
             local scale = container:GetEffectiveScale()
             
-            -- Get container position and size
             local containerLeft = container:GetLeft()
             local containerTop = container:GetTop()
             local mapWidth, mapHeight = UI:GetMapDimensions()
@@ -156,7 +132,6 @@ function DevTools:EnableCoordinatePicker()
                 return
             end
             
-            -- The texture is inset by 1 pixel border (see MainFrame.lua:481)
             local borderInset = 1
             local renderLeft = containerLeft + borderInset
             local renderTop = containerTop - borderInset
@@ -167,15 +142,12 @@ function DevTools:EnableCoordinatePicker()
             cursorX = cursorX / scale
             cursorY = cursorY / scale
             
-            -- Calculate position relative to the rendered texture area
             local relX = cursorX - renderLeft
             local relY = renderTop - cursorY
             
-            -- Convert to normalized coordinates (0-1)
             local normX = relX / renderWidth
             local normY = relY / renderHeight
             
-            -- Debug output
             if RDT.db.profile.debug then
                 print(string.format("|cFFFF8800[DEBUG]|r Container: %.0fx%.0f, Render area: %.0fx%.0f", 
                                   mapWidth, mapHeight, renderWidth, renderHeight))
@@ -187,30 +159,22 @@ function DevTools:EnableCoordinatePicker()
                                   normX, relX, renderWidth, normY, relY, renderHeight))
             end
             
-            -- Clamp to valid range
             normX = math.max(0, math.min(1, normX))
             normY = math.max(0, math.min(1, normY))
             
-            -- Format output for easy copy/paste
             local coordString = string.format("x = %.3f, y = %.3f", normX, normY)
-            
-            -- Print to chat with visual formatting
-            print("|cFF00FF00[RDT Coordinates]|r " .. coordString)
-            
-            -- Also show as a more complete pack entry template
-            print("  |cFFFFFF00{ id = ?, x = " .. string.format("%.3f", normX) .. 
-                  ", y = " .. string.format("%.3f", normY) .. ", mobs = {} }|r")
-            
-            -- Visual feedback
+
+            print("|cFF00FF00[RDT Coordinates]|r ")
+            print(string.format("\nx = %.3f,\ny = %.3f,", normX, normY))
+            print(string.format("\n{ x = %.3f, y = %.3f },", normX, normY))
+
             PlaySound(SOUNDKIT.ACHIEVEMENT_MENU_OPEN)
             
         elseif button == "RightButton" then
-            -- Right-click to disable
             DevTools:DisableCoordinatePicker()
         end
     end)
     
-    -- Update crosshair position on mouse move
     UI.mapContainer:SetScript("OnUpdate", function(frame)
         if coordPickerEnabled then
             UpdateCrosshairPosition(UI.mapTexture)
@@ -224,7 +188,6 @@ function DevTools:EnableCoordinatePicker()
     return true
 end
 
---- Disable coordinate picker mode
 function DevTools:DisableCoordinatePicker()
     if not coordPickerEnabled then
         RDT:Print("Coordinate picker is already disabled")
@@ -232,12 +195,10 @@ function DevTools:DisableCoordinatePicker()
     end
     
     coordPickerEnabled = false
-    
-    -- Hide indicators
+
     if coordPickerLabel then coordPickerLabel:Hide() end
     if crosshair then crosshair:Hide() end
-    
-    -- Restore map mouse behavior
+
     local UI = RDT.UI
     if UI and UI.mapContainer then
         UI.mapContainer:EnableMouse(false)
@@ -245,7 +206,6 @@ function DevTools:DisableCoordinatePicker()
         UI.mapContainer:SetScript("OnUpdate", nil)
     end
 
-    -- Re-enable drag detection
     if UI.mapViewport and UI.mapViewport.EnableDragDetection then
         UI.mapViewport.EnableDragDetection()
     end
@@ -253,7 +213,6 @@ function DevTools:DisableCoordinatePicker()
     RDT:Print("|cFFFF0000Coordinate Picker disabled|r")
 end
 
---- Toggle coordinate picker mode
 function DevTools:ToggleCoordinatePicker()
     if coordPickerEnabled then
         self:DisableCoordinatePicker()
@@ -262,7 +221,6 @@ function DevTools:ToggleCoordinatePicker()
     end
 end
 
---- Check if coordinate picker is enabled
 function DevTools:IsCoordinatePickerEnabled()
     return coordPickerEnabled
 end
@@ -272,8 +230,7 @@ end
 --------------------------------------------------------------------------------
 
 function DevTools:ShowCoordinateGrid()
-    RDT:Print("Coordinate grid overlay coming soon!")
-    -- TODO: Implement 10x10 grid with labeled axes
+    -- TODO: Implement
 end
 
 function DevTools:HideCoordinateGrid()
@@ -308,7 +265,6 @@ end
 -- Debug Info
 --------------------------------------------------------------------------------
 
---- Print current map dimensions and info
 function DevTools:PrintMapInfo()
     local UI = RDT.UI
     if not UI or not UI.mapTexture then
@@ -318,7 +274,6 @@ function DevTools:PrintMapInfo()
     
     local width = UI.mapTexture:GetWidth()
     local height = UI.mapTexture:GetHeight()
-    -- Use container's scale (textures don't have GetEffectiveScale)
     local scale = UI.mapContainer:GetEffectiveScale()
     
     RDT:Print("=== Map Information ===")
@@ -342,7 +297,6 @@ function DevTools:PrintMapInfo()
     end
 end
 
---- Print all packs and their coordinates
 function DevTools:ListPackCoordinates()
     local dungeon = RDT.State.currentDungeon
     if not dungeon then

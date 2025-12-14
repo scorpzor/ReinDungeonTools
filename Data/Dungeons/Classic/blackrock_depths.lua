@@ -8,7 +8,7 @@ local mobs = {
         name = "Blazing Fireguard",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blazing_fireguard",
-        scale = 0.6,
+        scale = 0.7,
     },
     ["brd_anvilrage_footman"] = {
         name = "Anvilrage Footman",
@@ -130,6 +130,78 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\shadowforge_senator",
         scale = 0.6,
     },
+    ["brd_anvilrage_marshal"] = {
+        name = "Anvilrage Marshal",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_marshal",
+        scale = 0.6,
+    },
+    ["brd_doomforge_dragoon"] = {
+        name = "Doomforge Dragoon",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\doomforge_dragoon",
+        scale = 0.6,
+    },
+    ["brd_weapon_technician"] = {
+        name = "Weapon Technician",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\weapon_technician",
+        scale = 0.6,
+    },
+    ["brd_doomforge_arcanasmith"] = {
+        name = "Doomforge Arcanasmith",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\doomforge_arcanasmith",
+        scale = 0.6,
+    },
+    ["brd_ragereaver_golem"] = {
+        name = "Ragereaver Golem",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ragereaver_golem",
+        scale = 0.7,
+    },
+    ["brd_wrath_hammer_construct"] = {
+        name = "Wrath Hammer Construct",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\wrath_hammer_construct",
+        scale = 0.7,
+    },
+    ["brd_grim_patron"] = {
+        name = "Grim Patron",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\grim_patron",
+        scale = 0.4,
+    },
+    ["brd_guzzling_patron"] = {
+        name = "Guzzling Patron",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\guzzling_patron",
+        scale = 0.4,
+    },
+    ["brd_hammered_patron"] = {
+        name = "Hammered Patron",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\hammered_patron",
+        scale = 0.4,
+    },
+    ["brd_molten_war_golem"] = {
+        name = "Molten War Golem",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\molten_war_golem",
+        scale = 0.7,
+    },
+    ["brd_anvilrage_reservist"] = {
+        name = "Anvilrage Reservist",
+        count = 1,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_reservist",
+        scale = 0.5,
+    },
+    ["brd_shadowforge_flame_keeper"] = {
+        name = "Shadowforge Flame Keeper",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\shadowforge_flame_keeper",
+        scale = 0.7,
+    },
 }
 
 local bosses = {
@@ -150,6 +222,12 @@ local bosses = {
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\houndmaster_grebmar",
         scale = 1,
+    },
+    ["brd_boss_ring_of_the_law"] = {
+        name = "Ring of the Law",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ring_of_the_law",
+        scale = 1.25,
     },
     ["brd_boss_baelgar"] = {
         name = "Bael'Gar",
@@ -185,6 +263,48 @@ local bosses = {
         name = "Pyromancer Loregrain",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\pyromancer_loregrain",
+        scale = 1.25,
+    },
+    ["brd_boss_general_angerforge"] = {
+        name = "General Angerforge",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\general_angerforge",
+        scale = 1.25,
+    },
+    ["brd_boss_golem_lord_argelmach"] = {
+        name = "Golem Lord Argelmach",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\golem_lord_argelmach",
+        scale = 1.25,
+    },
+    ["brd_boss_plugger_spazzring"] = {
+        name = "Plugger Spazzring",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\plugger_spazzring",
+        scale = 0.7,
+    },
+    ["brd_boss_phalanx"] = {
+        name = "Phalanx",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\phalanx",
+        scale = 0.9,
+    },
+    ["brd_boss_ambassador_flemelash"] = {
+        name = "Ambassador Flamelash",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ambassador_flemelash",
+        scale = 1.25,
+    },
+    ["brd_boss_panzor_the_invincible"] = {
+        name = "Panzor the Invincible",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\panzor_the_invincible",
+        scale = 1.25,
+    },
+    ["brd_boss_chest_of_the_seven"] = {
+        name = "Chest of the Seven",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\chest_of_the_seven",
         scale = 1.25,
     },
 }
@@ -1392,7 +1512,753 @@ local packDefinition = {
             ["brd_anvilrage_soldier"] = 1,
         },
     },
-    
+    {
+        id = 114,
+        x = 0.110,
+        y = 0.910,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_anvilrage_guardsman"] = 1,
+        },
+    },
+    {
+        id = 115,
+        x = 0.145,
+        y = 0.882,
+        mobs = {
+            ["brd_fireguard"] = 1,
+        },
+        patrol = {
+            { x = 0.158, y = 0.882 },
+            { x = 0.137, y = 0.882 },
+            { x = 0.137, y = 0.920 },
+            { x = 0.125, y = 0.907 },
+            { x = 0.125, y = 0.870 },
+        },
+    },
+    {
+        id = 116,
+        x = 0.124,
+        y = 0.895,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 3,
+        },
+    },
+    {
+        id = 117,
+        x = 0.126,
+        y = 0.850,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_fireguard"] = 1,
+        },
+    },
+    {
+        id = 118,
+        x = 0.151,
+        y = 0.922,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_anvilrage_guardsman"] = 2,
+        },
+    },
+    {
+        id = 119,
+        x = 0.173,
+        y = 0.922,
+        mobs = {
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_anvilrage_guardsman"] = 1,
+        },
+    },
+    {
+        id = 120,
+        x = 0.153,
+        y = 0.831,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_anvilrage_guardsman"] = 1,
+            ["brd_fireguard"] = 2,
+        },
+    },
+    {
+        id = 121,
+        x = 0.171,
+        y = 0.865,
+        mobs = {
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_anvilrage_guardsman"] = 2,
+        },
+    },
+    {
+        id = 122,
+        x = 0.167,
+        y = 0.882,
+        mobs = {
+            ["brd_fireguard"] = 1,
+        },
+        patrol = {
+            { x = 0.167, y = 0.915 },
+            { x = 0.167, y = 0.882 },
+            { x = 0.167, y = 0.837 },
+            { x = 0.190, y = 0.837 },
+        },
+    },
+    {
+        id = 123,
+        x = 0.177,
+        y = 0.826,
+        mobs = {
+            ["brd_anvilrage_footman"] = 1,
+            ["brd_anvilrage_guardsman"] = 1,
+        },
+    },
+    {
+        id = 124,
+        x = 0.188,
+        y = 0.849,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+        },
+    },
+    {
+        id = 125,
+        x = 0.209,
+        y = 0.781,
+        mobs = {
+            ["brd_anvilrage_guardsman"] = 2,
+            ["brd_fireguard"] = 1,
+        },
+    },
+    {
+        id = 126,
+        x = 0.203,
+        y = 0.745,
+        mobs = {
+            ["brd_anvilrage_footman"] = 2,
+            ["brd_anvilrage_guardsman"] = 1,
+        },
+    },
+    {
+        id = 127,
+        x = 0.124,
+        y = 0.661,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 2,
+            ["brd_anvilrage_marshal"] = 2,
+        },
+    },
+    {
+        id = 128,
+        x = 0.090,
+        y = 0.690,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 2,
+            ["brd_fireguard_destroyer"] = 1,
+        },
+    },
+    {
+        id = 129,
+        x = 0.090,
+        y = 0.745,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_fireguard_destroyer"] = 2,
+            ["brd_anvilrage_marshal"] = 1,
+        },
+    },
+    {
+        id = 130,
+        x = 0.054,
+        y = 0.738,
+        mobs = {
+            ["brd_anvilrage_marshal"] = 2,
+        },
+    },
+    {
+        id = 131,
+        x = 0.047,
+        y = 0.714,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 2,
+            ["brd_anvilrage_marshal"] = 1,
+        },
+    },
+    {
+        id = 132,
+        x = 0.023,
+        y = 0.714,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+            ["brd_anvilrage_marshal"] = 2,
+        },
+    },
+    {
+        id = 133,
+        x = 0.020,
+        y = 0.752,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+            ["brd_anvilrage_marshal"] = 1,
+            ["brd_doomforge_dragoon"] = 1,
+        },
+    },
+    {
+        id = 134,
+        x = 0.072,
+        y = 0.715,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+        },
+        patrol = {
+            { x = 0.072, y = 0.715 },
+            { x = 0.054, y = 0.715 },
+            { x = 0.081, y = 0.742 },
+            { x = 0.090, y = 0.699 },
+        },
+    },
+    {
+        id = 135,
+        x = 0.083,
+        y = 0.774,
+        mobs = {
+            ["brd_anvilrage_marshal"] = 2,
+            ["brd_doomforge_dragoon"] = 1,
+        },
+    },
+    {
+        id = 136,
+        x = 0.024,
+        y = 0.769,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 2,
+        },
+    },
+    {
+        id = 137,
+        x = 0.054,
+        y = 0.586,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.030, y = 0.591 },
+            { x = 0.089, y = 0.591 },
+        },
+    },
+    {
+        id = 138,
+        x = 0.062,
+        y = 0.586,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.030, y = 0.591 },
+            { x = 0.089, y = 0.591 },
+        },
+    },
+    {
+        id = 139,
+        x = 0.054,
+        y = 0.600,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 1,
+        },
+        patrol = {
+            { x = 0.030, y = 0.600 },
+            { x = 0.089, y = 0.600 },
+        },
+    },
+    {
+        id = 140,
+        x = 0.062,
+        y = 0.600,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 1,
+        },
+        patrol = {
+            { x = 0.030, y = 0.600 },
+            { x = 0.089, y = 0.600 },
+        },
+    },
+    {
+        id = 141,
+        x = 0.024,
+        y = 0.586,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 2,
+            ["brd_weapon_technician"] = 1,
+            ["brd_wrath_hammer_construct"] = 1,
+        },
+    },
+    {
+        id = 142,
+        x = 0.052,
+        y = 0.645,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.029, y = 0.648 },
+            { x = 0.074, y = 0.648 },
+        },
+    },
+    {
+        id = 143,
+        x = 0.023,
+        y = 0.663,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 3,
+            ["brd_weapon_technician"] = 4,
+        },
+    },
+    {
+        id = 144,
+        x = 0.018,
+        y = 0.621,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.026, y = 0.650 },
+            { x = 0.026, y = 0.595 },
+        },
+    },
+    {
+        id = 145,
+        x = 0.037,
+        y = 0.625,
+        mobs = {
+            ["brd_weapon_technician"] = 4,
+            ["brd_ragereaver_golem"] = 1,
+        },
+    },
+    {
+        id = 146,
+        x = 0.056,
+        y = 0.627,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.053, y = 0.627 },
+            { x = 0.023, y = 0.625 },
+            { x = 0.096, y = 0.637 },
+        },
+    },
+    {
+        id = 147,
+        x = 0.079,
+        y = 0.621,
+        mobs = {
+            ["brd_weapon_technician"] = 2,
+            ["brd_ragereaver_golem"] = 2,
+            ["brd_wrath_hammer_construct"] = 2,
+            ["brd_doomforge_arcanasmith"] = 1,
+        },
+    },
+    {
+        id = 148,
+        x = 0.100,
+        y = 0.638,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 1,
+        },
+    },
+    {
+        id = 149,
+        x = 0.114,
+        y = 0.608,
+        mobs = {
+            ["brd_weapon_technician"] = 4,
+            ["brd_wrath_hammer_construct"] = 1,
+            ["brd_doomforge_arcanasmith"] = 1,
+        },
+    },
+    {
+        id = 150,
+        x = 0.095,
+        y = 0.596,
+        mobs = {
+            ["brd_weapon_technician"] = 1,
+        },
+        patrol = {
+            { x = 0.117, y = 0.607 },
+            { x = 0.095, y = 0.596 },
+            { x = 0.083, y = 0.615 },
+        },
+    },
+    {
+        id = 151,
+        x = 0.150,
+        y = 0.562,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 2,
+        },
+    },
+    {
+        id = 152,
+        x = 0.180,
+        y = 0.549,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 2,
+        },
+    },
+    {
+        id = 153,
+        x = 0.205,
+        y = 0.500,
+        mobs = {
+            ["brd_guzzling_patron"] = 3,
+            ["brd_grim_patron"] = 3,
+        },
+    },
+    {
+        id = 154,
+        x = 0.228,
+        y = 0.508,
+        mobs = {
+            ["brd_guzzling_patron"] = 7,
+            ["brd_grim_patron"] = 5,
+            ["brd_hammered_patron"] = 1,
+        },
+    },
+    {
+        id = 155,
+        x = 0.230,
+        y = 0.562,
+        mobs = {
+            ["brd_guzzling_patron"] = 6,
+            ["brd_grim_patron"] = 7,
+            ["brd_hammered_patron"] = 4,
+        },
+    },
+    {
+        id = 156,
+        x = 0.250,
+        y = 0.538,
+        mobs = {
+            ["brd_hammered_patron"] = 2,
+        },
+    },
+    {
+        id = 157,
+        x = 0.263,
+        y = 0.518,
+        mobs = {
+            ["brd_guzzling_patron"] = 3,
+            ["brd_grim_patron"] = 4,
+        },
+    },
+    {
+        id = 158,
+        x = 0.264,
+        y = 0.454,
+        mobs = {
+            ["brd_guzzling_patron"] = 4,
+            ["brd_grim_patron"] = 6,
+        },
+    },
+    {
+        id = 159,
+        x = 0.271,
+        y = 0.488,
+        mobs = {
+            ["brd_guzzling_patron"] = 3,
+            ["brd_grim_patron"] = 1,
+            ["brd_hammered_patron"] = 5,
+        },
+    },
+    {
+        id = 160,
+        x = 0.302,
+        y = 0.507,
+        mobs = {
+            ["brd_shadowforge_citizen"] = 3,
+            ["brd_doomforge_arcanasmith"] = 1,
+            ["brd_fireguard_destroyer"] = 2,
+        },
+    },
+    {
+        id = 161,
+        x = 0.306,
+        y = 0.451,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+        },
+        patrol = {
+            { x = 0.300, y = 0.515 },
+            { x = 0.306, y = 0.451 },
+            { x = 0.363, y = 0.402 },
+        },
+    },
+    {
+        id = 162,
+        x = 0.330,
+        y = 0.407,
+        mobs = {
+            ["brd_shadowforge_citizen"] = 3,
+            ["brd_doomforge_dragoon"] = 2,
+            ["brd_weapon_technician"] = 1,
+        },
+    },
+    {
+        id = 163,
+        x = 0.365,
+        y = 0.408,
+        mobs = {
+            ["brd_shadowforge_citizen"] = 2,
+            ["brd_doomforge_arcanasmith"] = 2,
+            ["brd_anvilrage_marshal"] = 1,
+        },
+    },
+    {
+        id = 164,
+        x = 0.245,
+        y = 0.167,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 3,
+            ["brd_molten_war_golem"] = 1,
+        },
+    },
+    {
+        id = 165,
+        x = 0.256,
+        y = 0.079,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 2,
+            ["brd_molten_war_golem"] = 1,
+        },
+    },
+    {
+        id = 166,
+        x = 0.217,
+        y = 0.141,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 2,
+            ["brd_molten_war_golem"] = 1,
+        },
+    },
+    {
+        id = 167,
+        x = 0.200,
+        y = 0.100,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 2,
+            ["brd_molten_war_golem"] = 1,
+        },
+    },
+    {
+        id = 168,
+        x = 0.227,
+        y = 0.054,
+        mobs = {
+            ["brd_doomforge_arcanasmith"] = 3,
+            ["brd_molten_war_golem"] = 1,
+        },
+    },
+    {
+        id = 169,
+        x = 0.447,
+        y = 0.166,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 3,
+        },
+    },
+    {
+        id = 170,
+        x = 0.474,
+        y = 0.205,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 3,
+        },
+    },
+    {
+        id = 171,
+        x = 0.481,
+        y = 0.169,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+        },
+    },
+    {
+        id = 172,
+        x = 0.587,
+        y = 0.270,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 9,
+        },
+    },
+    {
+        id = 173,
+        x = 0.606,
+        y = 0.298,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 5,
+        },
+    },
+    {
+        id = 174,
+        x = 0.630,
+        y = 0.291,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 10,
+        },
+    },
+    {
+        id = 175,
+        x = 0.571,
+        y = 0.237,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 176,
+        x = 0.587,
+        y = 0.238,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 177,
+        x = 0.617,
+        y = 0.256,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 178,
+        x = 0.639,
+        y = 0.252,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 179,
+        x = 0.656,
+        y = 0.254,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 180,
+        x = 0.675,
+        y = 0.225,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+        },
+    },
+    {
+        id = 181,
+        x = 0.675,
+        y = 0.100,
+        mobs = {
+            ["brd_fireguard_destroyer"] = 1,
+        },
+    },
+    {
+        id = 182,
+        x = 0.675,
+        y = 0.259,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 183,
+        x = 0.697,
+        y = 0.259,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 184,
+        x = 0.690,
+        y = 0.232,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 185,
+        x = 0.646,
+        y = 0.234,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 186,
+        x = 0.617,
+        y = 0.233,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 187,
+        x = 0.524,
+        y = 0.209,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 188,
+        x = 0.542,
+        y = 0.217,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 189,
+        x = 0.590,
+        y = 0.213,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 5,
+        },
+    },
+    {
+        id = 190,
+        x = 0.632,
+        y = 0.212,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 191,
+        x = 0.646,
+        y = 0.212,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 192,
+        x = 0.661,
+        y = 0.209,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 193,
+        x = 0.711,
+        y = 0.218,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
 
     -------------------------------- Bosses --------------------------------
     {
@@ -1431,6 +2297,14 @@ local packDefinition = {
     },
     {
         id = 1003,
+        x = 0.958,
+        y = 0.432,
+        mobs = {
+            ["brd_boss_ring_of_the_law"] = 1,
+        },
+    },
+    {
+        id = 1004,
         x = 0.564,
         y = 0.422,
         mobs = {
@@ -1438,7 +2312,7 @@ local packDefinition = {
         },
     },
     {
-        id = 1004,
+        id = 1005,
         x = 0.333,
         y = 0.464,
         mobs = {
@@ -1446,7 +2320,7 @@ local packDefinition = {
         },
     },
     {
-        id = 1005,
+        id = 1006,
         x = 0.422,
         y = 0.348,
         mobs = {
@@ -1460,7 +2334,7 @@ local packDefinition = {
         },
     },
     {
-        id = 1006,
+        id = 1007,
         x = 0.402,
         y = 0.576,
         mobs = {
@@ -1469,12 +2343,79 @@ local packDefinition = {
         },
     },
     {
-        id = 1007,
+        id = 1008,
         x = 0.311,
         y = 0.967,
         mobs = {
             ["brd_boss_pyromancer_loregrain"] = 1,
             ["brd_twilight_emissary"] = 2,
+        },
+    },
+    {
+        id = 1009,
+        x = 0.060,
+        y = 0.791,
+        mobs = {
+            ["brd_boss_general_angerforge"] = 1,
+        },
+    },
+    {
+        id = 1010,
+        x = 0.058,
+        y = 0.527,
+        mobs = {
+            ["brd_boss_golem_lord_argelmach"] = 1,
+            ["brd_wrath_hammer_construct"] = 1,
+            ["brd_ragereaver_golem"] = 1,
+        },
+    },
+    {
+        id = 1011,
+        x = 0.246,
+        y = 0.472,
+        mobs = {
+            ["brd_boss_plugger_spazzring"] = 1,
+            ["brd_guzzling_patron"] = 2,
+            ["brd_grim_patron"] = 2,
+        },
+    },
+    {
+        id = 1012,
+        x = 0.281,
+        y = 0.516,
+        mobs = {
+            ["brd_boss_phalanx"] = 1,
+        },
+    },
+    {
+        id = 1013,
+        x = 0.310,
+        y = 0.252,
+        mobs = {
+            ["brd_boss_ambassador_flemelash"] = 1,
+        },
+    },
+    {
+        id = 1014,
+        x = 0.269,
+        y = 0.116,
+        mobs = {
+            ["brd_boss_panzor_the_invincible"] = 1,
+        },
+        patrol = {
+            { x = 0.251, y = 0.069 },
+            { x = 0.269, y = 0.116 },
+            { x = 0.230, y = 0.190 },
+            { x = 0.200, y = 0.120 },
+            { x = 0.232, y = 0.054 },
+        },
+    },
+    {
+        id = 1015,
+        x = 0.374,
+        y = 0.156,
+        mobs = {
+            ["brd_boss_chest_of_the_seven"] = 1,
         },
     },
 }
@@ -1505,7 +2446,7 @@ local manufactoryIdentifiers = {
     {
         id = 1,
         type = "dungeon-entrance",
-        x = 0.2,
+        x = 0.1,
         y = 0.1,
         name = "Entrance Portal",
         description = "Main entrance",
