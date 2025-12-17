@@ -202,6 +202,18 @@ local mobs = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\shadowforge_flame_keeper",
         scale = 0.7,
     },
+    ["brd_twilight_hammers_ambassador"] = {
+        name = "Twilight's Hammer Ambassador",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\twilight_hammers_ambassador",
+        scale = 0.7,
+    },
+    ["brd_anvilrage_captain"] = {
+        name = "Anvilrage Captain",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_captain",
+        scale = 0.7,
+    },
 }
 
 local bosses = {
@@ -305,6 +317,24 @@ local bosses = {
         name = "Chest of the Seven",
         count = 2,
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\chest_of_the_seven",
+        scale = 1.25,
+    },
+    ["brd_boss_magmus"] = {
+        name = "Magmus",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magmus",
+        scale = 1.25,
+    },
+    ["brd_boss_princess_moira_bronzebeard"] = {
+        name = "Princess Moira Bronzebeard",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\princess_moira_bronzebeard",
+        scale = 1.25,
+    },
+    ["brd_boss_emperor_dagran_thaurissan"] = {
+        name = "Emperor Dagran Thaurissan",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\emperor_dagran_thaurissan",
         scale = 1.25,
     },
 }
@@ -2259,6 +2289,501 @@ local packDefinition = {
             ["brd_anvilrage_reservist"] = 3,
         },
     },
+    {
+        id = 194,
+        x = 0.506,
+        y = 0.197,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 6,
+        },
+    },
+    {
+        id = 195,
+        x = 0.506,
+        y = 0.167,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 196,
+        x = 0.507,
+        y = 0.133,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 197,
+        x = 0.527,
+        y = 0.156,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 198,
+        x = 0.527,
+        y = 0.130,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 199,
+        x = 0.539,
+        y = 0.186,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 200,
+        x = 0.555,
+        y = 0.186,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 201,
+        x = 0.662,
+        y = 0.186,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 202,
+        x = 0.678,
+        y = 0.190,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 203,
+        x = 0.691,
+        y = 0.192,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 204,
+        x = 0.712,
+        y = 0.168,
+        mobs = {
+            ["brd_shadowforge_flame_keeper"] = 1,
+        },
+        patrol = {
+            { x = 0.712, y = 0.115 },
+            { x = 0.712, y = 0.207 },
+            { x = 0.712, y = 0.168 },
+            { x = 0.648, y = 0.168 },
+        },
+    },
+    {
+        id = 205,
+        x = 0.542,
+        y = 0.143,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 206,
+        x = 0.558,
+        y = 0.144,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 207,
+        x = 0.567,
+        y = 0.161,
+        mobs = {
+            ["brd_shadowforge_flame_keeper"] = 1,
+        },
+        patrol = {
+            { x = 0.567, y = 0.161 },
+            { x = 0.607, y = 0.158 },
+            { x = 0.620, y = 0.120 },
+        },
+    },
+    {
+        id = 208,
+        x = 0.585,
+        y = 0.173,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 7,
+        },
+    },
+    {
+        id = 209,
+        x = 0.597,
+        y = 0.148,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 210,
+        x = 0.613,
+        y = 0.172,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 9,
+        },
+    },
+    {
+        id = 211,
+        x = 0.619,
+        y = 0.135,
+        mobs = {
+            ["brd_shadowforge_flame_keeper"] = 1,
+        },
+        patrol = {
+            { x = 0.619, y = 0.135 },
+            { x = 0.609, y = 0.165 },
+        },
+    },
+    {
+        id = 212,
+        x = 0.634,
+        y = 0.168,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 7,
+        },
+    },
+    {
+        id = 213,
+        x = 0.643,
+        y = 0.148,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 214,
+        x = 0.657,
+        y = 0.166,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 215,
+        x = 0.662,
+        y = 0.142,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 216,
+        x = 0.691,
+        y = 0.142,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 6,
+        },
+    },
+    {
+        id = 217,
+        x = 0.542,
+        y = 0.116,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 218,
+        x = 0.563,
+        y = 0.118,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 6,
+        },
+    },
+    {
+        id = 219,
+        x = 0.583,
+        y = 0.121,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 220,
+        x = 0.613,
+        y = 0.115,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 8,
+        },
+    },
+    {
+        id = 221,
+        x = 0.632,
+        y = 0.120,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 222,
+        x = 0.648,
+        y = 0.119,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 223,
+        x = 0.687,
+        y = 0.112,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 224,
+        x = 0.695,
+        y = 0.079,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 5,
+        },
+    },
+    {
+        id = 225,
+        x = 0.673,
+        y = 0.076,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 226,
+        x = 0.709,
+        y = 0.117,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 227,
+        x = 0.530,
+        y = 0.088,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 228,
+        x = 0.542,
+        y = 0.071,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 229,
+        x = 0.558,
+        y = 0.069,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 230,
+        x = 0.588,
+        y = 0.096,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 231,
+        x = 0.603,
+        y = 0.098,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 232,
+        x = 0.618,
+        y = 0.094,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+        },
+    },
+    {
+        id = 233,
+        x = 0.634,
+        y = 0.094,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 2,
+            ["brd_shadowforge_flame_keeper"] = 1,
+        },
+    },
+    {
+        id = 234,
+        x = 0.648,
+        y = 0.096,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 235,
+        x = 0.589,
+        y = 0.061,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 7,
+        },
+    },
+    {
+        id = 236,
+        x = 0.591,
+        y = 0.035,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 3,
+        },
+    },
+    {
+        id = 237,
+        x = 0.618,
+        y = 0.039,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 4,
+        },
+    },
+    {
+        id = 238,
+        x = 0.627,
+        y = 0.061,
+        mobs = {
+            ["brd_anvilrage_reservist"] = 6,
+        },
+    },
+    {
+        id = 239,
+        x = 0.876,
+        y = 0.160,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+        },
+        patrol = {
+            { x = 0.876, y = 0.160 },
+            { x = 0.921, y = 0.160 },
+        },
+    },
+    {
+        id = 240,
+        x = 0.954,
+        y = 0.160,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+        },
+        patrol = {
+            { x = 0.954, y = 0.160 },
+            { x = 0.921, y = 0.160 },
+        },
+    },
+    {
+        id = 241,
+        x = 0.872,
+        y = 0.133,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_shadowforge_senator"] = 4,
+            ["brd_twilight_hammers_ambassador"] = 1,
+        },
+    },
+    {
+        id = 242,
+        x = 0.870,
+        y = 0.199,
+        mobs = {
+            ["brd_shadowforge_senator"] = 5,
+        },
+    },
+    {
+        id = 243,
+        x = 0.918,
+        y = 0.143,
+        mobs = {
+            ["brd_shadowforge_senator"] = 2,
+            ["brd_twilight_hammers_ambassador"] = 2,
+        },
+    },
+    {
+        id = 244,
+        x = 0.918,
+        y = 0.183,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_shadowforge_senator"] = 4,
+            ["brd_twilight_hammers_ambassador"] = 1,
+        },
+    },
+    {
+        id = 245,
+        x = 0.966,
+        y = 0.129,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_shadowforge_senator"] = 2,
+            ["brd_twilight_hammers_ambassador"] = 2,
+        },
+    },
+    {
+        id = 246,
+        x = 0.966,
+        y = 0.206,
+        mobs = {
+            ["brd_shadowforge_senator"] = 2,
+            ["brd_twilight_hammers_ambassador"] = 2,
+        },
+    },
+    {
+        id = 247,
+        x = 0.893,
+        y = 0.104,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_shadowforge_senator"] = 3,
+            ["brd_twilight_hammers_ambassador"] = 1,
+        },
+    },
+    {
+        id = 248,
+        x = 0.950,
+        y = 0.104,
+        mobs = {
+            ["brd_doomforge_dragoon"] = 1,
+            ["brd_shadowforge_senator"] = 2,
+            ["brd_twilight_hammers_ambassador"] = 2,
+        },
+    },
+    {
+        id = 249,
+        x = 0.892,
+        y = 0.220,
+        mobs = {
+            ["brd_shadowforge_senator"] = 5,
+            ["brd_anvilrage_captain"] = 1,
+        },
+    },
+    {
+        id = 250,
+        x = 0.944,
+        y = 0.221,
+        mobs = {
+            ["brd_shadowforge_senator"] = 3,
+            ["brd_twilight_hammers_ambassador"] = 1,
+            ["brd_anvilrage_captain"] = 1,
+        },
+    },
 
     -------------------------------- Bosses --------------------------------
     {
@@ -2416,6 +2941,30 @@ local packDefinition = {
         y = 0.156,
         mobs = {
             ["brd_boss_chest_of_the_seven"] = 1,
+        },
+    },
+    {
+        id = 1016,
+        x = 0.833,
+        y = 0.162,
+        mobs = {
+            ["brd_boss_magmus"] = 1,
+        },
+    },
+    {
+        id = 1017,
+        x = 0.978,
+        y = 0.160,
+        mobs = {
+            ["brd_boss_emperor_dagran_thaurissan"] = 1,
+        },
+    },
+    {
+        id = 1018,
+        x = 0.987,
+        y = 0.201,
+        mobs = {
+            ["brd_boss_princess_moira_bronzebeard"] = 1,
         },
     },
 }
