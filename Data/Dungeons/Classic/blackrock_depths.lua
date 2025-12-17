@@ -2822,8 +2822,8 @@ local packDefinition = {
     },
     {
         id = 1003,
-        x = 0.958,
-        y = 0.432,
+        x = 0.870,
+        y = 0.548,
         mobs = {
             ["brd_boss_ring_of_the_law"] = 1,
         },
