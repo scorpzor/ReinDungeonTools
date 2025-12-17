@@ -337,6 +337,12 @@ local bosses = {
         displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\emperor_dagran_thaurissan",
         scale = 1.25,
     },
+    ["brd_boss_hurley_blackbreath"] = {
+        name = "Hurley Blackbreath",
+        count = 2,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\hurley_blackbreath",
+        scale = 1.25,
+    },
 }
 
 RDT.Data:RegisterMobs(mobs)
@@ -2967,14 +2973,22 @@ local packDefinition = {
             ["brd_boss_princess_moira_bronzebeard"] = 1,
         },
     },
+    {
+        id = 1019,
+        x = 0.226,
+        y = 0.416,
+        mobs = {
+            ["brd_boss_hurley_blackbreath"] = 1,
+        },
+    },
 }
 
 local prisonIdentifiers = {
     {
         id = 1,
         type = "dungeon-entrance",
-        x = 0.175,
-        y = 0.779,
+        x = 0.672,
+        y = 0.728,
         name = "Entrance Portal",
         description = "Main entrance",
     }
@@ -2984,8 +2998,8 @@ local upperCityIdentifiers = {
     {
         id = 1,
         type = "dungeon-entrance",
-        x = 0.709,
-        y = 0.604,
+        x = 0.212,
+        y = 0.447,
         name = "Entrance Portal",
         description = "Main entrance",
     }
@@ -2995,8 +3009,8 @@ local manufactoryIdentifiers = {
     {
         id = 1,
         type = "dungeon-entrance",
-        x = 0.1,
-        y = 0.1,
+        x = 0.059,
+        y = 0.675,
         name = "Entrance Portal",
         description = "Main entrance",
     }
