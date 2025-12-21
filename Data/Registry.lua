@@ -1,6 +1,5 @@
 -- Data/Registry.lua
--- Dungeon registry and data management module
--- NOTE: This file loads AFTER Core/Init.lua and Data/Atlases.lua, so RDT object already exists
+-- Dungeon registry and data management
 --
 -- This module provides the registry for dungeons and mobs. Individual dungeons
 -- are defined in separate files under Data/Dungeons/ folder.
@@ -23,30 +22,23 @@
 --            "Interface\\AddOns\\ReinDungeonTools\\Textures\\Maps\\Classic\\DungeonName\\Tile4",
 --        }
 --    }
---    
+--
 -- Tiles are arranged left-to-right, top-to-bottom in the grid.
--- For a 2x2 grid: [1][2]
---                 [3][4]
+-- For a 2x3 grid: [1][2][3]
+--                 [4][5][6]
 
 local RDT = _G.RDT
 if not RDT then
     error("RDT object not found! Data/Registry.lua must load after Core/Init.lua")
 end
 
--- Data namespace
 RDT.Data = {}
 local Data = RDT.Data
 
--- Dungeon registry
 local dungeons = {}
-
--- Mob database (shared across all dungeons)
 local mobDatabase = {}
-
--- Identifier icon type database (doors, stairs, portals, etc.)
 local identifierTypes = {}
 
--- Get identifier atlas reference (loads after Atlases.lua)
 local identifierAtlas = RDT.Atlases and RDT.Atlases.Identifier or {
     texture = "",
     icons = {}
@@ -236,7 +228,7 @@ function Data:GetDungeonRequiredCount(dungeonName)
     return nil
 end
 
---- Get dungeon data with calculated pack counts (processes mob counts)
+--- Get dungeon data with calculated pack counts
 -- @param dungeonName string Name of the dungeon
 -- @return table Dungeon data with pack.count added for each pack, or nil
 function Data:GetProcessedDungeon(dungeonName)
@@ -244,8 +236,7 @@ function Data:GetProcessedDungeon(dungeonName)
     if not dungeon then
         return nil
     end
-    
-    -- Create a deep copy to avoid modifying the original
+
     local processed = {
         texture = dungeon.texture,
         tiles = dungeon.tiles,
@@ -253,7 +244,6 @@ function Data:GetProcessedDungeon(dungeonName)
         packData = {}
     }
     
-    -- Process each pack and calculate total count
     for _, pack in ipairs(dungeon.packData or {}) do
         local packCopy = {
             id = pack.id,
@@ -261,10 +251,9 @@ function Data:GetProcessedDungeon(dungeonName)
             y = pack.y,
             mobs = pack.mobs,
             patrol = pack.patrol,
-            count = 0  -- Will be calculated
+            count = 0
         }
 
-        -- Calculate pack count from mobs
         if pack.mobs then
             for mobKey, quantity in pairs(pack.mobs) do
                 local mobDef = self:GetMob(mobKey)
@@ -281,10 +270,9 @@ function Data:GetProcessedDungeon(dungeonName)
 end
 
 --------------------------------------------------------------------------------
--- Built-in Generic Mobs (fallbacks)
+-- Generic Mobs
 --------------------------------------------------------------------------------
 
--- Register some generic fallback mobs for testing
 local genericMobs = {
     ["generic_trash_mob"] = {
         name = "Generic Trash",
@@ -315,11 +303,10 @@ local genericMobs = {
 Data:RegisterMobs(genericMobs)
 
 --------------------------------------------------------------------------------
--- Default Identifier Types (Doors, Stairs, Portals, etc.)
+-- Identifier Types
 --------------------------------------------------------------------------------
 
 local defaultIdentifierTypes = {
-    -- Stair variants
     ["stairs-up"] = {
         name = "Stairs Up",
         description = "Stairs upward",
@@ -335,7 +322,6 @@ local defaultIdentifierTypes = {
         scale = 1.0,
     },
 
-    -- Door/Gate variants
     ["door-in"] = {
         name = "Door In",
         description = "Entrance door",
@@ -358,7 +344,6 @@ local defaultIdentifierTypes = {
         scale = 0.7,
     },
 
-    -- Portal
     ["portal"] = {
         name = "Portal",
         description = "Teleport portal",
@@ -367,7 +352,6 @@ local defaultIdentifierTypes = {
         scale = 1.0,
     },
 
-    -- Dungeon entrance
     ["dungeon-entrance"] = {
         name = "Dungeon Entrance",
         description = "Main dungeon entrance",
@@ -376,7 +360,6 @@ local defaultIdentifierTypes = {
         scale = 1.0,
     },
 
-    -- Action
     ["action"] = {
         name = "Action",
         description = "Special action point",
@@ -505,41 +488,6 @@ function Data:GetStats()
 end
 
 --------------------------------------------------------------------------------
--- Export Functions (for ImportExport module)
---------------------------------------------------------------------------------
-
---- Export dungeon data as Lua table string (for debugging/sharing)
--- @param dungeonName string Name of dungeon to export
--- @return string Serialized dungeon data or nil
-function Data:ExportDungeon(dungeonName)
-    local dungeon = self:GetDungeon(dungeonName)
-    if not dungeon then
-        RDT:PrintError("ExportDungeon: Dungeon not found: " .. dungeonName)
-        return nil
-    end
-    
-    local AceSerializer = LibStub:GetLibrary("AceSerializer-3.0", true)
-    if AceSerializer then
-        return AceSerializer:Serialize(dungeon)
-    end
-
-    return "-- Export not available without AceSerializer"
-end
-
---- Export all registered dungeons
--- @return table List of {name, data} pairs
-function Data:ExportAll()
-    local exports = {}
-    for name, data in pairs(dungeons) do
-        table.insert(exports, {
-            name = name,
-            data = data,
-        })
-    end
-    return exports
-end
-
---------------------------------------------------------------------------------
 -- Debug Commands
 --------------------------------------------------------------------------------
 
@@ -564,9 +512,5 @@ function Data:ListMobs()
     end
     RDT:Print("Total: " .. count .. " mob types")
 end
-
---------------------------------------------------------------------------------
--- Module Initialization
---------------------------------------------------------------------------------
 
 RDT:DebugPrint("Data registry initialized (dungeons will be loaded from modules)")
