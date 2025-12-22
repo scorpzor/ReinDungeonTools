@@ -21,12 +21,12 @@ RDT.Debug = false
 
 -- Runtime state (not saved)
 RDT.State = {
-    currentPull = 1,         -- Current pull number for adding packs
-    currentRoute = nil,      -- Reference to current route table from DB
-    packButtons = {},        -- Map of packID -> button frame
-    identifierButtons = {},  -- Map of identifierID -> button frame
-    identifierLines = {},    -- Array of identifier connection line textures
-    isInitialized = false,   -- Whether addon has finished loading
+    currentPull = 1,               -- Current pull number for adding packs
+    currentRoute = { pulls = {} }, -- Reference to current route table from DB
+    packButtons = {},              -- Map of packID -> button frame
+    identifierButtons = {},        -- Map of identifierID -> button frame
+    identifierLines = {},          -- Array of identifier connection line textures
+    isInitialized = false,         -- Whether addon has finished loading
 }
 
 --------------------------------------------------------------------------------
@@ -57,29 +57,29 @@ function RDT:OnEnable()
     if self.UI and self.UI.CreateMainFrame then
         self.UI:CreateMainFrame()
     end
-    
+
     -- Load saved dungeon or default to first available
     local currentDungeon = self.db.profile.currentDungeon
     local dungeonNames = self.Data:GetDungeonNames()
-    
+
     if not dungeonNames or #dungeonNames == 0 then
         self:PrintError("No dungeons available in Data.lua")
         return
     end
-    
+
     if not self.Data:DungeonExists(currentDungeon) then
         currentDungeon = dungeonNames[1]
         self.db.profile.currentDungeon = currentDungeon
         self:Print("Default dungeon set to: " .. currentDungeon)
     end
-    
+
     self:LoadDungeon(currentDungeon)
     self.State.isInitialized = true
 
     if self.MinimapButton then
         self.MinimapButton:Initialize()
     end
-    
+
     self:Print("ReinDungeonTools v" .. self.Version .. " loaded! Type /rdt to open")
 end
 
@@ -100,12 +100,12 @@ end
 -- @return boolean Success status
 function RDT:LoadDungeon(dungeonName)
     self:DebugPrint("Loading dungeon: " .. tostring(dungeonName))
-    
+
     if not self.Data then
         self:PrintError("Data module not loaded yet")
         return false
     end
-    
+
     if not self.Data:DungeonExists(dungeonName) then
         self:PrintError(string.format("Unknown dungeon: %s", tostring(dungeonName)))
         local available = self.Data:GetDungeonNames()
@@ -114,7 +114,7 @@ function RDT:LoadDungeon(dungeonName)
         end
         return false
     end
-    
+
     self.RouteManager:EnsureRouteExists(dungeonName)
 
     self.State.currentRoute = self.RouteManager:GetCurrentRoute(dungeonName)
@@ -123,7 +123,7 @@ function RDT:LoadDungeon(dungeonName)
         self:PrintError("Failed to get route for dungeon")
         return false
     end
-    
+
     if self.UI and self.UI.ClearPacks then
         self.UI:ClearPacks()
     end
@@ -133,19 +133,19 @@ function RDT:LoadDungeon(dungeonName)
     end
 
     self.State.currentPull = self.RouteManager:GetNextPull(self.State.currentRoute.pulls)
-    
+
     local dungeonData = self.Data:GetProcessedDungeon(dungeonName)
-    
+
     if not dungeonData then
         self:PrintError("Failed to process dungeon data")
         return false
     end
-    
+
     if not dungeonData.packData or #dungeonData.packData == 0 then
         self:PrintError(L["ERROR_NO_PACKS"])
         return false
     end
-    
+
     self.db.profile.currentDungeon = dungeonName
 
     if self.UI then
@@ -186,7 +186,7 @@ function RDT:LoadDungeon(dungeonName)
             self.UI:UpdateDungeonDropdown()
         end
     end
-    
+
     self:DebugPrint("Dungeon loaded successfully")
     return true
 end

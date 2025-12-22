@@ -41,7 +41,8 @@ function MapViewport:Create(container, mapTexture)
         canvas = nil,
     }
 
-    local scrollFrame = CreateFrame("ScrollFrame", "RDT_MapScrollFrame", container)
+    ---@type ScrollFrame
+    local scrollFrame = CreateFrame("ScrollFrame", "RDT_MapScrollFrame", container) --[[@as ScrollFrame]]
     scrollFrame:SetAllPoints(container)
     scrollFrame:EnableMouse(false)
     scrollFrame:EnableMouseWheel(true)
@@ -168,7 +169,7 @@ function MapViewport:SetZoom(viewport, newZoom, centerX, centerY)
         if clampedZoom == 1.0 then
             viewport.scrollH = 0
             viewport.scrollV = 0
-        -- Otherwise, adjust scroll to keep zoom point stationary
+            -- Otherwise, adjust scroll to keep zoom point stationary
         elseif centerX and centerY then
             local oldScrollH = viewport.scrollH
             local oldScrollV = viewport.scrollV
@@ -193,7 +194,7 @@ end
 -- @param centerX number Optional X coordinate to zoom towards
 -- @param centerY number Optional Y coordinate to zoom towards
 function MapViewport:ZoomIn(viewport, centerX, centerY)
-    local newZoom = viewport.zoom * 1.2  -- 20% increase
+    local newZoom = viewport.zoom * 1.2 -- 20% increase
     self:SetZoom(viewport, newZoom, centerX, centerY)
 end
 
@@ -202,7 +203,7 @@ end
 -- @param centerX number Optional X coordinate to zoom towards
 -- @param centerY number Optional Y coordinate to zoom towards
 function MapViewport:ZoomOut(viewport, centerX, centerY)
-    local newZoom = viewport.zoom / 1.2  -- 20% decrease
+    local newZoom = viewport.zoom / 1.2 -- 20% decrease
     self:SetZoom(viewport, newZoom, centerX, centerY)
 end
 

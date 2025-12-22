@@ -18,11 +18,18 @@ local Colors = RDT.Colors
 local LibGraph = LibStub("LibGraph-2.0")
 
 -- Constants
-local IDENTIFIER_ICON_SIZE = 32  -- Base size for identifier icons
+local IDENTIFIER_ICON_SIZE = 32 -- Base size for identifier icons
 
 -- Object pools for reusing frames/textures
 local identifierButtonPool = {}
 local identifierLineFrame = nil
+
+---@class IdentifierButton : Frame
+---@field icon Texture
+---@field identifierId string
+---@field identifierType string
+---@field identifierData table
+---@field typeDefinition table
 
 --------------------------------------------------------------------------------
 -- Identifier Icon Rendering
@@ -97,10 +104,11 @@ function UI:CreateIdentifierIcon(data)
     end
 
     -- Try to reuse a frame from the pool
+    ---@type IdentifierButton
     local frame = table.remove(identifierButtonPool)
     if not frame then
         -- No pooled frame available, create a new one
-        frame = CreateFrame("Frame", nil, self.mapCanvas)
+        frame = CreateFrame("Frame", nil, self.mapCanvas) --[[@as IdentifierButton]]
 
         local icon = frame:CreateTexture(nil, "ARTWORK")
         icon:SetAllPoints(frame)
@@ -235,7 +243,8 @@ function UI:DrawIdentifierConnections(identifiers)
         local linkedIdentifier = linkedIdentifiers[identifier.linkedTo]
         if linkedIdentifier then
             -- Create a unique key for this pair (sorted to avoid duplicates)
-            local pairKey = id < identifier.linkedTo and (id .. "_" .. identifier.linkedTo) or (identifier.linkedTo .. "_" .. id)
+            local pairKey = id < identifier.linkedTo and (id .. "_" .. identifier.linkedTo) or
+                (identifier.linkedTo .. "_" .. id)
 
             if not drawnPairs[pairKey] then
                 self:DrawConnectionLine(identifier, linkedIdentifier)

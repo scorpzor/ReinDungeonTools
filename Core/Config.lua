@@ -14,7 +14,7 @@ local defaults = {
         routes = {},
         debug = false,
         showMinimapButton = true,
-        
+
         -- Main window position
         windowPosition = {
             point = "CENTER",
@@ -29,6 +29,7 @@ local defaults = {
 -- Database Initialization (called from Init.lua OnInitialize)
 --------------------------------------------------------------------------------
 
+---@diagnostic disable-next-line: duplicate-set-field
 function RDT:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ReinDungeonToolsDB", defaults, true)
 
@@ -38,7 +39,7 @@ function RDT:OnInitialize()
 
     self:RegisterChatCommand("rdt", "SlashCommand")
     self:RegisterChatCommand("reindungeontools", "SlashCommand")
-    
+
     self:Print(string.format(L["VERSION_INFO"], self.Version))
     self:DebugPrint("Database initialized")
 end
@@ -79,7 +80,7 @@ function RDT:SetProfile(profileName)
         self:PrintError("Invalid profile name")
         return false
     end
-    
+
     self.db:SetProfile(profileName)
     self:Print(string.format(L["PROFILE_SWITCHED"], profileName))
     return true
@@ -93,7 +94,7 @@ function RDT:CreateProfile(profileName)
         self:PrintError("Invalid profile name")
         return false
     end
-    
+
     local profiles = self:GetProfiles()
     for _, name in ipairs(profiles) do
         if name == profileName then
@@ -101,7 +102,7 @@ function RDT:CreateProfile(profileName)
             return false
         end
     end
-    
+
     -- Create by switching to it (AceDB creates on-demand)
     self.db:SetProfile(profileName)
     self:Print(string.format(L["PROFILE_CREATED"], profileName))
@@ -116,12 +117,12 @@ function RDT:DeleteProfile(profileName)
         self:PrintError("Invalid profile name")
         return false
     end
-    
+
     if profileName == self:GetCurrentProfile() then
         self:PrintError("Cannot delete the active profile")
         return false
     end
-    
+
     self.db:DeleteProfile(profileName)
     self:Print(string.format(L["PROFILE_DELETED"], profileName))
     return true
@@ -135,12 +136,12 @@ function RDT:CopyProfile(sourceProfile)
         self:PrintError("Invalid profile name")
         return false
     end
-    
+
     if sourceProfile == self:GetCurrentProfile() then
         self:PrintError("Cannot copy profile to itself")
         return false
     end
-    
+
     self.db:CopyProfile(sourceProfile)
     self:Print(string.format(L["PROFILE_COPIED"], sourceProfile, self:GetCurrentProfile()))
 
@@ -176,9 +177,9 @@ end
 -- @param key string Setting key (supports dot notation: "routes.Test Dungeon")
 -- @return any Setting value or nil
 function RDT:GetSetting(key)
-    local parts = {strsplit(".", key)}
+    local parts = { strsplit(".", key) }
     local current = self.db.profile
-    
+
     for _, part in ipairs(parts) do
         if type(current) == "table" then
             current = current[part]
@@ -186,7 +187,7 @@ function RDT:GetSetting(key)
             return nil
         end
     end
-    
+
     return current
 end
 
@@ -194,16 +195,16 @@ end
 -- @param key string Setting key
 -- @param value any Value to save
 function RDT:SetSetting(key, value)
-    local parts = {strsplit(".", key)}
+    local parts = { strsplit(".", key) }
     local current = self.db.profile
-    
+
     for i = 1, #parts - 1 do
         if type(current[parts[i]]) ~= "table" then
             current[parts[i]] = {}
         end
         current = current[parts[i]]
     end
-    
+
     current[parts[#parts]] = value
 end
 

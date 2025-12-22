@@ -22,12 +22,34 @@ local FALLBACK_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 -- Object pools for reusing frames/textures
 local packGroupPool = {}
 local mobButtonPool = {}
-local borderFramePool = {}  -- Pools border container frames
-local patrolLinePool = {}   -- Pools patrol waypoint marker textures
+local borderFramePool = {} -- Pools border container frames
+local patrolLinePool = {}  -- Pools patrol waypoint marker textures
 
 local pullBorders = {}
 local patrolLinesByPack = {}
 local patrolOverlayFrame = nil
+
+---@class PackLabelFrame : Frame
+---@field text FontString
+
+---@class MobButton : Button
+---@field icon Texture
+---@field bg Texture
+---@field highlight Texture
+---@field glowBorder Texture
+---@field packId number
+---@field mobInfo table
+---@field iconScale number
+
+---@class PackGroup : Frame
+---@field pullLabel PackLabelFrame
+---@field packId number
+---@field count number
+---@field mobs table
+---@field isPatrol boolean
+---@field mobButtons MobButton[]
+---@field pullNum number
+
 
 --------------------------------------------------------------------------------
 -- Pack Button Creation
@@ -38,12 +60,12 @@ function UI:CreatePacks(packData)
         RDT:PrintError("No pack data provided to CreatePacks")
         return
     end
-    
+
     if not UI.mapTexture or not UI.mapContainer then
         RDT:PrintError("Map not initialized, cannot create packs")
         return
     end
-    
+
     local mapWidth, mapHeight = UI:GetMapDimensions()
 
     if not UI.packContainer then
@@ -63,9 +85,9 @@ function UI:CreatePacks(packData)
         UI.overlayContainer:SetAllPoints(UI.mapCanvas)
         UI.overlayContainer:SetFrameLevel(2000)
     end
-    
+
     RDT:DebugPrint("Creating " .. #packData .. " packs with mob icons")
-    
+
     for _, data in ipairs(packData) do
         -- Validate coordinates
         if not data.x or data.x < 0 or data.x > 1 or not data.y or data.y < 0 or data.y > 1 then
@@ -102,7 +124,7 @@ function UI:CalculateHexPositions(count, spacing)
     end
 
     if count == 1 then
-        tinsert(positions, {x = 0, y = 0})
+        tinsert(positions, { x = 0, y = 0 })
         return positions
     end
 
@@ -112,7 +134,7 @@ function UI:CalculateHexPositions(count, spacing)
 
     while mobsPlaced < count do
         if currentRing == 0 then
-            tinsert(positions, {x = 0, y = 0})
+            tinsert(positions, { x = 0, y = 0 })
             mobsPlaced = mobsPlaced + 1
         else
             -- Each ring holds currentRing * 6 mobs (ring 1 = 6, ring 2 = 12, etc.)
@@ -139,7 +161,7 @@ function UI:CalculateHexPositions(count, spacing)
                 local x = x1 + (x2 - x1) * t
                 local y = y1 + (y2 - y1) * t
 
-                tinsert(positions, {x = x, y = y})
+                tinsert(positions, { x = x, y = y })
                 mobsPlaced = mobsPlaced + 1
 
                 if mobsPlaced >= count then
@@ -156,12 +178,14 @@ end
 
 function UI:CreatePackGroup(data, mapWidth, mapHeight)
     -- Try to reuse a pack group frame from the pool, or create a new one
+    ---@type PackGroup
     local packGroup = table.remove(packGroupPool)
     if not packGroup then
         -- No pooled frame available, create a new one
-        packGroup = CreateFrame("Frame", nil, UI.packContainer)
+        packGroup = CreateFrame("Frame", nil, UI.packContainer) --[[@as PackGroup]]
 
-        local labelFrame = CreateFrame("Frame", nil, UI.overlayContainer)
+        ---@type PackLabelFrame
+        local labelFrame = CreateFrame("Frame", nil, UI.overlayContainer) --[[@as PackLabelFrame]]
         labelFrame:SetFrameStrata("HIGH")
         labelFrame:SetFrameLevel(1000)
         labelFrame:SetSize(40, 40)
@@ -187,7 +211,7 @@ function UI:CreatePackGroup(data, mapWidth, mapHeight)
     packGroup.packId = data.id
     packGroup.count = data.count or 0
     packGroup.mobs = data.mobs or {}
-    packGroup.isPatrol = data.patrol and #data.patrol > 1  -- Boolean flag for tooltip
+    packGroup.isPatrol = data.patrol and #data.patrol > 1 -- Boolean flag for tooltip
     packGroup.mobButtons = {}
 
     local mobList = {}
@@ -240,9 +264,10 @@ end
 
 function UI:CreateMobIcon(parent, mobInfo, xOffset, yOffset)
     -- Try to reuse a mob button from the pool
+    ---@type MobButton
     local button = table.remove(mobButtonPool)
     if not button then
-        button = CreateFrame("Button", nil, parent)
+        button = CreateFrame("Button", nil, parent) --[[@as MobButton]]
 
         local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetPoint("CENTER")
@@ -333,7 +358,7 @@ function UI:SetupMobIconHandlers(button)
     button:SetScript("OnEnter", function(self)
         UI:OnMobIconEnter(self)
     end)
-    
+
     button:SetScript("OnLeave", function(self)
         GameTooltip:Hide()
         UI:OnMobIconLeave(self)
@@ -343,7 +368,7 @@ end
 function UI:OnMobIconClick(button, mouseButton)
     local packId = button.packId
     local packGroup = RDT.State.packButtons["pack" .. packId]
-    
+
     if mouseButton == "RightButton" then
         if RDT.RouteManager then
             RDT.RouteManager:UnassignPack(packId)
@@ -374,7 +399,7 @@ function UI:OnMobIconEnter(button)
         GameTooltip:SetText(button.mobInfo.name, 1, 1, 0.5, 1, true)
         GameTooltip:AddLine(string.format("Enemy Forces: %.1f", button.mobInfo.count), 1, 1, 1)
     end
-    
+
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine(L["PACK"] .. " " .. button.packId, 0.7, 0.7, 0.7)
 
@@ -396,7 +421,7 @@ function UI:OnMobIconEnter(button)
 
             local mobList = {}
             for mobKey, quantity in pairs(packGroup.mobs) do
-                tinsert(mobList, {key = mobKey, quantity = quantity})
+                tinsert(mobList, { key = mobKey, quantity = quantity })
             end
             table.sort(mobList, function(a, b) return a.quantity > b.quantity end)
 
@@ -482,7 +507,7 @@ local function CalculateConvexHull(points)
     local currentIdx = lowerLeft
     local finalIdx = 1
     local tries = 0
-    local maxTries = 100  -- Prevent infinite loops
+    local maxTries = 100 -- Prevent infinite loops
 
     repeat
         tinsert(hull, currentIdx)
@@ -502,7 +527,7 @@ local function CalculateConvexHull(points)
     -- Convert indices to actual points
     local hullPoints = {}
     for _, idx in ipairs(hull) do
-        tinsert(hullPoints, {x = points[idx].x, y = points[idx].y})
+        tinsert(hullPoints, { x = points[idx].x, y = points[idx].y })
     end
 
     return hullPoints
@@ -524,7 +549,7 @@ local function CalculateCentroid(points)
     cx = cx / #points
     cy = cy / #points
 
-    return {x = cx, y = cy}
+    return { x = cx, y = cy }
 end
 
 --- Calculate the center point of a pull (for label positioning)
@@ -549,7 +574,7 @@ local function CalculatePullCenter(packIds)
                     if mobX and mobY then
                         local absX = packX + mobX
                         local absY = packY + mobY
-                        tinsert(points, {x = absX, y = absY})
+                        tinsert(points, { x = absX, y = absY })
                     end
                 end
             end
@@ -603,7 +628,7 @@ local function ExpandPolygonCircular(poly, numCirclePoints)
             local angle = (2 * math.pi / adjustedNumPoints) * j
             local cx = x + r * math.cos(angle)
             local cy = y + r * math.sin(angle)
-            res[resIndex] = {x = cx, y = cy, scale = scale}
+            res[resIndex] = { x = cx, y = cy, scale = scale }
             resIndex = resIndex + 1
         end
     end
@@ -638,7 +663,7 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
                         local absY = packY + mobY
                         local mobScale = mobBtn.iconScale or 1.0
 
-                        tinsert(points, {x = absX, y = absY, scale = mobScale})
+                        tinsert(points, { x = absX, y = absY, scale = mobScale })
 
                         totalMobs = totalMobs + 1
                         if totalMobs == 1 then
@@ -679,20 +704,20 @@ local function UpdatePullBorder(pullNum, packIds, r, g, b, alpha)
     borderFrame:Show()
 
     local lineWidth = 30
-    local color = {r, g, b, alpha}
+    local color = { r, g, b, alpha }
 
     local mapWidth = UI.mapTexture:GetWidth()
     local mapHeight = UI.mapTexture:GetHeight()
-    
+
     local point, relativeTo, relativePoint, mapOffsetX, mapOffsetY = UI.mapTexture:GetPoint(1)
     mapOffsetX = mapOffsetX or 0
     mapOffsetY = mapOffsetY or 0
-    
+
     local canvasHeight = borderFrame:GetHeight()
 
     for i = 1, #hull do
         local p1 = hull[i]
-        local p2 = hull[(i % #hull) + 1]  -- Wrap around to first point
+        local p2 = hull[(i % #hull) + 1] -- Wrap around to first point
 
         local x1 = p1.x + mapOffsetX
         local y1 = canvasHeight + (p1.y + mapOffsetY)
@@ -789,7 +814,7 @@ end
 
 function UI:HighlightPull(pullNum, enable)
     if not RDT.State.currentRoute then return end
-    
+
     for packId, pNum in pairs(RDT.State.currentRoute.pulls) do
         if pNum == pullNum then
             local packGroup = RDT.State.packButtons["pack" .. packId]
@@ -835,7 +860,7 @@ end
 -- @param mapHeight number Map height in pixels
 function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
     if not patrolPoints or #patrolPoints < 2 then
-        return  -- Need at least 2 points to draw a path
+        return -- Need at least 2 points to draw a path
     end
 
     if not patrolOverlayFrame then
@@ -871,7 +896,7 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
     local point, relativeTo, relativePoint, mapOffsetX, mapOffsetY = self.mapTexture:GetPoint(1)
     mapOffsetX = mapOffsetX or 0
     mapOffsetY = mapOffsetY or 0
-    
+
     local canvasHeight = patrolOverlayFrame:GetHeight()
 
     for i = 1, #patrolPoints - 1 do
@@ -886,17 +911,17 @@ function UI:RenderPatrolPath(packId, patrolPoints, mapWidth, mapHeight)
 
         x1 = x1 + mapOffsetX
         y1 = canvasHeight + mapOffsetY - y1
-        
+
         x2 = x2 + mapOffsetX
         y2 = canvasHeight + mapOffsetY - y2
 
         local lineTexture = LibGraph:DrawLine(
-            patrolOverlayFrame,  -- Canvas frame
-            x1, y1,              -- Start coordinates
-            x2, y2,              -- End coordinates
-            20,                  -- Line width
-            Colors.Patrol,       -- Color {r, g, b, a}
-            "OVERLAY"            -- Draw layer
+            patrolOverlayFrame, -- Canvas frame
+            x1, y1,             -- Start coordinates
+            x2, y2,             -- End coordinates
+            20,                 -- Line width
+            Colors.Patrol,      -- Color {r, g, b, a}
+            "OVERLAY"           -- Draw layer
         )
 
         if lineTexture then
@@ -982,7 +1007,7 @@ function UI:ClearPacks()
                 for _, mobBtn in ipairs(packGroup.mobButtons) do
                     mobBtn:Hide()
                     mobBtn:ClearAllPoints()
-                    
+
                     if mobBtn.icon then
                         mobBtn.icon:SetTexture(nil)
                     end

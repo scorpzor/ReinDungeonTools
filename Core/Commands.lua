@@ -8,7 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ReinDungeonTools")
 -- Command Handlers
 --------------------------------------------------------------------------------
 
-local commands = {
+local commands
+
+commands = {
     -- Toggle main window
     [""] = function()
         local frame = _G["RDT_MainFrame"]
@@ -16,7 +18,7 @@ local commands = {
             RDT:PrintError("UI not initialized yet")
             return
         end
-        
+
         if frame:IsShown() then
             frame:Hide()
         else
@@ -26,36 +28,36 @@ local commands = {
             end
         end
     end,
-    
+
     -- Toggle debug mode
     ["debug"] = function()
         RDT.db.profile.debug = not RDT.db.profile.debug
         RDT:Print("Debug mode: " .. (RDT.db.profile.debug and "|cFF00FF00ON|r" or "|cFFFF0000OFF|r"))
     end,
-    
+
     -- Reset all pulls
     ["reset"] = function()
         if RDT.RouteManager then
             RDT.RouteManager:ResetPulls()
         end
     end,
-    
+
     -- Show version info
     ["version"] = function()
         RDT:Print(string.format(L["VERSION_INFO"], RDT.Version))
     end,
-    
+
     ["v"] = function()
         RDT:Print(string.format(L["VERSION_INFO"], RDT.Version))
     end,
-    
+
     -- Export current route
     ["export"] = function()
         if not RDT.ImportExport then
             RDT:PrintError("ImportExport module not loaded")
             return
         end
-        
+
         local exportString = RDT.ImportExport:Export()
         if exportString then
             if not RDT.Dialogs or not RDT.Dialogs.ShowExport then
@@ -65,16 +67,16 @@ local commands = {
             RDT.Dialogs:ShowExport(exportString)
         end
     end,
-    
+
     -- Import from command line or show dialog
     ["import"] = function(args)
         if not RDT.ImportExport then
             RDT:PrintError("ImportExport module not loaded")
             return
         end
-        
+
         local importString = args and strtrim(args) or ""
-        
+
         if importString ~= "" then
             -- Import directly from command
             RDT.ImportExport:Import(importString)
@@ -87,29 +89,28 @@ local commands = {
             RDT.Dialogs:ShowImport()
         end
     end,
-    
+
     -- Minimap button management
     ["minimap"] = function(args)
         if not args or args == "" then
             RDT:Print("Usage: /rdt minimap <show|hide|toggle|reset>")
             return
         end
-        
+
+        ---@diagnostic disable-next-line: param-type-mismatch
         local subCmd = string.lower(strtrim(args))
-        
+
         if not RDT.MinimapButton then
             RDT:PrintError("Minimap button module not loaded")
             return
         end
-        
+
         if subCmd == "show" then
             RDT.MinimapButton:Show()
             RDT:Print("Minimap button shown")
-            
         elseif subCmd == "hide" then
             RDT.MinimapButton:Hide()
             RDT:Print("Minimap button hidden")
-            
         elseif subCmd == "toggle" then
             RDT.MinimapButton:Toggle()
             if RDT.MinimapButton:IsShown() then
@@ -117,26 +118,24 @@ local commands = {
             else
                 RDT:Print("Minimap button hidden")
             end
-            
         elseif subCmd == "reset" then
             RDT.MinimapButton:ResetPosition()
-            
         else
             RDT:PrintError("Unknown minimap command: " .. subCmd)
             RDT:Print("Available: show, hide, toggle, reset")
         end
     end,
-    
+
     -- Profile management
     ["profile"] = function(args)
         if not args or args == "" then
             RDT:Print("Usage: /rdt profile <list|use|create|delete|copy|reset>")
             return
         end
-        
+
         local subCmd, arg1, arg2 = strsplit(" ", args, 3)
         subCmd = string.lower(subCmd or "")
-        
+
         if subCmd == "list" then
             RDT:Print("Available profiles:")
             local profiles = RDT:GetProfiles()
@@ -145,44 +144,38 @@ local commands = {
                 local marker = (name == current) and " |cFF00FF00(current)|r" or ""
                 RDT:Print("  - " .. name .. marker)
             end
-            
         elseif subCmd == "use" then
             if not arg1 or arg1 == "" then
                 RDT:PrintError("Usage: /rdt profile use <name>")
                 return
             end
             RDT:SetProfile(arg1)
-            
         elseif subCmd == "create" then
             if not arg1 or arg1 == "" then
                 RDT:PrintError("Usage: /rdt profile create <name>")
                 return
             end
             RDT:CreateProfile(arg1)
-            
         elseif subCmd == "delete" then
             if not arg1 or arg1 == "" then
                 RDT:PrintError("Usage: /rdt profile delete <name>")
                 return
             end
             RDT:DeleteProfile(arg1)
-            
         elseif subCmd == "copy" then
             if not arg1 or arg1 == "" then
                 RDT:PrintError("Usage: /rdt profile copy <source>")
                 return
             end
             RDT:CopyProfile(arg1)
-            
         elseif subCmd == "reset" then
             RDT:ResetProfile()
-            
         else
             RDT:PrintError("Unknown profile command: " .. subCmd)
             RDT:Print("Available: list, use, create, delete, copy, reset")
         end
     end,
-    
+
     -- List all registered dungeons
     ["list"] = function()
         if RDT.Data then
@@ -191,7 +184,7 @@ local commands = {
             RDT:PrintError("Data module not loaded")
         end
     end,
-    
+
     -- List all registered mobs
     ["mobs"] = function()
         if RDT.Data then
@@ -200,7 +193,7 @@ local commands = {
             RDT:PrintError("Data module not loaded")
         end
     end,
-    
+
     -- Show registry statistics
     ["stats"] = function()
         if RDT.Data then
@@ -213,14 +206,14 @@ local commands = {
             RDT:PrintError("Data module not loaded")
         end
     end,
-    
+
     -- Validate a dungeon
     ["validate"] = function(args)
         if not RDT.Data then
             RDT:PrintError("Data module not loaded")
             return
         end
-        
+
         if not args or args == "" then
             -- Validate all if no specific dungeon given
             local results = RDT.Data:ValidateAll()
@@ -242,7 +235,7 @@ local commands = {
             end
         end
     end,
-    
+
     -- Development Tools: Coordinate Picker
     ["coords"] = function()
         if not RDT.DevTools then
@@ -251,7 +244,7 @@ local commands = {
         end
         RDT.DevTools:ToggleCoordinatePicker()
     end,
-    
+
     -- Development Tools: Map Info
     ["mapinfo"] = function()
         if not RDT.DevTools then
@@ -260,7 +253,7 @@ local commands = {
         end
         RDT.DevTools:PrintMapInfo()
     end,
-    
+
     -- Development Tools: List Pack Coordinates
     ["packcoords"] = function()
         if not RDT.DevTools then
@@ -269,7 +262,7 @@ local commands = {
         end
         RDT.DevTools:ListPackCoordinates()
     end,
-    
+
     -- Help text
     ["help"] = function()
         RDT:Print(L["SLASH_HELP"])
@@ -304,7 +297,7 @@ local commands = {
         RDT:Print("/rdt mapinfo - Show current map information")
         RDT:Print("/rdt packcoords - List all pack coordinates for current dungeon")
     end,
-    
+
     ["?"] = function()
         commands["help"]()
     end,
@@ -320,7 +313,7 @@ function RDT:SlashCommand(input)
     input = input or ""
     local cmd, args = input:match("^(%S*)%s*(.-)$")
     cmd = string.lower(cmd or "")
-    
+
     local handler = commands[cmd]
     if handler then
         handler(args)
