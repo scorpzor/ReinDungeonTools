@@ -626,7 +626,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 48,
+            id = 49,
             x = 0.525,
             y = 0.276,
             mobs = {
@@ -634,7 +634,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 49,
+            id = 50,
             x = 0.533,
             y = 0.358,
             mobs = {
@@ -642,7 +642,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 50,
+            id = 51,
             x = 0.507,
             y = 0.336,
             mobs = {
@@ -651,7 +651,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 51,
+            id = 52,
             x = 0.494,
             y = 0.277,
             mobs = {
@@ -659,7 +659,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 52,
+            id = 53,
             x = 0.486,
             y = 0.238,
             mobs = {
@@ -667,7 +667,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 53,
+            id = 54,
             x = 0.524,
             y = 0.409,
             mobs = {
@@ -675,7 +675,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 54,
+            id = 55,
             x = 0.494,
             y = 0.524,
             mobs = {
@@ -684,7 +684,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 55,
+            id = 56,
             x = 0.469,
             y = 0.484,
             mobs = {
@@ -693,7 +693,7 @@ local mapDefinition = {
             },
         },
         {
-            id = 56,
+            id = 57,
             x = 0.490,
             y = 0.542,
             mobs = {
