@@ -199,22 +199,10 @@ function Data:GetAllIdentifierTypes()
     return identifierTypes
 end
 
---- Get the atlas texture path for identifier icons
--- @return string Atlas texture path
-function Data:GetIdentifierAtlasTexture()
-    return RDT.Atlases and RDT.Atlases:GetIdentifierAtlasTexture() or ""
-end
-
 --- Get the scrollbar atlas configuration
 -- @return table Atlas configuration with texture, size, and arrow coordinates
 function Data:GetScrollbarAtlas()
     return RDT.Atlases and RDT.Atlases:GetScrollbarAtlas() or {}
-end
-
---- Get the dropdown atlas configuration
--- @return table Atlas configuration with texture, size, and icon coordinates
-function Data:GetDropdownAtlas()
-    return RDT.Atlases and RDT.Atlases:GetDropdownAtlas() or {}
 end
 
 --- Get the required enemy forces count for a dungeon
@@ -307,39 +295,35 @@ Data:RegisterMobs(genericMobs)
 --------------------------------------------------------------------------------
 
 local defaultIdentifierTypes = {
-    ["stairs-up"] = {
-        name = "Stairs Up",
-        description = "Stairs upward",
-        icon = identifierAtlas.texture,
-        texCoords = identifierAtlas.icons["stairs-up"],
-        scale = 1.0,
-    },
-    ["stairs-down"] = {
-        name = "Stairs Down",
-        description = "Stairs downward",
-        icon = identifierAtlas.texture,
-        texCoords = identifierAtlas.icons["stairs-down"],
-        scale = 1.0,
-    },
-
     ["door-in"] = {
         name = "Door In",
         description = "Entrance door",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\poi-door-in",
         texCoords = identifierAtlas.icons["door-in"],
         scale = 1.0,
     },
     ["door-out"] = {
         name = "Door Out",
         description = "Exit door",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\poi-door-out",
+        texCoords = identifierAtlas.icons["door-out"],
+        scale = 1.0,
+    },
+    ["door"] = {
+        name = "Door",
+        description = "Door",
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\poi-door",
         texCoords = identifierAtlas.icons["door-out"],
         scale = 1.0,
     },
     ["gate"] = {
         name = "Gate",
         description = "A gate or barrier",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\gate",
         texCoords = identifierAtlas.icons["gate"],
         scale = 0.7,
     },
@@ -347,7 +331,8 @@ local defaultIdentifierTypes = {
     ["portal"] = {
         name = "Portal",
         description = "Teleport portal",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\portal",
         texCoords = identifierAtlas.icons["portal"],
         scale = 1.0,
     },
@@ -355,15 +340,17 @@ local defaultIdentifierTypes = {
     ["dungeon-entrance"] = {
         name = "Dungeon Entrance",
         description = "Main dungeon entrance",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\dungeon-entrance",
         texCoords = identifierAtlas.icons["dungeon-entrance"],
-        scale = 1.0,
+        scale = 0.7,
     },
 
     ["action"] = {
         name = "Action",
         description = "Special action point",
-        icon = identifierAtlas.texture,
+        --icon = identifierAtlas.texture,
+        icon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\action",
         texCoords = identifierAtlas.icons["action"],
         scale = 1.0,
     },

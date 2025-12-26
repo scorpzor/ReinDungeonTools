@@ -112,10 +112,12 @@ function UI:CreateIdentifierIcon(data)
 
         local icon = frame:CreateTexture(nil, "ARTWORK")
         icon:SetAllPoints(frame)
-        local atlasTexture = RDT.Atlases:GetIdentifierAtlasTexture()
-        icon:SetTexture(atlasTexture)
+        --local atlasTexture = RDT.Atlases:GetIdentifierAtlasTexture()
+        --icon:SetTexture(atlasTexture)
         frame.icon = icon
     end
+
+    frame.icon:SetTexture(identifierType.icon)
 
     -- Reset frame parent in case it was pooled
     frame:SetParent(self.mapCanvas)
@@ -133,11 +135,11 @@ function UI:CreateIdentifierIcon(data)
         data.x * mapWidth,
         -(data.y * mapHeight))
 
-    if identifierType.texCoords then
-        frame.icon:SetTexCoord(unpack(identifierType.texCoords))
-    else
-        frame.icon:SetTexCoord(0, 1, 0, 1)
-    end
+    --if identifierType.texCoords then
+    --    frame.icon:SetTexCoord(unpack(identifierType.texCoords))
+    --else
+    --    frame.icon:SetTexCoord(0, 1, 0, 1)
+    --end
 
     -- Store reference data
     frame.identifierId = data.id
@@ -202,8 +204,6 @@ function UI:OnIdentifierIconEnter(button)
         local linkTypeName = "Identifier"
         if data.type == "portal" then
             linkTypeName = "Portal"
-        elseif data.type == "stairs-up" or data.type == "stairs-down" or data.type == "stairs" then
-            linkTypeName = "Stairs"
         elseif data.type == "door-in" or data.type == "door-out" or data.type == "door" then
             linkTypeName = "Door"
         end

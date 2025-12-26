@@ -7,20 +7,13 @@ local RDT = _G.RDT
 RDT.UIHelpers = RDT.UIHelpers or {}
 local UIHelpers = RDT.UIHelpers
 
-local scrollbarAtlas, dropdownAtlas
+local scrollbarAtlas
 
 local function GetScrollbarAtlas()
     if not scrollbarAtlas then
         scrollbarAtlas = RDT.Atlases and RDT.Atlases:GetScrollbarAtlas() or {}
     end
     return scrollbarAtlas
-end
-
-local function GetDropdownAtlas()
-    if not dropdownAtlas then
-        dropdownAtlas = RDT.Atlases and RDT.Atlases:GetDropdownAtlas() or {}
-    end
-    return dropdownAtlas
 end
 
 --------------------------------------------------------------------------------
@@ -440,16 +433,13 @@ end
 --   - GetButton(): Get the main button frame
 --   - Show/Hide(): Control visibility
 function UIHelpers:CreateSquareDropdown(config)
-    local dropdownAtlas = GetDropdownAtlas()
     local dropdown = {}
 
-    -- Create main button
     local button = CreateFrame("Button", config.name, config.parent)
     button:SetPoint(config.point or "TOPLEFT", config.x or 0, config.y or 0)
     button:SetSize(config.width or 200, config.height or 24)
     self:StyleSquareButton(button)
-    
-    -- Dropdown text
+
     local text = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     text:SetPoint("LEFT", 8, 0)
     text:SetPoint("RIGHT", -20, 0)
@@ -458,15 +448,12 @@ function UIHelpers:CreateSquareDropdown(config)
     text:SetTextColor(1, 1, 1, 1)
     button.text = text
 
-    -- Dropdown arrow (using dropdown atlas down arrow)
     local arrow = button:CreateTexture(nil, "OVERLAY")
-    arrow:SetSize(12, 5)
+    arrow:SetSize(12, 12)
     arrow:SetPoint("RIGHT", -5, 0)
-    arrow:SetTexture(dropdownAtlas.texture)
-    arrow:SetTexCoord(unpack(dropdownAtlas.icons["icon-down-small"]))
+    arrow:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\common-dropdown-icon-next-2x")
     arrow:SetVertexColor(1, 1, 0.5)
 
-    -- Create dropdown menu frame
     local menuFrame = CreateFrame("Frame", config.name.."Menu", config.parent)
     menuFrame:SetSize(config.width or 200, config.menuHeight or 200)
     menuFrame:SetFrameStrata("DIALOG")
@@ -480,24 +467,21 @@ function UIHelpers:CreateSquareDropdown(config)
     menuFrame:SetBackdropColor(0.2, 0.2, 0.2, 0.98)
     menuFrame:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
     menuFrame:Hide()
-    
-    -- Scroll frame for menu items
+
     local scrollFrame = CreateFrame("ScrollFrame", config.name.."Scroll", menuFrame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", 4, -4)
     scrollFrame:SetPoint("BOTTOMRIGHT", -26, 4)
-    
+
     local scrollChild = CreateFrame("Frame", nil, scrollFrame)
     scrollChild:SetSize((config.width or 200) - 30, 1)
     scrollFrame:SetScrollChild(scrollChild)
-    
-    -- Style the scrollbar
+
     self:StyleScrollBar(scrollFrame)
     
     menuFrame.scrollFrame = scrollFrame
     menuFrame.scrollChild = scrollChild
     menuFrame.buttons = {}
-    
-    -- Frame level management
+
     menuFrame:SetScript("OnShow", function(self)
         self:SetFrameLevel(button:GetFrameLevel() + 10)
         self:EnableMouse(true)
@@ -506,37 +490,31 @@ function UIHelpers:CreateSquareDropdown(config)
     menuFrame:SetScript("OnHide", function(self)
         self:EnableMouse(false)
     end)
-    
-    -- Click handler to toggle menu
+
     button:SetScript("OnClick", function(self)
         if menuFrame:IsShown() then
             menuFrame:Hide()
         else
-            -- Position menu below button
             menuFrame:ClearAllPoints()
             menuFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -2)
-            
-            -- Show menu
             menuFrame:Show()
         end
     end)
-    
+
     button.menuFrame = menuFrame
-    
-    -- Public API
+
     dropdown.button = button
     dropdown.menuFrame = menuFrame
-    
+
     --- Update dropdown items
     -- @param items table Array of items, each with: { value = any, text = string, isSelected = boolean }
     function dropdown:SetItems(items)
         local scrollChild = menuFrame.scrollChild
-        
-        -- Clear existing buttons
+
         for _, btn in ipairs(menuFrame.buttons) do
             btn:Hide()
         end
-        
+
         local yOffset = 0
         local itemWidth = (config.width or 200) - 30
         
@@ -563,8 +541,7 @@ function UIHelpers:CreateSquareDropdown(config)
                 local checkmark = btn:CreateTexture(nil, "OVERLAY")
                 checkmark:SetSize(12, 12)
                 checkmark:SetPoint("RIGHT", -5, 0)
-                checkmark:SetTexture(dropdownAtlas.texture)
-                checkmark:SetTexCoord(unpack(dropdownAtlas.icons["icon-left"]))
+                checkmark:SetTexture("Interface\\AddOns\\ReinDungeonTools\\Textures\\Icons\\common-dropdown-icon-back-2x")
                 checkmark:SetVertexColor(0, 1, 0)
                 btn.checkmark = checkmark
 
@@ -586,8 +563,7 @@ function UIHelpers:CreateSquareDropdown(config)
             btn:SetPoint("TOPLEFT", 0, yOffset)
             btn.text:SetText(item.text or tostring(item.value))
             btn.itemData = item
-            
-            -- Update selection state
+
             btn.isSelected = item.isSelected
             btn.checkmark:SetShown(item.isSelected)
             if item.isSelected then
@@ -595,8 +571,7 @@ function UIHelpers:CreateSquareDropdown(config)
             else
                 btn:SetBackdropColor(0, 0, 0, 0)
             end
-            
-            -- Click handler
+
             btn:SetScript("OnClick", function(self)
                 if config.onItemClick then
                     config.onItemClick(self.itemData)
@@ -610,28 +585,24 @@ function UIHelpers:CreateSquareDropdown(config)
         
         scrollChild:SetHeight(math.max(math.abs(yOffset), 1))
     end
-    
-    --- Update button text
+
     function dropdown:SetText(newText)
         text:SetText(newText)
     end
-    
-    --- Get the main button
+
     function dropdown:GetButton()
         return button
     end
-    
-    --- Show the dropdown
+
     function dropdown:Show()
         button:Show()
     end
-    
-    --- Hide the dropdown
+
     function dropdown:Hide()
         button:Hide()
         menuFrame:Hide()
     end
-    
+
     return dropdown
 end
 
