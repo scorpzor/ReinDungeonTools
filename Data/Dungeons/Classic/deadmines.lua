@@ -55,25 +55,25 @@ local mobs = {
     ["dmines_goblin_woodcarver"] = {
         name = "Goblin Woodcarver",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_woodcarver",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 0.7,
     },
     ["dmines_goblin_craftsman"] = {
         name = "Goblin Craftsman",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_craftsman",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 0.7,
     },
     ["dmines_goblin_engineer"] = {
         name = "Goblin Engineer",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_engineer",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 0.7,
     },
     ["dmines_goblin_shipbuilder"] = {
         name = "Goblin Shipbuilder",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_shipbuilder",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 0.7,
     },
     ["dmines_defias_pirate"] = {
@@ -124,7 +124,7 @@ local bosses = {
     ["dmines_boss_gilnid"] = {
         name = "Gilnid",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\gilnid",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 1.25,
     },
     ["dmines_boss_mr_smite"] = {
@@ -142,7 +142,7 @@ local bosses = {
     ["dmines_boss_captain_greenskin"] = {
         name = "Captain Greenskin",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\captain_greenskin",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\goblin_miner",
         scale = 1.25,
     },
     ["dmines_boss_edwin_vancleef"] = {
