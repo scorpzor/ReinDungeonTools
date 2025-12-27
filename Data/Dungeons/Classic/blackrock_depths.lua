@@ -789,8 +789,8 @@ local packDefinition = {
     },
     {
         id = 41,
-        x = 0.848,
-        y = 0.921,
+        x = 0.850,
+        y = 0.897,
         mobs = {
             ["brd_anvilrage_warden"] = 1,
             ["brd_bloodhound"] = 2,
@@ -2010,7 +2010,7 @@ local packDefinition = {
     {
         id = 160,
         x = 0.302,
-        y = 0.507,
+        y = 0.485,
         mobs = {
             ["brd_shadowforge_citizen"] = 3,
             ["brd_doomforge_arcanasmith"] = 1,
@@ -2019,21 +2019,21 @@ local packDefinition = {
     },
     {
         id = 161,
-        x = 0.306,
-        y = 0.451,
+        x = 0.298,
+        y = 0.441,
         mobs = {
             ["brd_fireguard_destroyer"] = 1,
         },
         patrol = {
-            { x = 0.300, y = 0.515 },
-            { x = 0.306, y = 0.451 },
-            { x = 0.363, y = 0.402 },
+            { x = 0.300, y = 0.486 },
+            { x = 0.298, y = 0.441 },
+            { x = 0.349, y = 0.411 },
         },
     },
     {
         id = 162,
-        x = 0.330,
-        y = 0.407,
+        x = 0.313,
+        y = 0.411,
         mobs = {
             ["brd_shadowforge_citizen"] = 3,
             ["brd_doomforge_dragoon"] = 2,
@@ -2042,7 +2042,7 @@ local packDefinition = {
     },
     {
         id = 163,
-        x = 0.365,
+        x = 0.342,
         y = 0.408,
         mobs = {
             ["brd_shadowforge_citizen"] = 2,
