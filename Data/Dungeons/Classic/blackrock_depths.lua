@@ -7,7 +7,7 @@ local mobs = {
     ["brd_blazing_fireguard"] = {
         name = "Blazing Fireguard",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\blazing_fireguard",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\conflagration",
         scale = 0.7,
     },
     ["brd_anvilrage_footman"] = {
@@ -67,7 +67,7 @@ local mobs = {
     ["brd_fireguard"] = {
         name = "Fireguard",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fireguard",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\conflagration",
         scale = 0.6,
     },
     ["brd_warbringer_construct"] = {
@@ -103,13 +103,13 @@ local mobs = {
     ["brd_bloodhound_mastiff"] = {
         name = "Bloodhound Mastiff",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\bloodhound_mastiff",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\bloodhound",
         scale = 0.6,
     },
     ["brd_fireguard_destroyer"] = {
         name = "Fireguard Destroyer",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\fireguard_destroyer",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\conflagration",
         scale = 0.6,
     },
     ["brd_arena_spectator"] = {
@@ -157,7 +157,7 @@ local mobs = {
     ["brd_ragereaver_golem"] = {
         name = "Ragereaver Golem",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\ragereaver_golem",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\warbringer_construct",
         scale = 0.7,
     },
     ["brd_wrath_hammer_construct"] = {
@@ -187,13 +187,13 @@ local mobs = {
     ["brd_molten_war_golem"] = {
         name = "Molten War Golem",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\molten_war_golem",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\warbringer_construct",
         scale = 0.7,
     },
     ["brd_anvilrage_reservist"] = {
         name = "Anvilrage Reservist",
         count = 1,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_reservist",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_footman",
         scale = 0.5,
     },
     ["brd_shadowforge_flame_keeper"] = {
@@ -211,7 +211,7 @@ local mobs = {
     ["brd_anvilrage_captain"] = {
         name = "Anvilrage Captain",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\anvilrage_captain",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\doomforge_dragoon",
         scale = 0.7,
     },
 }
@@ -250,7 +250,7 @@ local bosses = {
     ["brd_boss_lord_incendius"] = {
         name = "Lord Incendius",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\lord_incendius",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\conflagration",
         scale = 1.25,
     },
     ["brd_boss_fineous_darkvire"] = {
@@ -268,8 +268,8 @@ local bosses = {
     ["brd_boss_verek"] = {
         name = "Verek",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\verek",
-        scale = 1.25,
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\bloodhound",
+        scale = 1.20,
     },
     ["brd_boss_pyromancer_loregrain"] = {
         name = "Pyromancer Loregrain",
@@ -298,7 +298,7 @@ local bosses = {
     ["brd_boss_phalanx"] = {
         name = "Phalanx",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\phalanx",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\warbringer_construct",
         scale = 0.9,
     },
     ["brd_boss_ambassador_flemelash"] = {
@@ -322,7 +322,7 @@ local bosses = {
     ["brd_boss_magmus"] = {
         name = "Magmus",
         count = 2,
-        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\magmus",
+        displayIcon = "Interface\\AddOns\\ReinDungeonTools\\Textures\\Mobs\\baelgar",
         scale = 1.25,
     },
     ["brd_boss_princess_moira_bronzebeard"] = {
